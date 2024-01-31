@@ -1,19 +1,20 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import useGet from "../customed_hook/getData";
 import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Pagination from "react-bootstrap/Pagination";
+import Table from "react-bootstrap/Table";
+import { useParams } from "react-router-dom";
+import useGet from "../customed_hook/getData";
+import endpoint from "../utils/endpoint";
 
 const ElementLibList = () => {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
   const [selectedElements, setSelectedElements] = useState([]); // selected elements
   const [expandingNamesList, setExpandingNamesList] = useState([]); // concat input
   const { listId, operationId, operationListId } = useParams(); // extracts url param
-  const styleNum = useGet(`http://127.0.0.1:8000/collection/${listId}`);
+  const styleNum = useGet(`${endpoint}/collection/${listId}`);
   const itemName = styleNum && styleNum.item && styleNum.item.name;
   const [elementList, setElementList] = useState([]);
   const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
@@ -22,52 +23,53 @@ const ElementLibList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+  const handleSearchChange = (e) => {
+    setSearchFilter(e.target.value);
+    setCurrentPage(1);
+  };
 
-    const handleSearchChange = (e) => {
-      setSearchFilter(e.target.value);
-      setCurrentPage(1); 
-    };
-  
-    const handlePageChange = (pageNumber) => {
-      setCurrentPage(pageNumber);
-    };
-  
-    const filteredElements = elementLibList.filter((element) =>
-      element.name.toLowerCase().includes(searchFilter.toLowerCase())
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const filteredElements = elementLibList.filter((element) =>
+    element.name.toLowerCase().includes(searchFilter.toLowerCase())
+  );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredElements.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(filteredElements.length / itemsPerPage); i++) {
+    pageNumbers.push(
+      <Pagination.Item
+        key={i}
+        active={i === currentPage}
+        onClick={() => handlePageChange(i)}
+      >
+        {i}
+      </Pagination.Item>
     );
-  
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredElements.slice(indexOfFirstItem, indexOfLastItem);
-
-    const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredElements.length / itemsPerPage); i++) {
-      pageNumbers.push(
-        <Pagination.Item
-          key={i}
-          active={i === currentPage}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </Pagination.Item>
-      );
-    }
-
-
+  }
 
   const [currentOperation, setCurrentOperation] = useState(null);
   useEffect(() => {
-    axios.get(`http://127.0.0.1:8000/operation_lib/${operationId}`, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("access_token")}`,
-      },
-    })
-    .then((response) => {
-      setCurrentOperation(response.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching operation details:", error);
-    });
+    axios
+      .get(`${endpoint}/operation_lib/${operationId}`, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("access_token")}`,
+        },
+      })
+      .then((response) => {
+        setCurrentOperation(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching operation details:", error);
+      });
   }, [operationId]);
 
   let title = "Build Elements";
@@ -76,7 +78,7 @@ const ElementLibList = () => {
   }
 
   const scrollableTableStyle = {
-    maxHeight: "580px", 
+    maxHeight: "580px",
     overflowY: "auto",
   };
 
@@ -94,9 +96,9 @@ const ElementLibList = () => {
     setTotalSam(finalTotalTime);
   }, [selectedElements]);
 
-
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/element_list/", {
+    axios
+      .get(`${endpoint}/element_list/`, {
         params: { operationList: operationListId },
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
@@ -123,28 +125,27 @@ const ElementLibList = () => {
       });
   }, []);
 
-
   useEffect(() => {
     const fetchExpandingNames = async () => {
       try {
         // get elements
         const elementListResponse = await axios.get(
-          "http://127.0.0.1:8000/element_list/",
+          `${endpoint}/element_list/`,
           {
             params: { operationList: operationListId },
             headers: {
               Authorization: `JWT ${localStorage.getItem("access_token")}`,
             },
-          },
+          }
         );
 
         const uniqueExpandingNames = [
           ...new Set(
-            elementListResponse.data.map((item) => item.expanding_name),
+            elementListResponse.data.map((item) => item.expanding_name)
           ),
         ];
         setExpandingNamesList(
-          uniqueExpandingNames.filter((name) => name !== null),
+          uniqueExpandingNames.filter((name) => name !== null)
         );
       } catch (error) {
         console.error("Error fetching expanding names:", error);
@@ -154,12 +155,11 @@ const ElementLibList = () => {
     fetchExpandingNames();
   }, []);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [elementLibResponse] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/element_lib/", {
+          axios.get(`${endpoint}/element_lib/`, {
             params: { operation_id: operationId },
           }),
         ]);
@@ -172,8 +172,8 @@ const ElementLibList = () => {
                 ...variable,
                 options: variable.options.map((option) => {
                   return {
-                    id: option.id, 
-                    name: option.name, 
+                    id: option.id,
+                    name: option.name,
                   };
                 }),
               };
@@ -190,26 +190,24 @@ const ElementLibList = () => {
     fetchData();
   }, []);
 
-
   const saveSelectedElementsToLocalStorage = (elements) => {
     localStorage.setItem("selectedElements", JSON.stringify(elements));
   };
 
- 
   const handleAddElement = async (
     elementId,
     selectedOptions,
-    userExpandingName,
+    userExpandingName
   ) => {
     const selectedElement = elementLibList.find(
-      (element) => element.id === elementId,
+      (element) => element.id === elementId
     );
     if (!selectedElement) {
       console.error(`Element with ID ${elementId} not found.`);
       return;
     }
 
-    const uniqueId = Date.now();  
+    const uniqueId = Date.now();
     const newElement = {
       ...selectedElement,
       selectedOptions: {},
@@ -222,7 +220,7 @@ const ElementLibList = () => {
     selectedElement.variables.forEach((variable) => {
       const selectedOptionId = parseInt(
         selectedOptions[`${elementId}_${variable.name}`],
-        10,
+        10
       );
       newElement.selectedOptions[variable.name] = selectedOptionId;
     });
@@ -231,18 +229,18 @@ const ElementLibList = () => {
       const postData = {
         listItem: operationListId,
         elements: newElement.id,
-        expanding_name: newElement.expandingName, 
+        expanding_name: newElement.expandingName,
         options: Object.values(newElement.selectedOptions),
       };
 
       const addResponse = await axios.post(
-        "http://127.0.0.1:8000/element_list/",
+        `${endpoint}/element_list/`,
         postData,
         {
           headers: {
             Authorization: `JWT ${localStorage.getItem("access_token")}`,
           },
-        },
+        }
       );
 
       const addedElement = {
@@ -252,24 +250,25 @@ const ElementLibList = () => {
 
       setSelectedElements((prevElements) => [...prevElements, addedElement]);
 
-
-      const response = await axios.get(`http://127.0.0.1:8000/element_list/`, {
+      const response = await axios.get(`${endpoint}/element_list/`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
       });
       const fetchedElement = response.data.find(
-        (item) => item.id === addedElement.uniqueId,
+        (item) => item.id === addedElement.uniqueId
       );
 
-      const fetchedTime = fetchedElement ? (parseFloat(fetchedElement.nmt) || 0).toFixed(4) : "N/A";
+      const fetchedTime = fetchedElement
+        ? (parseFloat(fetchedElement.nmt) || 0).toFixed(4)
+        : "N/A";
 
       setSelectedElements((prevElements) =>
         prevElements.map((el) =>
           el.uniqueId === addedElement.uniqueId
             ? { ...el, time: fetchedTime }
-            : el,
-        ),
+            : el
+        )
       );
     } catch (error) {
       console.error("Error in adding element", error);
@@ -278,12 +277,11 @@ const ElementLibList = () => {
         prevElements.map((el) =>
           el.uniqueId === newElement.uniqueId
             ? { ...el, time: "Error fetching time" }
-            : el,
-        ),
+            : el
+        )
       );
     }
   };
-
 
   const fetchExpandingNameForElement = async (elementName, selectedOptions) => {
     if (elementList.length === 0) {
@@ -292,7 +290,7 @@ const ElementLibList = () => {
 
     try {
       const matchingElement = elementList.find(
-        (element) => element.elements.name === elementName,
+        (element) => element.elements.name === elementName
       );
 
       if (!matchingElement) {
@@ -302,7 +300,7 @@ const ElementLibList = () => {
       const matchingOptionsElement = matchingElement.options.find((element) => {
         const elementOptionNames = element.variables.map(
           (variable) =>
-            selectedOptions[`${matchingElement.id}_${variable.name}`],
+            selectedOptions[`${matchingElement.id}_${variable.name}`]
         );
 
         return (
@@ -320,7 +318,6 @@ const ElementLibList = () => {
     }
   };
 
-
   const fetchTimeForElement = async (elementName, selectedOptions) => {
     if (elementList.length === 0) {
       return "N/A";
@@ -328,7 +325,7 @@ const ElementLibList = () => {
 
     try {
       const matchingElement = elementList.find(
-        (element) => element.elements.name === elementName,
+        (element) => element.elements.name === elementName
       );
 
       if (!matchingElement) {
@@ -338,7 +335,7 @@ const ElementLibList = () => {
       const matchingOptionsElement = matchingElement.options.find((element) => {
         const elementOptionNames = element.variables.map(
           (variable) =>
-            selectedOptions[`${matchingElement.id}_${variable.name}`],
+            selectedOptions[`${matchingElement.id}_${variable.name}`]
         );
 
         return (
@@ -358,7 +355,7 @@ const ElementLibList = () => {
 
   const handleDeleteElement = (uniqueId) => {
     axios
-      .delete(`http://127.0.0.1:8000/element_list/${uniqueId}`, {
+      .delete(`${endpoint}/element_list/${uniqueId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
@@ -367,7 +364,7 @@ const ElementLibList = () => {
         console.log("Element deleted successfully:", response.data);
 
         const updatedElements = selectedElements.filter(
-          (element) => element.uniqueId !== uniqueId,
+          (element) => element.uniqueId !== uniqueId
         );
 
         setSelectedElements(updatedElements);
@@ -378,7 +375,6 @@ const ElementLibList = () => {
       });
   };
 
-
   const [selectedVariables, setSelectedVariables] = useState({});
   const handleVariableChange = (elementId, variableName, selectedOptionId) => {
     setSelectedVariables((prevSelectedVariables) => ({
@@ -387,36 +383,32 @@ const ElementLibList = () => {
     }));
   };
 
-
   const areAllVariablesSelected = (elementId) => {
     const elementVariables =
       elementLibList.find((element) => element.id === elementId)?.variables ||
       [];
     return elementVariables.every((variable) =>
-      selectedVariables.hasOwnProperty(`${elementId}_${variable.name}`),
+      selectedVariables.hasOwnProperty(`${elementId}_${variable.name}`)
     );
   };
 
-
   const handleExpandingNameChange = (uniqueId, expandingName) => {
     const updatedSelectedElements = selectedElements.map((element) =>
-      element.uniqueId === uniqueId ? { ...element, expandingName } : element,
+      element.uniqueId === uniqueId ? { ...element, expandingName } : element
     );
 
     setSelectedElements(updatedSelectedElements);
     saveSelectedElementsToLocalStorage(updatedSelectedElements);
   };
 
-
-  const [newExpandingName, setNewExpandingName] = useState(""); 
+  const [newExpandingName, setNewExpandingName] = useState("");
   const handleAddNewExpandingName = async (uniqueId) => {
     if (newExpandingName.trim() !== "") {
- 
       setExpandingNamesList((prevList) => [...prevList, newExpandingName]);
-      setNewExpandingName(""); 
+      setNewExpandingName("");
 
       const selectedElement = selectedElements.find(
-        (element) => element.uniqueId === uniqueId,
+        (element) => element.uniqueId === uniqueId
       );
 
       if (!selectedElement) {
@@ -426,7 +418,7 @@ const ElementLibList = () => {
 
       try {
         const response = await axios.patch(
-          `http://127.0.0.1:8000/element_list/${selectedElement.uniqueId}/`,
+          `${endpoint}/element_list/${selectedElement.uniqueId}/`,
           {
             expanding_name: newExpandingName,
           },
@@ -434,7 +426,7 @@ const ElementLibList = () => {
             headers: {
               Authorization: `JWT ${localStorage.getItem("access_token")}`,
             },
-          },
+          }
         );
 
         console.log("Expanding name added successfully:", response.data);
@@ -443,13 +435,13 @@ const ElementLibList = () => {
       }
     }
   };
-  
+
   return (
     <div className="container p-5" style={{ fontFamily: "Arial, sans-serif" }}>
       <h2 className="font-bold text-center">{title}</h2>
       <h3 className="font-bold text-center">Style {itemName}</h3>
 
-         <div className="row my-2">
+      <div className="row my-2">
         {/* Element Library Section */}
         <div className="col-md-6">
           <Card>
@@ -460,7 +452,7 @@ const ElementLibList = () => {
                 placeholder="Search Elements..."
                 value={searchFilter}
                 onChange={handleSearchChange}
-                style={{ width: '300px', marginBottom: '10px' }}
+                style={{ width: "300px", marginBottom: "10px" }}
               />
             </Card.Header>
             <Card.Body>
@@ -494,7 +486,7 @@ const ElementLibList = () => {
                                       handleVariableChange(
                                         elementLib.id,
                                         variable.name,
-                                        e.target.value,
+                                        e.target.value
                                       )
                                     }
                                     value={
@@ -503,7 +495,6 @@ const ElementLibList = () => {
                                       ] || ""
                                     }
                                   >
-  
                                     <option value="">Select an option</option>
                                     {variable.options.map(
                                       (option, optionIndex) => (
@@ -513,7 +504,7 @@ const ElementLibList = () => {
                                         >
                                           {option.name}
                                         </option>
-                                      ),
+                                      )
                                     )}
                                   </select>
                                 </div>
@@ -543,7 +534,7 @@ const ElementLibList = () => {
             </Card.Body>
           </Card>
         </div>
-  
+
         <div className="col-md-6">
           <Card>
             <Card.Header>
@@ -577,8 +568,6 @@ const ElementLibList = () => {
                         <td>{selectedElement.name}</td>
 
                         <td>
-
-
                           <div>
                             <select
                               className="form-select"
@@ -586,7 +575,7 @@ const ElementLibList = () => {
                               onChange={(e) =>
                                 handleExpandingNameChange(
                                   selectedElement.uniqueId,
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                             >
@@ -616,7 +605,7 @@ const ElementLibList = () => {
                                 className="btn btn-primary ms-2"
                                 onClick={() =>
                                   handleAddNewExpandingName(
-                                    selectedElement.uniqueId,
+                                    selectedElement.uniqueId
                                   )
                                 }
                               >
@@ -638,7 +627,7 @@ const ElementLibList = () => {
                               <div key={index}>
                                 {variableName}: {optionName}
                               </div>
-                            ),
+                            )
                           )}
                         </td>
 
@@ -663,7 +652,6 @@ const ElementLibList = () => {
       </div>
     </div>
   );
-
 };
 
 export default ElementLibList;
