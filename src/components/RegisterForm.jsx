@@ -26,8 +26,10 @@ export default function RegisterForm() {
       setErrors({});
       navigate("/login");
     } catch (error) {
-      setErrors(error.response.data);
-      console.log(error.response.data);
+      if (error.response) {
+        setErrors(error.response.data);
+      }
+      console.log(error);
     }
   };
 
