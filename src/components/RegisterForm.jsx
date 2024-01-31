@@ -26,17 +26,8 @@ export default function RegisterForm() {
       setErrors({});
       navigate("/login");
     } catch (error) {
-      if (
-        error.response.data.detail ===
-        "Authentication credentials were not provided."
-      ) {
-        console.log(error.response.data.detail);
-        setErrors({});
-        navigate("/login");
-      } else {
-        setErrors(error.response.data);
-        console.log(error.response.data);
-      }
+      setErrors(error.response.data);
+      console.log(error.response.data);
     }
   };
 
