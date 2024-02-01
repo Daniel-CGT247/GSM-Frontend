@@ -146,11 +146,10 @@ export default function OperationLibList({
       op.id === operation.id ? { ...op, added: true } : op
     );
   
-    // Update local state and localStorage first for immediate UI update
+    // update localStorage 
     setOperationLibs(updatedOperationLibs);
     localStorage.setItem(`operationLibs_${bundleGroup}`, JSON.stringify(updatedOperationLibs));
   
-    // Then, asynchronously update the backend
     try {
       await axios.post(
         "https://gsm-app.vercel.app/operation_list/",
@@ -161,11 +160,9 @@ export default function OperationLibList({
         { headers }
       );
   
-      // Optionally, confirm the operation was added and update UI as needed
       updateOperationLists(); 
     } catch (error) {
       console.error("Error adding operation:", error);
-      // Handle error, possibly revert changes in UI if necessary
     }
   };
   

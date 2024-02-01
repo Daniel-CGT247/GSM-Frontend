@@ -130,14 +130,11 @@ export default function OperationList({
   }, [bundleGroup, listId]);
 
   const handleAddOperation = (operation) => {
-    // Update the local state
     const updatedOperationList = [...operationList, operation];
     setOperationList(updatedOperationList);
 
-    // Update localStorage
+    // update localStorage
     localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
-
-    // Notify parent component to update OperationLists
     updateOperationLists();
   };
 
@@ -154,10 +151,7 @@ export default function OperationList({
         );
         setOperationList(updatedOperationList);
 
-        // Update localStorage after deleting an operation
         localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
-
-        // Notify Operation to update OperationLists
         updateOperationLists(operationId, false);
       })
       .catch((error) => {
