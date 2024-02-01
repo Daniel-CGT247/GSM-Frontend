@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import endpoint from "../utils/endpoint";
 
 export default function OperationList({
   bundleGroup,
@@ -10,12 +11,13 @@ export default function OperationList({
   updateOperationLists,
 }) {
   const [operationList, setOperationList] = useState([]);
+  const localStorageKey = `addedOperations_${bundleGroup}_${listId}`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://gsm-app.vercel.app/operation_list/",
+          `${endpoint}/operation_list/`,
           {
             params: {
               bundle_group: bundleGroup,
@@ -35,20 +37,29 @@ export default function OperationList({
     fetchData();
   }, [bundleGroup, listId]);
 
+  const handleAddOperation = (operation) => {
+    const updatedOperationList = [...operationList, operation];
+    setOperationList(updatedOperationList);
+
+    // update localStorage
+    localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
+    updateOperationLists();
+  };
+
   const handleDelete = (operationListId, operationId) => {
     axios
-      .delete(`https://gsm-app.vercel.app/operation_list/${operationListId}`, {
+      .delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
       })
-      .then((response) => {
-        const newList = operationList.filter(
+      .then(() => {
+        const updatedOperationList = operationList.filter(
           (item) => item.id !== operationListId
         );
-        setOperationList(newList);
+        setOperationList(updatedOperationList);
 
-        // notify Operation to update OperationLists
+        localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
         updateOperationLists(operationId, false);
       })
       .catch((error) => {
@@ -80,7 +91,7 @@ export default function OperationList({
                 <td>
                   <Button
                     className="btn-danger"
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(item.id, item.operations.id)}
                   >
                     Delete
                   </Button>
@@ -93,3 +104,4 @@ export default function OperationList({
     </Card>
   );
 }
+
