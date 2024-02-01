@@ -15,7 +15,7 @@ export default function OperationList({
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/operation_list/",
+          "https://gsm-app.vercel.app/operation_list/",
           {
             params: {
               bundle_group: bundleGroup,
@@ -37,7 +37,7 @@ export default function OperationList({
 
   const handleDelete = (operationListId, operationId) => {
     axios
-      .delete(`http://127.0.0.1:8000/operation_list/${operationListId}`, {
+      .delete(`https://gsm-app.vercel.app/operation_list/${operationListId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },

@@ -27,7 +27,7 @@ export default function OperationLibList({
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/operation_lib/",
+        "https://gsm-app.vercel.app/operation_lib/",
         { params: { bundle_group: bundleGroup } }
       );
       setOperationLibs(response.data);
@@ -40,7 +40,7 @@ export default function OperationLibList({
   const handleAddOperation = async (operation) => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/operation_list/",
+        "https://gsm-app.vercel.app/operation_list/",
         {
           list: listId,
           operations: operation.id,
