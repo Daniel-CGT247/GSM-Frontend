@@ -1,101 +1,9 @@
-// import axios from "axios";
-// import React, { useEffect, useState } from "react";
-// import Button from "react-bootstrap/Button";
-// import Card from "react-bootstrap/Card";
-// import Table from "react-bootstrap/Table";
-// import endpoint from "../utils/endpoint";
-
-// export default function OperationList({
-//   bundleGroup,
-//   listId,
-//   updateOperationLists,
-// }) {
-//   const [operationList, setOperationList] = useState([]);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const response = await axios.get(`${endpoint}/operation_list/`, {
-//           params: {
-//             bundle_group: bundleGroup,
-//             listId: listId,
-//           },
-//           headers: {
-//             Authorization: `JWT ${localStorage.getItem("access_token")}`,
-//           },
-//         });
-//         setOperationList(response.data);
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//       }
-//     };
-
-//     fetchData();
-//   }, [bundleGroup, listId]);
-
-//   const handleDelete = (operationListId, operationId) => {
-//     axios
-//       .delete(`${endpoint}/operation_list/${operationListId}`, {
-//         headers: {
-//           Authorization: `JWT ${localStorage.getItem("access_token")}`,
-//         },
-//       })
-//       .then((response) => {
-//         const newList = operationList.filter(
-//           (item) => item.id !== operationListId
-//         );
-//         setOperationList(newList);
-
-//         // notify Operation to update OperationLists
-//         updateOperationLists(operationId, false);
-//       })
-//       .catch((error) => {
-//         console.error("Error deleting data:", error);
-//       });
-//   };
-
-//   return (
-//     <Card>
-//       <Card.Header>
-//         <Card.Title>Operation List</Card.Title>
-//       </Card.Header>
-//       <Card.Body>
-//         <Table striped hover>
-//           <thead>
-//             <tr>
-//               <th>#</th>
-//               <th>Operation Code</th>
-//               <th>Name</th>
-//               <th>Delete</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {operationList.map((item, index) => (
-//               <tr key={item.id}>
-//                 <td>{index + 1}</td>
-//                 <td>{item.operations.operation_code}</td>
-//                 <td>{item.operations.name}</td>
-//                 <td>
-//                   <Button
-//                     className="btn-danger"
-//                     onClick={() => handleDelete(item.id)}
-//                   >
-//                     Delete
-//                   </Button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </Table>
-//       </Card.Body>
-//     </Card>
-//   );
-// }
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
+import endpoint from "../utils/endpoint";
 
 export default function OperationList({
   bundleGroup,
@@ -103,23 +11,19 @@ export default function OperationList({
   updateOperationLists,
 }) {
   const [operationList, setOperationList] = useState([]);
-  const localStorageKey = `addedOperations_${bundleGroup}_${listId}`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/operation_list/",
-          {
-            params: {
-              bundle_group: bundleGroup,
-              listId: listId,
-            },
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
+        const response = await axios.get(`${endpoint}/operation_list/`, {
+          params: {
+            bundle_group: bundleGroup,
+            listId: listId,
+          },
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("access_token")}`,
+          },
+        });
         setOperationList(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -129,30 +33,20 @@ export default function OperationList({
     fetchData();
   }, [bundleGroup, listId]);
 
-  const handleAddOperation = (operation) => {
-    const updatedOperationList = [...operationList, operation];
-    setOperationList(updatedOperationList);
-
-    localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
-
-    updateOperationLists();
-  };
-
   const handleDelete = (operationListId, operationId) => {
     axios
-      .delete(`http://127.0.0.1:8000/operation_list/${operationListId}`, {
+      .delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
       })
-      .then(() => {
-        const updatedOperationList = operationList.filter(
+      .then((response) => {
+        const newList = operationList.filter(
           (item) => item.id !== operationListId
         );
-        setOperationList(updatedOperationList);
-        
-        localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
+        setOperationList(newList);
 
+        // notify Operation to update OperationLists
         updateOperationLists(operationId, false);
       })
       .catch((error) => {
@@ -184,7 +78,7 @@ export default function OperationList({
                 <td>
                   <Button
                     className="btn-danger"
-                    onClick={() => handleDelete(item.id, item.operations.id)}
+                    onClick={() => handleDelete(item.id)}
                   >
                     Delete
                   </Button>
@@ -197,4 +91,3 @@ export default function OperationList({
     </Card>
   );
 }
-
