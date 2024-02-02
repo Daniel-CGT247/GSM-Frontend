@@ -7,6 +7,11 @@ import endpoint from "../utils/endpoint";
 
 export default function YourListTable({ bundleId, listId }) {
   const [operationList, setOperationList] = useState([]);
+  
+  const tableStyle = {
+    maxWidth: "80%",  
+    margin: "0 auto",  
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,11 +37,6 @@ export default function YourListTable({ bundleId, listId }) {
     fetchData();
   }, [bundleId, listId]);
 
-
-  const tableStyle = {
-    maxWidth: "80%",  
-    margin: "0 auto",  
-  }
 
   return (
     <div className="my-5" style={{ display: 'flex', justifyContent: 'center' }}>
