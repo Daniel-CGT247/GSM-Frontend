@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
+import endpoint from "../utils/endpoint";
 
 export default function OperationLibList({
   bundleGroup,
@@ -16,7 +17,9 @@ export default function OperationLibList({
   };
 
   useEffect(() => {
-    const storedOperationLibs = localStorage.getItem(`operationLibs_${bundleGroup}`);
+    const storedOperationLibs = localStorage.getItem(
+      `operationLibs_${bundleGroup}`
+    );
     if (storedOperationLibs) {
       setOperationLibs(JSON.parse(storedOperationLibs));
     } else {
@@ -26,12 +29,14 @@ export default function OperationLibList({
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/operation_lib/",
-        { params: { bundle_group: bundleGroup } }
-      );
+      const response = await axios.get(`${endpoint}/operation_lib/`, {
+        params: { bundle_group: bundleGroup },
+      });
       setOperationLibs(response.data);
-      localStorage.setItem(`operationLibs_${bundleGroup}`, JSON.stringify(response.data));
+      localStorage.setItem(
+        `operationLibs_${bundleGroup}`,
+        JSON.stringify(response.data)
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -40,7 +45,7 @@ export default function OperationLibList({
   const handleAddOperation = async (operation) => {
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/operation_list/",
+        `${endpoint}/operation_list/`,
         {
           list: listId,
           operations: operation.id,
@@ -48,18 +53,21 @@ export default function OperationLibList({
         { headers }
       );
 
-      const updatedOperations = [
-        ...addedOperations,
-        operation.id,
-      ];
+      const updatedOperations = [...addedOperations, operation.id];
       setAddedOperations(updatedOperations);
-      localStorage.setItem(`addedOperations_${listId}`, JSON.stringify(updatedOperations));
+      localStorage.setItem(
+        `addedOperations_${listId}`,
+        JSON.stringify(updatedOperations)
+      );
 
       const updatedLibs = operationLibs.map((op) =>
         op.id === operation.id ? { ...op, added: true } : op
       );
       setOperationLibs(updatedLibs);
-      localStorage.setItem(`operationLibs_${bundleGroup}`, JSON.stringify(updatedLibs));
+      localStorage.setItem(
+        `operationLibs_${bundleGroup}`,
+        JSON.stringify(updatedLibs)
+      );
 
       updateOperationLists();
     } catch (error) {
