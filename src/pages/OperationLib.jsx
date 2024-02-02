@@ -1,30 +1,11 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
+import headers from "../headers";
 import endpoint from "../utils/endpoint";
 
-export default function OperationLibList({ bundleGroup, listId }) {
-  const [operationLibs, setOperationLibs] = useState([]);
-  const headers = {
-    Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/operation_lib/`, {
-          params: { bundle_group: bundleGroup },
-        });
-        setOperationLibs(response.data);
-      } catch (error) {
-        console.error("Error fetching Operations:", error);
-      }
-    };
-    fetchData();
-  });
-
+export default function OperationLib({ operationLibs, onAdd, listId }) {
   const handleAddOperation = async (operation) => {
     try {
       await axios.post(
@@ -33,13 +14,12 @@ export default function OperationLibList({ bundleGroup, listId }) {
           list: listId,
           operations: operation.id,
         },
-        { headers }
+        { headers: headers }
       );
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
-
   return (
     <Card>
       <Card.Header>
@@ -63,7 +43,10 @@ export default function OperationLibList({ bundleGroup, listId }) {
                   <td>
                     <Button
                       className="btn-success"
-                      onClick={() => handleAddOperation(operation)}
+                      onClick={() => {
+                        onAdd(operation.id);
+                        handleAddOperation(operation);
+                      }}
                     >
                       Add
                     </Button>

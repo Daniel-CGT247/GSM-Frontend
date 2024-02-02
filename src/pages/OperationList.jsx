@@ -1,52 +1,15 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
+import headers from "../headers";
 import endpoint from "../utils/endpoint";
 
-export default function OperationList({ bundleGroup, listId }) {
-  const [operationList, setOperationList] = useState([]);
-  const localStorageKey = `addedOperations_${bundleGroup}_${listId}`;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/operation_list/`, {
-          params: {
-            bundle_group: bundleGroup,
-            listId: listId,
-          },
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
-        });
-        setOperationList(response.data);
-      } catch (error) {
-        console.error("Error fetching Operation List:", error);
-      }
-    };
-
-    fetchData();
-  });
-
-  const handleDelete = (operationListId, operationId) => {
+export default function OperationList({ operationList, onDelete }) {
+  const handleDelete = (operationListId) => {
     axios
       .delete(`${endpoint}/operation_list/${operationListId}`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
-      })
-      .then(() => {
-        const updatedOperationList = operationList.filter(
-          (item) => item.id !== operationListId
-        );
-        setOperationList(updatedOperationList);
-
-        localStorage.setItem(
-          localStorageKey,
-          JSON.stringify(updatedOperationList)
-        );
+        headers: headers,
       })
       .catch((error) => {
         console.error("Error deleting data:", error);
@@ -77,7 +40,10 @@ export default function OperationList({ bundleGroup, listId }) {
                 <td>
                   <Button
                     className="btn-danger"
-                    onClick={() => handleDelete(item.id, item.operations.id)}
+                    onClick={() => {
+                      onDelete(item.id);
+                      handleDelete(item.id);
+                    }}
                   >
                     Delete
                   </Button>
