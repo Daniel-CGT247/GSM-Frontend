@@ -29,7 +29,9 @@ export default function Operation() {
   return (
     <div className="p-5">
       <div className="flex flex-col space-y-2 items-center justify-center">
-        <h1 className="font-bold">Build Operation - {bundleName}</h1>
+        <h1 className="font-bold">
+          Build Operation - {bundleName}
+        </h1>
 
         <h3 className="font-bold">Style {itemName}</h3>
         <div className="space-x-5">

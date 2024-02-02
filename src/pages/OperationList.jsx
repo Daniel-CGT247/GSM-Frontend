@@ -5,7 +5,6 @@ import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
 import endpoint from "../utils/endpoint";
 
-
 export default function OperationList({
   bundleGroup,
   listId,
