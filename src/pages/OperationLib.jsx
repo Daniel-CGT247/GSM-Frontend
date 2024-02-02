@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
-import Card from "react-bootstrap/Card";
 import endpoint from "../utils/endpoint";
 
 export default function OperationLibList({ 
