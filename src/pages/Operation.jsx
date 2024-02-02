@@ -27,7 +27,7 @@ export default function Operation() {
   const paramsLib = { bundle_group: bundleId };
   const paramList = { bundle_group: bundleId };
   const [operations, setOperations] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLibLoading, SetIsLibLoading] = useState(true);
   useEffect(() => {
     try {
       if (localStorage.getItem("access_token") === null) {
@@ -35,7 +35,7 @@ export default function Operation() {
       }
       getData();
     } catch (error) {
-      setIsLoading(false);
+      SetIsLibLoading(false);
       console.log("Error:", error);
     }
   }, []);
@@ -45,10 +45,11 @@ export default function Operation() {
       params: paramsLib,
     });
     setOperations(res.data);
-    setIsLoading(false);
+    SetIsLibLoading(false);
   };
 
   const [operationList, setOperationList] = useState([]);
+  const [isListLoading, setIsListLoading] = useState(true);
   useEffect(() => {
     try {
       if (localStorage.getItem("access_token") === null) {
@@ -56,7 +57,7 @@ export default function Operation() {
       }
       getList();
     } catch (error) {
-      setIsLoading(false);
+      setIsListLoading(false);
       console.log("Error:", error);
     }
   }, []);
@@ -67,7 +68,7 @@ export default function Operation() {
       headers: headers,
     });
     setOperationList(res.data);
-    setIsLoading(false);
+    setIsListLoading(false);
   };
 
   return (
@@ -93,26 +94,34 @@ export default function Operation() {
       <div className="container text-center my-5">
         <div className="row">
           <div className="col">
-            <OperationLib
-              operationLibs={operations}
-              onAdd={(id) =>
-                setOperationList([
-                  ...operationList,
-                  { operations: operations[id] },
-                ])
-              }
-              listId={listId}
-            />
+            {isLibLoading ? (
+              <BasicSpinner />
+            ) : (
+              <OperationLib
+                operationLibs={operations}
+                onAdd={(id) =>
+                  setOperationList([
+                    ...operationList,
+                    { operations: operations[id] },
+                  ])
+                }
+                listId={listId}
+              />
+            )}
           </div>
           <div className="col space-y-10">
-            <OperationList
-              operationList={operationList}
-              onDelete={(id) =>
-                setOperationList(operationList.filter((e) => e.id !== id))
-              }
-              bundleGroup={bundleId}
-              listId={listId}
-            />
+            {isListLoading ? (
+              <BasicSpinner />
+            ) : (
+              <OperationList
+                operationList={operationList}
+                onDelete={(id) =>
+                  setOperationList(operationList.filter((e) => e.id !== id))
+                }
+                bundleGroup={bundleId}
+                listId={listId}
+              />
+            )}
           </div>
         </div>
       </div>
