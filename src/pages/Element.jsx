@@ -5,7 +5,7 @@ import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Pagination from "react-bootstrap/Pagination";
 import Table from "react-bootstrap/Table";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useGet from "../customed_hook/getData";
 import endpoint from "../utils/endpoint";
 
@@ -18,6 +18,7 @@ const ElementLibList = () => {
   const itemName = styleNum && styleNum.item && styleNum.item.name;
   const [elementList, setElementList] = useState([]);
   const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
+  const navigate = useNavigate()
 
   const [searchFilter, setSearchFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -440,6 +441,14 @@ const ElementLibList = () => {
     <div className="container p-5" style={{ fontFamily: "Arial, sans-serif" }}>
       <h2 className="font-bold text-center">{title}</h2>
       <h3 className="font-bold text-center">Style {itemName}</h3>
+      <div className="flex flex-col space-y-2 items-center justify-center">
+        <button type="button" 
+          className="btn btn-success"
+          onClick={() => navigate(-1)} 
+        >
+          Complete
+        </button>
+      </div>
 
       <div className="row my-2">
         {/* Element Library Section */}
