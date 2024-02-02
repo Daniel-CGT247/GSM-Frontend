@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import useGet from "../customed_hook/getData";
+import endpoint from "../utils/endpoint";
 import OperationLibList from "./OperationLib";
 import OperationList from "./OperationList";
-import endpoint from "../utils/endpoint";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
@@ -18,13 +18,6 @@ export default function Operation() {
     jobGroup.bundle_groups &&
     jobGroup.bundle_groups.find((bundle) => bundle.id == bundleId);
   const bundleName = bundle_group && bundle_group.name;
-  // re-render OperationList
-  const [operationListKey, setOperationListKey] = useState(0);
-
-  // update OperationLists after an operation is deleted or added
-  const updateOperationLists = (operationId, deleted) => {
-    setOperationListKey((prevKey) => prevKey + 1);
-  };
 
   return (
     <div className="p-5">
@@ -44,18 +37,12 @@ export default function Operation() {
       <div className="container text-center my-5">
         <div className="row">
           <div className="col">
-            <OperationLibList
-              bundleGroup={bundleId}
-              listId={listId}
-              updateOperationLists={updateOperationLists}
-            />
+            <OperationLibList bundleGroup={bundleId} listId={listId} />
           </div>
           <div className="col space-y-10">
             <OperationList
               bundleGroup={bundleId}
               listId={listId}
-              key={operationListKey}
-              updateOperationLists={updateOperationLists}
               bundleName={bundleName}
             />
           </div>

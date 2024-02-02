@@ -5,16 +5,25 @@ import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
 import endpoint from "../utils/endpoint";
 
-export default function OperationLibList({
-  bundleGroup,
-  listId,
-  updateOperationLists,
-}) {
+export default function OperationLibList({ bundleGroup, listId }) {
   const [operationLibs, setOperationLibs] = useState([]);
-  const [addedOperations, setAddedOperations] = useState([]);
   const headers = {
     Authorization: `JWT ${localStorage.getItem("access_token")}`,
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${endpoint}/operation_lib/`, {
+          params: { bundle_group: bundleGroup },
+        });
+        setOperationLibs(response.data);
+      } catch (error) {
+        console.error("Error fetching Operations:", error);
+      }
+    };
+    fetchData();
+  });
 
   const handleAddOperation = async (operation) => {
     try {
@@ -26,40 +35,11 @@ export default function OperationLibList({
         },
         { headers }
       );
-
-      setAddedOperations((prevAddedOperations) => [
-        ...prevAddedOperations,
-        operation.id,
-      ]);
-
-      setOperationLibs((prevOperationLibs) =>
-        prevOperationLibs.map((op) =>
-          op.id === operation.id ? { ...op, added: true } : op
-        )
-      );
-      updateOperationLists();
+      // updateOperationLists();
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${endpoint}/operation_lib/`,
-          {
-            params: { bundle_group: bundleGroup },
-          }
-        );
-        setOperationLibs(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [bundleGroup, listId, updateOperationLists]);
 
   return (
     <Card>

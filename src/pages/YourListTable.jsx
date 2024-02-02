@@ -11,18 +11,15 @@ export default function YourListTable({ bundleId, listId }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${endpoint}/operation_list/`,
-          {
-            params: {
-              bundle_group: bundleId,
-              listId: listId,
-            },
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
+        const response = await axios.get(`${endpoint}/operation_list/`, {
+          params: {
+            bundle_group: bundleId,
+            listId: listId,
+          },
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("access_token")}`,
+          },
+        });
         setOperationList(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -30,17 +27,21 @@ export default function YourListTable({ bundleId, listId }) {
     };
 
     fetchData();
-  }, [bundleId, listId]);
-
+  });
 
   const tableStyle = {
-    maxWidth: "80%",  
-    margin: "0 auto",  
-  }
+    maxWidth: "80%",
+    margin: "0 auto",
+  };
 
   return (
-    <div className="my-5" style={{ display: 'flex', justifyContent: 'center' }}>
-      <Table striped bordered hover style={{ ...tableStyle, textAlign: 'center' }}>
+    <div className="my-5" style={{ display: "flex", justifyContent: "center" }}>
+      <Table
+        striped
+        bordered
+        hover
+        style={{ ...tableStyle, textAlign: "center" }}
+      >
         <thead>
           <tr>
             <th>Operation Code</th>

@@ -1,51 +1,34 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
 import endpoint from "../utils/endpoint";
 
-
-export default function OperationList({
-  bundleGroup,
-  listId,
-  updateOperationLists,
-}) {
+export default function OperationList({ bundleGroup, listId }) {
   const [operationList, setOperationList] = useState([]);
   const localStorageKey = `addedOperations_${bundleGroup}_${listId}`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${endpoint}/operation_list/`,
-          {
-            params: {
-              bundle_group: bundleGroup,
-              listId: listId,
-            },
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
+        const response = await axios.get(`${endpoint}/operation_list/`, {
+          params: {
+            bundle_group: bundleGroup,
+            listId: listId,
+          },
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("access_token")}`,
+          },
+        });
         setOperationList(response.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching Operation List:", error);
       }
     };
 
     fetchData();
-  }, [bundleGroup, listId]);
-
-  const handleAddOperation = (operation) => {
-    const updatedOperationList = [...operationList, operation];
-    setOperationList(updatedOperationList);
-
-    // update localStorage
-    localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
-    updateOperationLists();
-  };
+  });
 
   const handleDelete = (operationListId, operationId) => {
     axios
@@ -60,8 +43,10 @@ export default function OperationList({
         );
         setOperationList(updatedOperationList);
 
-        localStorage.setItem(localStorageKey, JSON.stringify(updatedOperationList));
-        updateOperationLists(operationId, false);
+        localStorage.setItem(
+          localStorageKey,
+          JSON.stringify(updatedOperationList)
+        );
       })
       .catch((error) => {
         console.error("Error deleting data:", error);
@@ -105,4 +90,3 @@ export default function OperationList({
     </Card>
   );
 }
-
