@@ -35,7 +35,6 @@ export default function OperationLibList({ bundleGroup, listId }) {
         },
         { headers }
       );
-      // updateOperationLists();
     } catch (error) {
       console.error("Error adding operation:", error);
     }
