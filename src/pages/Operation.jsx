@@ -208,7 +208,7 @@ export default function Operation() {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
       });
-
+  
       const newOperation = {
         id: response.data.id,
         operations: {
@@ -216,9 +216,10 @@ export default function Operation() {
           name: selectedOperation.name
         }
       };
-
+  
+      // Update the operationList state with the new operation
       setOperationList(prevOperationList => [...prevOperationList, newOperation]);
-
+      
       // Update the addedOperations state to include the newly added operation
       setAddedOperations(prevAddedOperations => [...prevAddedOperations, newOperation]);
     } catch (error) {
@@ -227,6 +228,19 @@ export default function Operation() {
   };
   
 
+  // const handleDelete = async (operationId) => {
+  //   try {
+  //     await axios.delete(`${endpoint}/operation_list/${operationId}`, {
+  //       headers: {
+  //         Authorization: `JWT ${localStorage.getItem("access_token")}`
+  //       }
+  //     });
+
+  //     setOperationList(prevOperationList => prevOperationList.filter(op => op.id !== operationId));
+  //   } catch (error) {
+  //     console.error("Error deleting operation:", error);
+  //   }
+  // };
   const handleDelete = async (operationId) => {
     try {
       await axios.delete(`${endpoint}/operation_list/${operationId}`, {
@@ -234,13 +248,14 @@ export default function Operation() {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
       });
-
+  
+      // Update the operationList state to remove the deleted operation
       setOperationList(prevOperationList => prevOperationList.filter(op => op.id !== operationId));
     } catch (error) {
       console.error("Error deleting operation:", error);
     }
   };
-
+  
 
   return (
     <div className="p-5">
@@ -258,21 +273,21 @@ export default function Operation() {
       </div>
 
       <div className="container text-center my-5">
-        <div className="row">
-          <div className="col">
-            <OperationLibList
-              operationLibs={operationLibs}
-              handleAddOperation={handleAddOperation}
-            />
-          </div>
-          <div className="col space-y-10">
-            <OperationList
-              operationList={operationList}
-              handleDelete={handleDelete}
-            />
-          </div>
+      <div className="row">
+        <div className="col">
+          <OperationLibList
+            operationLibs={operationLibs}
+            handleAddOperation={handleAddOperation}
+          />
+        </div>
+        <div className="col space-y-10">
+          <OperationList
+            operationList={operationList}
+            handleDelete={handleDelete}
+          />
         </div>
       </div>
+    </div>
       
     </div>
   );
