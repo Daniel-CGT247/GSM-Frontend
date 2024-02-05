@@ -32,24 +32,25 @@ export default function OperationList({ operationList, onDelete }) {
             </tr>
           </thead>
           <tbody>
-            {operationList.map((item, index) => (
-              <tr key={item.id}>
-                <td>{index + 1}</td>
-                <td>{item.operations.operation_code}</td>
-                <td>{item.operations.name}</td>
-                <td>
-                  <Button
-                    className="btn-danger"
-                    onClick={() => {
-                      onDelete(item.id);
-                      handleDelete(item.id);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {operationList &&
+              operationList.map((item, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{item.operations.operation_code}</td>
+                  <td>{item.operations.name}</td>
+                  <td>
+                    <Button
+                      className="btn-danger"
+                      onClick={() => {
+                        onDelete(item.id);
+                        handleDelete(item.id);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
       </Card.Body>

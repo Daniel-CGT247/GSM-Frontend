@@ -25,7 +25,7 @@ export default function Operation() {
   const bundleName = bundle_group && bundle_group.name;
 
   const paramsLib = { bundle_group: bundleId };
-  const paramList = { bundle_group: bundleId };
+  const paramList = { bundle_group: bundleId, listId: listId };
   const [operations, setOperations] = useState([]);
   const [isLibLoading, SetIsLibLoading] = useState(true);
   useEffect(() => {
@@ -70,6 +70,7 @@ export default function Operation() {
     setOperationList(res.data);
     setIsListLoading(false);
   };
+  console.log(operationList);
 
   return (
     <div className="p-5">
@@ -99,12 +100,15 @@ export default function Operation() {
             ) : (
               <OperationLib
                 operationLibs={operations}
-                onAdd={(id) =>
+                onAdd={(id) => {
                   setOperationList([
                     ...operationList,
-                    { operations: operations[id] },
-                  ])
-                }
+                    {
+                      operations: operations[id - 1],
+                      id: operationList.length + 1,
+                    },
+                  ]);
+                }}
                 listId={listId}
               />
             )}
