@@ -1,12 +1,11 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import { Link } from "react-router-dom";
-import endpoint from "../utils/endpoint";
-import useGet from "../customed_hook/getData";
-import headers from "../headers";
 import BasicSpinner from "../components/Spinner";
+import useGet from "../customed_hook/getData";
+import endpoint from "../utils/endpoint";
+import headers from "../utils/headers";
 export default function YourListTable({ bundleId, listId }) {
   const tableStyle = {
     maxWidth: "80%",
