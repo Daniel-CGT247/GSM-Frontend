@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import BasicSpinner from "../components/Spinner";
 import useGet from "../customed_hook/getData";
-import headers from "../headers";
+import headers from "../utils/headers";
 import endpoint from "../utils/endpoint";
 import OperationLib from "./OperationLib";
 import OperationList from "./OperationList";

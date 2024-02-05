@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import headers from "../headers";
+import headers from "../utils/headers";
 
 export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);

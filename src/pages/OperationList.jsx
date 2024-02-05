@@ -2,7 +2,7 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
-import headers from "../headers";
+import headers from "../utils/headers";
 import endpoint from "../utils/endpoint";
 
 export default function OperationList({ operationList, onDelete }) {
