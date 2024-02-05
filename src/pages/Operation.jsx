@@ -71,7 +71,7 @@ import { Link, useParams } from "react-router-dom";
 import useGet from "../customed_hook/getData";
 import OperationLibList from "./OperationLib"; 
 import OperationList from "./OperationList"; 
-
+import endpoint from "../utils/endpoint";
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
 
