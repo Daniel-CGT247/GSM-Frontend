@@ -131,4 +131,3 @@ const OperationList = ({ operationList, handleDelete }) => {
 };
 
 export default OperationList;
-

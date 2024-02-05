@@ -207,6 +207,7 @@
 //     </Card>
 //   );
 // }
+
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
@@ -231,7 +232,7 @@ const OperationLibList = ({ operationLibs, handleAddOperation }) => {
                 <td>{operation.operation_code}</td>
                 <td>{operation.name}</td>
                 <td>
-                  <Button onClick={() => handleAddOperation(operation)}>
+                  <Button variant="success" onClick={() => handleAddOperation(operation)}>
                     Add
                   </Button>
                 </td>
