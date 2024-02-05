@@ -232,7 +232,7 @@ const OperationLibList = ({ operationLibs, handleAddOperation }) => {
                 <td>{operation.operation_code}</td>
                 <td>{operation.name}</td>
                 <td>
-                  <Button variant="warning" onClick={() => handleAddOperation(operation)}>
+                  <Button variant="light" onClick={() => handleAddOperation(operation)}>
                     Add
                   </Button>
                 </td>
