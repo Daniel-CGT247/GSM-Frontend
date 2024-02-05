@@ -118,7 +118,7 @@ export default function Operation() {
         operations: selectedOperation.id
       }, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+          Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
       });
       // expected structure
