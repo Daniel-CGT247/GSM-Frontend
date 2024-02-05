@@ -105,8 +105,41 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
+import axios from 'axios';
+import endpoint from "../utils/endpoint";
+const OperationLibList = ({ operationLibs, listId, updateOperationList }) => {
+  
+  const handleAddOperation = async (selectedOperation) => {
+    try {
+      const response = await axios.post(
+        `${endpoint}/operation_list/`,
+        { 
+          list: listId, 
+          operations: selectedOperation.id },
+        {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+  
+      // Adjust the added operation's structure if necessary
+      const adjustedOperation = {
+        id: response.data.id, // Assuming this is correct
+        operations: {
+          operation_code: selectedOperation.operation_code,
+          name: selectedOperation.name,
+        },
+      };
+  
+      updateOperationList(adjustedOperation); // Now passing the adjusted structure
+    } catch (error) {
+      console.error("Error adding operation:", error);
+    }
+  };
 
-const OperationLibList = ({ operationLibs, handleAddOperation }) => {
+  
+  
   return (
     <Card>
       <Card.Header>Operation Library</Card.Header>
@@ -125,7 +158,7 @@ const OperationLibList = ({ operationLibs, handleAddOperation }) => {
                 <td>{operation.operation_code}</td>
                 <td>{operation.name}</td>
                 <td>
-                  <Button variant="light" onClick={() => handleAddOperation(operation)}>
+                  <Button variant="dark" onClick={() => handleAddOperation(operation)}>
                     Add
                   </Button>
                 </td>
