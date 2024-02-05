@@ -212,7 +212,6 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
-import endpoint from "../utils/endpoint";
 
 const OperationLibList = ({ operationLibs, handleAddOperation }) => {
   return (
