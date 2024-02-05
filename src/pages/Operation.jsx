@@ -76,9 +76,9 @@ export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
 
   // fetching style and job group information
-  const styleNum = useGet(`http://127.0.0.1:8000/collection/${listId}`);
+  const styleNum = useGet(`${endpoint}/collection/${listId}`);
   const itemName = styleNum && styleNum.item && styleNum.item.name;
-  const jobGroup = useGet(`http://127.0.0.1:8000/job_group/${jobId}`);
+  const jobGroup = useGet(`${endpoint}/job_group/${jobId}`);
   const bundle_group = jobGroup && jobGroup.bundle_groups && jobGroup.bundle_groups.find(bundle => bundle.id === bundleId);
   const bundleName = bundle_group && bundle_group.name;
 
@@ -89,7 +89,7 @@ export default function Operation() {
     // fetch operation lib
     const fetchOperationLibs = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/operation_lib/?bundle_group=${bundleId}`);
+        const response = await axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`);
         setOperationLibs(response.data);
       } catch (error) {
         console.error("Failed to fetch operation libraries:", error);
@@ -99,7 +99,7 @@ export default function Operation() {
     // fetch operation list
     const fetchOperationList = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/operation_list/?bundle_group=${bundleId}`);
+        const response = await axios.get(`${endpoint}/operation_list/?bundle_group=${bundleId}`);
         setOperationList(response.data);
       } catch (error) {
         console.error("Failed to fetch operation list:", error);
@@ -113,7 +113,7 @@ export default function Operation() {
   // add an operation
   const handleAddOperation = async (selectedOperation) => {
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/operation_list/`, {
+      const response = await axios.post(`${endpoint}/operation_list/`, {
         list: listId,
         operations: selectedOperation.id
       }, {
@@ -140,7 +140,7 @@ export default function Operation() {
   // delete an operation
   const handleDelete = async (operationId) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/operation_list/${operationId}`, {
+      await axios.delete(`${endpoint}/operation_list/${operationId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
