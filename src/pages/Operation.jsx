@@ -65,7 +65,6 @@
 //   );
 // }
 
-//=================================================================
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
@@ -126,23 +125,13 @@ export default function Operation() {
         }
       });
   
-      const newOperation = {
-        id: response.data.id,
-        operations: {
-          operation_code: selectedOperation.operation_code,
-          name: selectedOperation.name
-        }
-      };
-  
-      // Update the operationList state with the new operation
-      setOperationList(prevOperationList => [...prevOperationList, newOperation]);
-      
-      // Update the addedOperations state to include the newly added operation
-      setAddedOperations(prevAddedOperations => [...prevAddedOperations, newOperation]);
+      // Consider refetching the operation list to ensure it's up to date
+      fetchOperationList(); // Assuming this function fetches and updates `operationList`
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
+  
   
   const handleDelete = async (operationId) => {
     try {
