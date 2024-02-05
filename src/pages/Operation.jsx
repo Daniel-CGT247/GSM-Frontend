@@ -72,6 +72,7 @@ import useGet from "../customed_hook/getData";
 import OperationLibList from "./OperationLib"; 
 import OperationList from "./OperationList"; 
 import endpoint from "../utils/endpoint";
+
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
 
@@ -135,6 +136,65 @@ export default function Operation() {
   //     console.error("Error adding operation:", error);
   //   }
   // };
+  const fetchOperationLibs = async () => {
+    try {
+      const response = await axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`);
+      setOperationLibs(response.data);
+    } catch (error) {
+      console.error("Failed to fetch operation libraries:", error);
+    }
+  };
+
+  const fetchOperationList = async () => {
+    try {
+      const response = await axios.get(`${endpoint}/operation_list/?bundle_group=${bundleId}`);
+      setOperationList(response.data);
+    } catch (error) {
+      console.error("Failed to fetch operation list:", error);
+    }
+  };
+
+  // const handleAddOperation = async (selectedOperation) => {
+  //   try {
+  //     const response = await axios.post(`${endpoint}/operation_list/`, {
+  //       list: listId,
+  //       operations: selectedOperation.id
+  //     }, {
+  //       headers: {
+  //         Authorization: `JWT ${localStorage.getItem("access_token")}`
+  //       }
+  //     });
+  
+  //     const newOperation = {
+  //       id: response.data.id,  
+  //       operations: {
+  //         operation_code: selectedOperation.operation_code, 
+  //         name: selectedOperation.name
+  //       }
+  //     };
+  
+  //     setOperationList(prev => [...prev, newOperation]);
+  //   } catch (error) {
+  //     console.error("Error adding operation:", error);
+  //   }
+  // };
+  
+  
+
+  // // delete an operation
+  // const handleDelete = async (operationId) => {
+  //   try {
+  //     await axios.delete(`${endpoint}/operation_list/${operationId}`, {
+  //       headers: {
+  //         Authorization: `JWT ${localStorage.getItem("access_token")}`
+  //       }
+        
+  //     });
+  //     setOperationList(prev => prev.filter(op => op.id !== operationId));
+  //   } catch (error) {
+  //     console.error("Error deleting operation:", error);
+  //   }
+  // };
   const handleAddOperation = async (selectedOperation) => {
     try {
       const response = await axios.post(`${endpoint}/operation_list/`, {
@@ -145,38 +205,34 @@ export default function Operation() {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
       });
-  
+
       const newOperation = {
-        id: response.data.id,  
+        id: response.data.id,
         operations: {
-          operation_code: selectedOperation.operation_code, 
+          operation_code: selectedOperation.operation_code,
           name: selectedOperation.name
         }
       };
-  
-      setOperationList(prev => [...prev, newOperation]);
+
+      setOperationList(prevOperationList => [...prevOperationList, newOperation]);
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
-  
-  
 
-  // delete an operation
   const handleDelete = async (operationId) => {
     try {
       await axios.delete(`${endpoint}/operation_list/${operationId}`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
-        
       });
-      setOperationList(prev => prev.filter(op => op.id !== operationId));
+
+      setOperationList(prevOperationList => prevOperationList.filter(op => op.id !== operationId));
     } catch (error) {
       console.error("Error deleting operation:", error);
     }
   };
-
 
 
   return (
