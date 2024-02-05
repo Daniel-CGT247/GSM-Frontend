@@ -111,6 +111,30 @@ export default function Operation() {
   }, [listId, jobId, bundleId]); // re-fetch when these parameters change
 
   // add an operation
+  // const handleAddOperation = async (selectedOperation) => {
+  //   try {
+  //     const response = await axios.post(`${endpoint}/operation_list/`, {
+  //       list: listId,
+  //       operations: selectedOperation.id
+  //     }, {
+  //       headers: {
+  //         Authorization: `JWT ${localStorage.getItem("access_token")}`
+  //       }
+  //     });
+  //     // expected structure
+  //     const newOperation = {
+  //       ...response.data,
+  //       operations: {
+  //         ...response.data.operations,
+  //         operation_code: selectedOperation.operation_code,
+  //         name: selectedOperation.name
+  //       }
+  //     };
+  //     setOperationList(prev => [...prev, newOperation]);
+  //   } catch (error) {
+  //     console.error("Error adding operation:", error);
+  //   }
+  // };
   const handleAddOperation = async (selectedOperation) => {
     try {
       const response = await axios.post(`${endpoint}/operation_list/`, {
@@ -121,20 +145,21 @@ export default function Operation() {
           Authorization: `JWT ${localStorage.getItem("access_token")}`
         }
       });
-      // expected structure
+  
       const newOperation = {
-        ...response.data,
+        id: response.data.id,  
         operations: {
-          ...response.data.operations,
-          operation_code: selectedOperation.operation_code,
+          operation_code: selectedOperation.operation_code, 
           name: selectedOperation.name
         }
       };
+  
       setOperationList(prev => [...prev, newOperation]);
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
+  
   
 
   // delete an operation
@@ -151,6 +176,8 @@ export default function Operation() {
       console.error("Error deleting operation:", error);
     }
   };
+
+
 
   return (
     <div className="p-5">
