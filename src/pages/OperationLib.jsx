@@ -29,7 +29,6 @@ export default function OperationLib({ operationLibs, onAdd, listId }) {
         <Table striped hover>
           <thead>
             <tr>
-              <th scope="col">Operation Code</th>
               <th scope="col">Name</th>
               <th scope="col">Add</th>
             </tr>
@@ -38,7 +37,6 @@ export default function OperationLib({ operationLibs, onAdd, listId }) {
             {operationLibs &&
               operationLibs.map((operation) => (
                 <tr key={operation.id}>
-                  <td>{operation.operation_code}</td>
                   <td>{operation.name}</td>
                   <td>
                     <Button

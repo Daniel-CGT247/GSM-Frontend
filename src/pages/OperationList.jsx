@@ -26,8 +26,9 @@ export default function OperationList({ operationList, onDelete }) {
           <thead>
             <tr>
               <th>#</th>
-              <th>Operation Code</th>
               <th>Name</th>
+              <th>Operation Code</th>
+              <th>Operation Code</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -36,7 +37,6 @@ export default function OperationList({ operationList, onDelete }) {
               operationList.map((item, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{item.operations.operation_code}</td>
                   <td>{item.operations.name}</td>
                   <td>
                     <Button
