@@ -104,32 +104,54 @@ export default function Operation() {
     };
 
     // Fetch operation list
+    // But when fetching operation lists, you should adjust it to store the data considering both listId and bundleGroup
     const fetchOperationList = async () => {
       try {
-          const response = await axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
-              headers: {
-                  Authorization: `JWT ${localStorage.getItem("access_token")}`,
-              },
-          });
-          setOperations(prev => ({ ...prev, [listId]: response.data }));
+        const response = await axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
+            headers: {
+                Authorization: `JWT ${localStorage.getItem("access_token")}`,
+            },
+        });
+        // Assuming response.data is an array of operations
+        updateOperationList(bundleId, response.data); // Pass the whole array to be set in the state
       } catch (error) {
           console.error("Failed to fetch operation list:", error);
       }
-  };
+    };
+
 
     fetchOperationLibs();
     fetchOperationList();
   }, [listId, jobId, bundleId]); // Re-fetch when these parameters change
 
 // Update function for operation list
-const updateOperationList = (operation, isDelete = false) => {
+// const updateOperationList = (operation, isDelete = false) => {
+//   setOperations(prev => {
+//       const listOperations = prev[listId] || [];
+//       if (isDelete) {
+//           return { ...prev, [listId]: listOperations.filter(op => op.id !== operation) };
+//       } else {
+//           return { ...prev, [listId]: [...listOperations, operation] };
+//       }
+//   });
+// };
+const updateOperationList = (bundleGroupId, operation, isDelete = false) => {
   setOperations(prev => {
-      const listOperations = prev[listId] || [];
-      if (isDelete) {
-          return { ...prev, [listId]: listOperations.filter(op => op.id !== operation) };
-      } else {
-          return { ...prev, [listId]: [...listOperations, operation] };
-      }
+    // Copy the current state to avoid direct mutation
+    const newState = { ...prev };
+
+    // Ensure the structure for current listId and bundleGroupId exists
+    if (!newState[listId]) newState[listId] = {};
+    if (!newState[listId][bundleGroupId]) newState[listId][bundleGroupId] = [];
+
+    // Add or delete the operation
+    if (isDelete) {
+      newState[listId][bundleGroupId] = newState[listId][bundleGroupId].filter(op => op.id !== operation.id);
+    } else {
+      newState[listId][bundleGroupId] = [...newState[listId][bundleGroupId], operation];
+    }
+
+    return newState;
   });
 };
 
@@ -159,10 +181,12 @@ const updateOperationList = (operation, isDelete = false) => {
           </div>
           <div className="col space-y-10">
           <OperationList
-                operationList={operations[listId] || []}
-                token={localStorage.getItem("access_token")}
-                updateOperationList={(operationId) => updateOperationList(operationId, true)}
-            />
+  operationList={operations[listId] && operations[listId][bundleId] ? operations[listId][bundleId] : []}
+  token={localStorage.getItem("access_token")}
+  bundleGroupId={bundleId}
+  updateOperationList={(operationId, isDelete) => updateOperationList(bundleId, operationId, isDelete)}
+/>
+
 
           </div>
         </div>
