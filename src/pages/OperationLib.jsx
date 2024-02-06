@@ -101,79 +101,38 @@
 //   );
 // }
 
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
-import endpoint from "../utils/endpoint";
+import React, { memo } from 'react';
+import axios from 'axios';
+import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table';
+import { useSWRConfig } from 'swr';
+import endpoint from '../utils/endpoint';
 
-export default function OperationLibList({
-  bundleGroup,
-  listId,
-  updateOperationLists,
-}) {
-  const [operationLibs, setOperationLibs] = useState([]);
-  const [addedOperations, setAddedOperations] = useState([]);
-  const headers = {
-    Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  };
+const OperationLibList = memo(({ bundleGroup, listId, updateOperationLists }) => {
+  const { mutate } = useSWRConfig();
 
   const handleAddOperation = async (operation) => {
-    const newOperation = { ...operation, added: true };
-    
-    // Update UI immediately
-    setOperationLibs((prevOperationLibs) =>
-      prevOperationLibs.map((op) => (op.id === operation.id ? newOperation : op))
-    );
-    
-    // Also update local storage to include this operation as added
-    let operationsInLocalStorage = JSON.parse(localStorage.getItem('operations') || '[]');
-    operationsInLocalStorage.push(newOperation);
-    localStorage.setItem('operations', JSON.stringify(operationsInLocalStorage));
-    
-    updateOperationLists();
-  
-    // Attempt to sync with the backend
+    const updatedOperation = { ...operation, added: true }; // Example of an optimistic update
+    mutate(`${endpoint}/operation_list/`, { ...operation, added: true }, false);
+
     try {
-      await axios.post(
-        `${endpoint}/operation_list/`,
-        { list: listId, operations: operation.id },
-        { headers }
-      );
-      // If successful, no action needed here since UI is already updated
+      await axios.post(`${endpoint}/operation_list/`, {
+        list: listId,
+        operations: operation.id,
+      }, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      updateOperationLists();
     } catch (error) {
       console.error("Error adding operation:", error);
-      // Optionally handle error, e.g., by retrying or showing an error message
+      // Rollback if needed
     }
   };
-  
-  
-  useEffect(() => {
-    // Load operations from localStorage for immediate feedback
-    const operationsFromStorage = JSON.parse(localStorage.getItem('operations') || '[]');
-    if (operationsFromStorage.length > 0) {
-      setOperationList(operationsFromStorage);
-    }
-  
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/operation_list/`, {
-          params: { bundle_group: bundleGroup, listId: listId },
-          headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
-        });
-        // Update the local storage and state with the latest from server
-        localStorage.setItem('operations', JSON.stringify(response.data));
-        setOperationList(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-  
-    fetchData();
-  }, [bundleGroup, listId, updateOperationLists]);
-  
 
+  // Assume operations are fetched elsewhere and passed as props, or use SWR here
   return (
     <Card>
       <Card.Header>
@@ -211,5 +170,7 @@ export default function OperationLibList({
       </Card.Body>
     </Card>
   );
-}
 
+});
+
+export default OperationLibList;

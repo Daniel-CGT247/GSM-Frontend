@@ -91,64 +91,38 @@
 //     </Card>
 //   );
 // }
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
-import endpoint from "../utils/endpoint";
+import React, { useEffect, useState, memo } from 'react';
+import axios from 'axios';
+import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table';
+import useSWR from 'swr';
+import endpoint from '../utils/endpoint';
 
-export default function OperationList({
-  bundleGroup,
-  listId,
-  updateOperationLists,
-}) {
-  const [operationList, setOperationList] = useState([]);
+const fetcher = url => axios.get(url, {
+  headers: {
+    Authorization: `JWT ${localStorage.getItem("access_token")}`,
+  },
+}).then(res => res.data);
 
-  useEffect(() => {
-    // Load operations from localStorage first for immediate UI update
-    const localAddedOperations = JSON.parse(localStorage.getItem('addedOperations') || '[]');
-    if (localAddedOperations.length > 0) {
-      setOperationList(localAddedOperations.map(id => ({ id, operations: { operation_code: "Loading...", name: "Loading..." }})));
-    }
-  
-    // Then fetch the latest data from the backend
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/operation_list/`, {
-          params: { bundle_group: bundleGroup, listId: listId },
-          headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
-        });
-        setOperationList(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-  
-    fetchData();
-  }, [bundleGroup, listId]);
-  
+const OperationList = memo(({ bundleGroup, listId, updateOperationLists }) => {
+  const { data: operationList, mutate } = useSWR(`${endpoint}/operation_list/?bundle_group=${bundleGroup}&listId=${listId}`, fetcher);
 
-  const handleDelete = (operationListId) => {
-    // Update UI immediately
-    const updatedList = operationList.filter(item => item.id !== operationListId);
-    setOperationList(updatedList);
-    localStorage.setItem('operations', JSON.stringify(updatedList));
-  
-    // Async deletion from backend
-    axios.delete(`${endpoint}/operation_list/${operationListId}`, {
-      headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
-    }).catch(error => {
+  const handleDelete = async (operationListId) => {
+    mutate(operationList.filter(op => op.id !== operationListId), false);
+    try {
+      await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("access_token")}`,
+        },
+      });
+      updateOperationLists();
+    } catch (error) {
       console.error("Error deleting operation:", error);
-      // Optionally handle re-adding the operation on error
-    });
-  
-    updateOperationLists();
+      // Rollback or show an error message if needed
+    }
   };
-  
-  
 
-  return (
+   return (
     <Card>
       <Card.Header>
         <Card.Title>Operation List</Card.Title>
@@ -184,4 +158,6 @@ export default function OperationList({
       </Card.Body>
     </Card>
   );
-}
+});
+
+export default OperationList;
