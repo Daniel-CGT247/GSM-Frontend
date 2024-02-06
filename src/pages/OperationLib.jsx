@@ -101,100 +101,50 @@
 //   );
 // }
 
-import React from 'react';
-import Button from 'react-bootstrap/Button';
-import Table from 'react-bootstrap/Table';
-import Card from 'react-bootstrap/Card';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Button from "react-bootstrap/Button";
 import endpoint from "../utils/endpoint";
-const OperationLibList = ({ operationLibs, listId, updateOperationList }) => {
-  
-  // const handleAddOperation = async (selectedOperation) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${endpoint}/operation_list/`,
-  //       { 
-  //         list: listId, 
-  //         operations: selectedOperation.id },
-  //       {
-  //         headers: {
-  //           Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  //         },
-  //       }
-  //     );
-  
-  //     // Adjust the added operation's structure if necessary
-  //     const adjustedOperation = {
-  //       id: response.data.id, // Assuming this is correct
-  //       operations: {
-  //         operation_code: selectedOperation.operation_code,
-  //         name: selectedOperation.name,
-  //       },
-  //     };
-  
-  //     updateOperationList(adjustedOperation); // Now passing the adjusted structure
-  //   } catch (error) {
-  //     console.error("Error adding operation:", error);
-  //   }
-  // };
-  const handleAddOperation = async (selectedOperation) => {
-    try {
-      const response = await axios.post(
-        `${endpoint}/operation_list/`,
-        {
-          list: listId,
-          operations: [selectedOperation.id], // Ensure this matches the expected format for your backend
-        },
-        {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
+
+function OperationLibList({ listId, bundleId, updateOperationLists }) {
+    const [libOperations, setLibOperations] = useState([]);
+
+    useEffect(() => {
+        const fetchLibOperations = async () => {
+            try {
+                const response = await axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`);
+                setLibOperations(response.data);
+            } catch (error) {
+                console.error("Error fetching operation library:", error);
+            }
+        };
+
+        fetchLibOperations();
+    }, [bundleId]);
+
+    const handleAddOperation = async (operationId) => {
+        try {
+            await axios.post(
+                `${endpoint}/operation_list/`,
+                { list: listId, operation: operationId },
+                { headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` } }
+            );
+            updateOperationLists(); 
+        } catch (error) {
+            console.error("Error adding operation:", error);
         }
-      );
-  
-      // Adjust the added operation's structure if necessary
-      const adjustedOperation = {
-        id: response.data.id,
-        ...selectedOperation,
-      };
-  
-      updateOperationList(adjustedOperation, false);
-    } catch (error) {
-      console.error("Error adding operation:", error);
-    }
-  };
-  
-  
-  
-  return (
-    <Card>
-      <Card.Header>Operation Library</Card.Header>
-      <Card.Body>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>Operation Code</th>
-              <th>Name</th>
-              <th>Add</th>
-            </tr>
-          </thead>
-          <tbody>
-            {operationLibs.map((operation) => (
-              <tr key={operation.id}>
-                <td>{operation.operation_code}</td>
-                <td>{operation.name}</td>
-                <td>
-                  <Button variant="dark" onClick={() => handleAddOperation(operation)}>
-                    Add
-                  </Button>
-                </td>
-              </tr>
+    };
+
+    return (
+        <div>
+            {libOperations.map((operation) => (
+                <div key={operation.id}>
+                    {operation.name}
+                    <Button onClick={() => handleAddOperation(operation.id)}>Add</Button>
+                </div>
             ))}
-          </tbody>
-        </Table>
-      </Card.Body>
-    </Card>
-  );
-};
+        </div>
+    );
+}
 
 export default OperationLibList;

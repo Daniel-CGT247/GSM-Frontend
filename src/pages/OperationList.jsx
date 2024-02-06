@@ -91,116 +91,33 @@
 //     </Card>
 //   );
 // }
-// import React from 'react';
-// import Button from 'react-bootstrap/Button';
-// import Table from 'react-bootstrap/Table';
-// import Card from 'react-bootstrap/Card';
-
-// const OperationList = ({ operationList, handleDelete }) => {
-//   return (
-//     <Card>
-//       <Card.Header>Operation List</Card.Header>
-//       <Card.Body>
-//         <Table striped hover>
-//           <thead>
-//             <tr>
-//               <th>#</th>
-//               <th>Operation Code</th>
-//               <th>Name</th>
-//               <th>Delete</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {operationList.map((operation, index) => (
-//               <tr key={operation.id}>
-//                 <td>{index + 1}</td>
-//                 <td>{operation.operations.operation_code}</td>
-//                 <td>{operation.operations.name}</td>
-//                 <td>
-//                   <Button variant="danger" onClick={() => handleDelete(operation.id)}>
-//                     Delete
-//                   </Button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </Table>
-//       </Card.Body>
-//     </Card>
-//   );
-// };
-
-// export default OperationList;
-
-
-import React from 'react';
-import Button from 'react-bootstrap/Button';
-import Table from 'react-bootstrap/Table';
-import Card from 'react-bootstrap/Card';
-import axios from 'axios';
+import React from "react";
+import axios from "axios";
+import Button from "react-bootstrap/Button";
 import endpoint from "../utils/endpoint";
-const OperationList = ({ operationList, updateOperationList }) => {
 
-  // const handleDelete = async (operationId) => {
-  //   try {
-  //     await axios.delete(`${endpoint}/operation_list/${operationId}`, {
-  //       headers: {
-  //         Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  //       },
-  //     });
-
-  //     updateOperationList(operationId, true); // This function needs to be implemented in the parent component to update the state accordingly
-  //   } catch (error) {
-  //     console.error("Error deleting operation:", error);
-  //   }
-  // };
-  const handleDelete = async (operationId) => {
-    try {
-      await axios.delete(`${endpoint}/operation_list/${operationId}`, {
-        headers: {
-
-          Authorization: `JWT ${localStorage.getItem("access_token")}`
+function OperationList({ operations, listId, bundleId, updateOperationLists }) {
+    const handleDelete = async (operationId) => {
+        try {
+            await axios.delete(`${endpoint}/operation_list/${operationId}`, {
+                headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
+            });
+            updateOperationLists(); 
+        } catch (error) {
+            console.error("Error deleting operation:", error);
         }
-      });
+    };
 
-      updateOperationList({ id: operationId }, true);
-    } catch (error) {
-      console.error("Error deleting operation:", error);
-    }
-  };
-  
-
-  return (
-    <Card>
-      <Card.Header>Operation List</Card.Header>
-      <Card.Body>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Operation Code</th>
-              <th>Name</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {operationList.map((operation, index) => (
-              <tr key={operation.id}>
-                <td>{index + 1}</td>
-                <td>{operation.operations.operation_code}</td>
-                <td>{operation.operations.name}</td>
-                <td>
-                  <Button variant="danger" onClick={() => handleDelete(operation.id)}>
-                    Delete
-                  </Button>
-                </td>
-              </tr>
+    return (
+        <div>
+            {operations.map((operation) => (
+                <div key={operation.id}>
+                    {operation.name}
+                    <Button onClick={() => handleDelete(operation.id)}>Delete</Button>
+                </div>
             ))}
-          </tbody>
-        </Table>
-      </Card.Body>
-    </Card>
-  );
-};
+        </div>
+    );
+}
 
 export default OperationList;
