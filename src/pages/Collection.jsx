@@ -7,7 +7,7 @@ import useGet from "../customed_hook/getData";
 import endpoint from "../utils/endpoint";
 
 export default function Collection() {
-  const data = useGet(`${endpoint}/collection/`);
+  const { data, isLoading } = useGet(`${endpoint}/collection/`);
   const [searchTerm, setSearchTerm] = useState(""); // search bar
   const [selectedSeason, setSelectedSeason] = useState(""); // season dropdown
   const [selectedProto, setSelectedProto] = useState("");

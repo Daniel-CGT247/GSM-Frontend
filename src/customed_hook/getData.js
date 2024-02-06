@@ -1,23 +1,31 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import headers from "../utils/headers";
 
-export default function useGet(endpoint) {
+export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);
-  const headers = {
-    Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("access_token") === null) {
-      window.location.href = "/login";
+    try {
+      if (localStorage.getItem("access_token") === null) {
+        window.location.href = "/login";
+      }
+      getData();
+    } catch (error) {
+      setIsLoading(false);
+      console.log("Error:", error);
     }
-    getData();
-  }, []);
+  }, [deps]);
 
   let getData = async () => {
-    let res = await axios.get(`${endpoint}`, { headers });
+    let res = await axios.get(`${endpoint}`, {
+      params: params,
+      headers: headers,
+    });
     setData(res.data);
+    setIsLoading(false);
   };
 
-  return data;
+  return { isLoading, data };
 }
