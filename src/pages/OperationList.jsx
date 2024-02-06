@@ -129,25 +129,23 @@ export default function OperationList({
   }, [bundleGroup, listId]);
   
 
-  const handleDelete = async (operationListId, operationId) => {
-    try {
-      // Update UI immediately
-      const newList = operationList.filter((item) => item.id !== operationListId);
-      setOperationList(newList);
-      const updatedAddedOperations = newList.map(item => item.id);
-      localStorage.setItem('addedOperations', JSON.stringify(updatedAddedOperations));
+  const handleDelete = (operationListId) => {
+    // Update UI immediately
+    const updatedList = operationList.filter(item => item.id !== operationListId);
+    setOperationList(updatedList);
+    localStorage.setItem('operations', JSON.stringify(updatedList));
   
-      // notify Operation to update OperationLists
-      updateOperationLists(operationId, true);
+    // Async deletion from backend
+    axios.delete(`${endpoint}/operation_list/${operationListId}`, {
+      headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
+    }).catch(error => {
+      console.error("Error deleting operation:", error);
+      // Optionally handle re-adding the operation on error
+    });
   
-      // Asynchronously delete from backend
-      await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
-        headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
-      });
-    } catch (error) {
-      console.error("Error deleting data:", error);
-    }
+    updateOperationLists();
   };
+  
   
 
   return (

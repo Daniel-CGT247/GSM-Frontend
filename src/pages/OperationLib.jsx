@@ -120,48 +120,59 @@ export default function OperationLibList({
   };
 
   const handleAddOperation = async (operation) => {
+    const newOperation = { ...operation, added: true };
+    
+    // Update UI immediately
+    setOperationLibs((prevOperationLibs) =>
+      prevOperationLibs.map((op) => (op.id === operation.id ? newOperation : op))
+    );
+    
+    // Also update local storage to include this operation as added
+    let operationsInLocalStorage = JSON.parse(localStorage.getItem('operations') || '[]');
+    operationsInLocalStorage.push(newOperation);
+    localStorage.setItem('operations', JSON.stringify(operationsInLocalStorage));
+    
+    updateOperationLists();
+  
+    // Attempt to sync with the backend
     try {
-      // Immediately update UI and localStorage
-      const newAddedOperations = [...addedOperations, operation.id];
-      setAddedOperations(newAddedOperations);
-      localStorage.setItem('addedOperations', JSON.stringify(newAddedOperations));
-  
-      // Update operationLibs state to reflect the operation as added
-      setOperationLibs((prevOperationLibs) =>
-        prevOperationLibs.map((op) =>
-          op.id === operation.id ? { ...op, added: true } : op
-        )
-      );
-      updateOperationLists();
-  
-      // Asynchronously update the backend
-      const response = await axios.post(
+      await axios.post(
         `${endpoint}/operation_list/`,
         { list: listId, operations: operation.id },
         { headers }
       );
-  
-      console.log("Operation added successfully:", response.data);
+      // If successful, no action needed here since UI is already updated
     } catch (error) {
       console.error("Error adding operation:", error);
+      // Optionally handle error, e.g., by retrying or showing an error message
     }
   };
   
-
+  
   useEffect(() => {
+    // Load operations from localStorage for immediate feedback
+    const operationsFromStorage = JSON.parse(localStorage.getItem('operations') || '[]');
+    if (operationsFromStorage.length > 0) {
+      setOperationList(operationsFromStorage);
+    }
+  
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${endpoint}/operation_lib/`, {
-          params: { bundle_group: bundleGroup },
+        const response = await axios.get(`${endpoint}/operation_list/`, {
+          params: { bundle_group: bundleGroup, listId: listId },
+          headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
         });
-        setOperationLibs(response.data);
+        // Update the local storage and state with the latest from server
+        localStorage.setItem('operations', JSON.stringify(response.data));
+        setOperationList(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, [bundleGroup, listId, updateOperationLists]);
+  
 
   return (
     <Card>
