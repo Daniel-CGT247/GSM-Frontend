@@ -16,6 +16,7 @@ export default function OperationLib({ operationLibs, onAdd, listId }) {
         },
         { headers: headers }
       );
+      const list = await axios.get(`${endpoint}/operation_list/`);
     } catch (error) {
       console.error("Error adding operation:", error);
     }

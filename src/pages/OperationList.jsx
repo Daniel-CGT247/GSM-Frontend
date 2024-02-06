@@ -6,10 +6,13 @@ import headers from "../utils/headers";
 import endpoint from "../utils/endpoint";
 
 export default function OperationList({ operationList, onDelete }) {
-  const handleDelete = (operationListId) => {
-    axios
+  const handleDelete = async (operationListId) => {
+    const response = await axios
       .delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: headers,
+      })
+      .then((response) => {
+        console.log("Data deleted:", response);
       })
       .catch((error) => {
         console.error("Error deleting data:", error);
@@ -27,7 +30,7 @@ export default function OperationList({ operationList, onDelete }) {
             <tr>
               <th>#</th>
               <th>Name</th>
-              <th>Operation Code</th>
+              <th>Expanding Name</th>
               <th>Operation Code</th>
               <th>Delete</th>
             </tr>
@@ -38,6 +41,8 @@ export default function OperationList({ operationList, onDelete }) {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{item.operations.name}</td>
+                  <td></td>
+                  <td></td>
                   <td>
                     <Button
                       className="btn-danger"
