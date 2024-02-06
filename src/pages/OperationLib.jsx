@@ -140,7 +140,7 @@ function OperationLibList({ listId, bundleId, updateOperationLists }) {
             {libOperations.map((operation) => (
                 <div key={operation.id}>
                     {operation.name}
-                    <Button onClick={() => handleAddOperation(operation.id)}>Add</Button>
+                    <Button variant="success" onClick={() => handleAddOperation(operation.id)}>Add</Button>
                 </div>
             ))}
         </div>
