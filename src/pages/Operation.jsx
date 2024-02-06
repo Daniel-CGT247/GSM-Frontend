@@ -88,55 +88,99 @@ export default function Operation() {
   // States for operation libraries and lists
   const [operationLibs, setOperationLibs] = useState([]);
   const [operationList, setOperationList] = useState([]);
-
   const [operations, setOperations] = useState({}); // Operations now keyed by listId
 
 
+  // useEffect(() => {
+  //   // Fetch operation libraries
+  //   const fetchOperationLibs = async () => {
+  //     try {
+  //       const response = await axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`);
+  //       setOperationLibs(response.data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch operation libraries:", error);
+  //     }
+  //   };
+
+  //   // Fetch operation list
+  //   const fetchOperationList = async () => {
+  //     try {
+  //         const response = await axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
+  //             headers: {
+  //                 Authorization: `JWT ${localStorage.getItem("access_token")}`,
+  //             },
+  //         });
+  //         setOperations(prev => ({ ...prev, [listId]: response.data }));
+  //     } catch (error) {
+  //         console.error("Failed to fetch operation list:", error);
+  //     }
+  // };
+
+  //   fetchOperationLibs();
+  //   fetchOperationList();
+  // }, [listId, jobId, bundleId]); // Re-fetch when these parameters change
+
   useEffect(() => {
-    // Fetch operation libraries
-    const fetchOperationLibs = async () => {
+    // Fetch operation libraries and list
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`);
-        setOperationLibs(response.data);
+        const [libsResponse, listResponse] = await Promise.all([
+          axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`),
+          axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("access_token")}`,
+            },
+          }),
+        ]);
+
+        setOperationLibs(libsResponse.data);
+        setOperations(prev => ({
+          ...prev,
+          [`${listId}-${bundleId}`]: listResponse.data, // Key by both listId and bundleId
+        }));
       } catch (error) {
-        console.error("Failed to fetch operation libraries:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
 
-    // Fetch operation list
-    const fetchOperationList = async () => {
-      try {
-          const response = await axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
-              headers: {
-                  Authorization: `JWT ${localStorage.getItem("access_token")}`,
-              },
-          });
-          setOperations(prev => ({ ...prev, [listId]: response.data }));
-      } catch (error) {
-          console.error("Failed to fetch operation list:", error);
-      }
-  };
+    fetchData();
+  }, [listId, jobId, bundleId]);
 
-    fetchOperationLibs();
-    fetchOperationList();
-  }, [listId, jobId, bundleId]); // Re-fetch when these parameters change
 
-// Update function for operation list
-const updateOperationList = (operation, isDelete = false) => {
-  setOperations(prev => {
-      const listOperations = prev[listId] || [];
+// // Update function for operation list
+// const updateOperationList = (operation, isDelete = false) => {
+//   setOperations(prev => {
+//       const listOperations = prev[listId] || [];
+//       if (isDelete) {
+//           return { ...prev, [listId]: listOperations.filter(op => op.id !== operation.id) };
+//       } else {
+//           // Check if operation already exists
+//           const operationExists = listOperations.some(op => op.id === operation.id);
+//           if (!operationExists) {
+//               return { ...prev, [listId]: [...listOperations, operation] };
+//           }
+//           return prev; // Return previous state if operation already exists
+//       }
+//   });
+// };
+  // Update function for operation list, now scoped by listId and bundleId
+  const updateOperationList = (operation, isDelete = false) => {
+    setOperations(prev => {
+      const operationsKey = `${listId}-${bundleId}`;
+      const listOperations = prev[operationsKey] || [];
       if (isDelete) {
-          return { ...prev, [listId]: listOperations.filter(op => op.id !== operation.id) };
+        return {
+          ...prev,
+          [operationsKey]: listOperations.filter(op => op.id !== operation.id),
+        };
       } else {
-          // Check if operation already exists
-          const operationExists = listOperations.some(op => op.id === operation.id);
-          if (!operationExists) {
-              return { ...prev, [listId]: [...listOperations, operation] };
-          }
-          return prev; // Return previous state if operation already exists
+        return {
+          ...prev,
+          [operationsKey]: [...listOperations, operation],
+        };
       }
-  });
-};
+    });
+  };
 
 
   return (
