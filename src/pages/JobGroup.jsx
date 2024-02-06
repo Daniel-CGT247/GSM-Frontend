@@ -38,11 +38,7 @@ export default function JobGroup() {
       </div>
       <div className="flex justify-center flex-wrap gap-10 my-5">
         {data.map((job_group) => (
-          <JobGroupCard
-            job_group={job_group}
-            listId={listId}
-            // onStatusChange={handleStatusChange}
-          />
+          <JobGroupCard job_group={job_group} listId={listId} />
         ))}
       </div>
     </div>
