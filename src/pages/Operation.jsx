@@ -137,7 +137,7 @@ export default function Operation() {
         setOperations(prev => ({
           ...prev,
           [`${listId}-${bundleId}`]: listResponse.data, // Key by both listId and bundleId
-        }));
+        }));        
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
@@ -163,7 +163,24 @@ export default function Operation() {
 //       }
 //   });
 // };
-  // Update function for operation list, now scoped by listId and bundleId
+  // // Update function for operation list, now scoped by listId and bundleId
+  // const updateOperationList = (operation, isDelete = false) => {
+  //   setOperations(prev => {
+  //     const operationsKey = `${listId}-${bundleId}`;
+  //     const listOperations = prev[operationsKey] || [];
+  //     if (isDelete) {
+  //       return {
+  //         ...prev,
+  //         [operationsKey]: listOperations.filter(op => op.id !== operation.id),
+  //       };
+  //     } else {
+  //       return {
+  //         ...prev,
+  //         [operationsKey]: [...listOperations, operation],
+  //       };
+  //     }
+  //   });
+  // };
   const updateOperationList = (operation, isDelete = false) => {
     setOperations(prev => {
       const operationsKey = `${listId}-${bundleId}`;
@@ -174,13 +191,18 @@ export default function Operation() {
           [operationsKey]: listOperations.filter(op => op.id !== operation.id),
         };
       } else {
-        return {
-          ...prev,
-          [operationsKey]: [...listOperations, operation],
-        };
+        const operationExists = listOperations.some(op => op.id === operation.id);
+        if (!operationExists) {
+          return {
+            ...prev,
+            [operationsKey]: [...listOperations, operation],
+          };
+        }
+        return prev; // Return previous state if operation already exists
       }
     });
   };
+  
 
 
   return (
