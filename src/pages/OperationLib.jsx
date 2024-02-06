@@ -185,11 +185,11 @@ export default function OperationLibList({ bundleGroup, listId, updateOperationL
                 <td>{operation.name}</td>
                 <td>
                   <Button
-                    className={operation.added ? "btn-secondary" : "btn-success"}
+                    // className={operation.added ? "btn-secondary" : "btn-success"}
                     onClick={() => handleAddOperation(operation)}
-                    disabled={operation.added}
-                  >
-                    {operation.added ? "Added" : "Add"}
+                  //   disabled={operation.added}
+                   >
+                  //   {operation.added ? "Added" : "Add"}
                   </Button>
                 </td>
               </tr>

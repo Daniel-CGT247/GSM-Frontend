@@ -98,66 +98,69 @@ import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import endpoint from "../utils/endpoint";
 
-export default function OperationList({ bundleGroup, listId, updateOperationLists }) {
+export default function OperationList({ bundleGroup, listId }) {
   const [operationList, setOperationList] = useState([]);
 
   useEffect(() => {
-    // Initially load from local storage, then sync with backend if needed
+    // Load operations from local storage
+    loadOperationsFromLocalStorage();
+  }, []); // Removed unnecessary dependencies to avoid re-fetching
+
+  const loadOperationsFromLocalStorage = () => {
     const operations = JSON.parse(localStorage.getItem("operations") || "[]");
-    setOperationList(operations.filter(op => op.bundleGroup === bundleGroup));
-  }, [bundleGroup, listId, updateOperationLists]);
-
-  const handleDelete = (operationId) => {
-    // Update local storage immediately for UI update
-    const updatedOperations = removeOperationFromLocalStorage(operationId);
-    setOperationList(updatedOperations.filter(op => op.bundleGroup === bundleGroup));
-
-    // Asynchronously delete from backend
-    const headers = { Authorization: `JWT ${localStorage.getItem("access_token")}` };
-    axios.delete(`${endpoint}/operation_list/${operationId}`, { headers })
-      .then(response => {
-        console.log("Operation deleted successfully:", response.data);
-        // Optionally refresh the list from the backend here
-      })
-      .catch(error => {
-        console.error("Error deleting operation:", error);
-      });
+    // Assuming operations stored in local storage include bundleGroup info
+    const filteredOperations = operations.filter(op => op.bundleGroup === bundleGroup);
+    setOperationList(filteredOperations);
   };
 
-  // Remove operation from local storage
+  const handleDelete = async (operationId) => {
+    // Optimistically remove the operation from UI
+    const updatedOperations = operationList.filter(op => op.id !== operationId);
+    setOperationList(updatedOperations);
+
+    // Remove operation from local storage
+    removeOperationFromLocalStorage(operationId);
+
+    // Asynchronously delete from backend
+    try {
+      await axios.delete(`${endpoint}/operation_list/${operationId}`, {
+        headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
+      });
+      console.log("Operation deleted successfully");
+    } catch (error) {
+      console.error("Error deleting operation:", error);
+      // If deletion fails, reload the operations from local storage or handle the error appropriately
+      loadOperationsFromLocalStorage();
+    }
+  };
+
   const removeOperationFromLocalStorage = (operationId) => {
     let operations = JSON.parse(localStorage.getItem("operations") || "[]");
     const filteredOperations = operations.filter(op => op.id !== operationId);
     localStorage.setItem("operations", JSON.stringify(filteredOperations));
-    return filteredOperations;
   };
 
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>Operation List</Card.Title>
-      </Card.Header>
+      <Card.Header as="h5">Operation List</Card.Header>
       <Card.Body>
-        <Table striped hover>
+        <Table striped bordered hover>
           <thead>
             <tr>
               <th>#</th>
               <th>Operation Code</th>
               <th>Name</th>
-              <th>Delete</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {operationList.map((item, index) => (
-              <tr key={item.id}>
+              <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{item.operation_code}</td>
                 <td>{item.name}</td>
                 <td>
-                  <Button
-                    className="btn-danger"
-                    onClick={() => handleDelete(item.id)}
-                  >
+                  <Button variant="danger" onClick={() => handleDelete(item.id)}>
                     Delete
                   </Button>
                 </td>
