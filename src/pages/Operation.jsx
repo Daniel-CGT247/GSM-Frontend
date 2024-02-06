@@ -184,24 +184,22 @@ export default function Operation() {
   const updateOperationList = (operation, isDelete = false) => {
     setOperations(prev => {
       const operationsKey = `${listId}-${bundleId}`;
-      const listOperations = prev[operationsKey] || [];
+      let listOperations = prev[operationsKey] || [];
       if (isDelete) {
-        return {
-          ...prev,
-          [operationsKey]: listOperations.filter(op => op.id !== operation.id),
-        };
+        // Filter out the operation to be deleted
+        listOperations = listOperations.filter(op => op.id !== operation.id);
       } else {
-        const operationExists = listOperations.some(op => op.id === operation.id);
-        if (!operationExists) {
-          return {
-            ...prev,
-            [operationsKey]: [...listOperations, operation],
-          };
+        // Check if the operation already exists to avoid duplicates
+        if (!listOperations.some(op => op.id === operation.id)) {
+          // Add the operation if it does not exist
+          listOperations = [...listOperations, operation];
         }
-        return prev; // Return previous state if operation already exists
       }
+      // Update the state with the new operations array for the specific listId and bundleId
+      return { ...prev, [operationsKey]: listOperations };
     });
   };
+  
   
 
 
@@ -236,11 +234,12 @@ export default function Operation() {
                 updateOperationList={(operationId) => updateOperationList(operationId, true)}
             /> */}
 
-          <OperationList
-            operationList={operations[`${listId}-${bundleId}`] || []}
-            token={localStorage.getItem("access_token")}
-            updateOperationList={(operationId) => updateOperationList(operationId, true)}
-          />
+            <OperationList
+              operationList={operations[`${listId}-${bundleId}`] || []}
+              token={localStorage.getItem("access_token")}
+              updateOperationList={updateOperationList}
+            />
+
 
           </div>
         </div>

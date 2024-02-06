@@ -141,15 +141,29 @@ import axios from 'axios';
 import endpoint from "../utils/endpoint";
 const OperationList = ({ operationList, updateOperationList }) => {
 
+  // const handleDelete = async (operationId) => {
+  //   try {
+  //     await axios.delete(`${endpoint}/operation_list/${operationId}`, {
+  //       headers: {
+  //         Authorization: `JWT ${localStorage.getItem("access_token")}`,
+  //       },
+  //     });
+
+  //     updateOperationList(operationId, true); // This function needs to be implemented in the parent component to update the state accordingly
+  //   } catch (error) {
+  //     console.error("Error deleting operation:", error);
+  //   }
+  // };
   const handleDelete = async (operationId) => {
     try {
       await axios.delete(`${endpoint}/operation_list/${operationId}`, {
         headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
+
+          Authorization: `JWT ${localStorage.getItem("access_token")}`
+        }
       });
 
-      updateOperationList(operationId, true); // This function needs to be implemented in the parent component to update the state accordingly
+      updateOperationList({ id: operationId }, true);
     } catch (error) {
       console.error("Error deleting operation:", error);
     }

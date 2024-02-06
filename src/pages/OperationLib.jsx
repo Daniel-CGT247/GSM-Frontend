@@ -109,13 +109,42 @@ import axios from 'axios';
 import endpoint from "../utils/endpoint";
 const OperationLibList = ({ operationLibs, listId, updateOperationList }) => {
   
+  // const handleAddOperation = async (selectedOperation) => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${endpoint}/operation_list/`,
+  //       { 
+  //         list: listId, 
+  //         operations: selectedOperation.id },
+  //       {
+  //         headers: {
+  //           Authorization: `JWT ${localStorage.getItem("access_token")}`,
+  //         },
+  //       }
+  //     );
+  
+  //     // Adjust the added operation's structure if necessary
+  //     const adjustedOperation = {
+  //       id: response.data.id, // Assuming this is correct
+  //       operations: {
+  //         operation_code: selectedOperation.operation_code,
+  //         name: selectedOperation.name,
+  //       },
+  //     };
+  
+  //     updateOperationList(adjustedOperation); // Now passing the adjusted structure
+  //   } catch (error) {
+  //     console.error("Error adding operation:", error);
+  //   }
+  // };
   const handleAddOperation = async (selectedOperation) => {
     try {
       const response = await axios.post(
         `${endpoint}/operation_list/`,
-        { 
-          list: listId, 
-          operations: selectedOperation.id },
+        {
+          list: listId,
+          operations: [selectedOperation.id], // Ensure this matches the expected format for your backend
+        },
         {
           headers: {
             Authorization: `JWT ${localStorage.getItem("access_token")}`,
@@ -125,19 +154,16 @@ const OperationLibList = ({ operationLibs, listId, updateOperationList }) => {
   
       // Adjust the added operation's structure if necessary
       const adjustedOperation = {
-        id: response.data.id, // Assuming this is correct
-        operations: {
-          operation_code: selectedOperation.operation_code,
-          name: selectedOperation.name,
-        },
+        id: response.data.id,
+        ...selectedOperation,
       };
   
-      updateOperationList(adjustedOperation); // Now passing the adjusted structure
+      updateOperationList(adjustedOperation, false);
     } catch (error) {
       console.error("Error adding operation:", error);
     }
   };
-
+  
   
   
   return (
