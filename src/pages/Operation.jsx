@@ -128,8 +128,8 @@ export default function Operation() {
           axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`),
           axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
             headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`
+            }
           }),
         ]);
 
