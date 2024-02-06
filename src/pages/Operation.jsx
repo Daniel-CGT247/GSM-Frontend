@@ -128,8 +128,8 @@ export default function Operation() {
           axios.get(`${endpoint}/operation_lib/?bundle_group=${bundleId}`),
           axios.get(`${endpoint}/operation_list/?list_id=${listId}&bundle_group=${bundleId}`, {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`
-            }
+              Authorization: `JWT ${localStorage.getItem("access_token")}`,
+            },
           }),
         ]);
 
@@ -208,11 +208,17 @@ export default function Operation() {
             />
           </div>
           <div className="col space-y-10">
-          <OperationList
+          {/* <OperationList
                 operationList={operations[listId] || []}
                 token={localStorage.getItem("access_token")}
                 updateOperationList={(operationId) => updateOperationList(operationId, true)}
-            />
+            /> */}
+
+          <OperationList
+            operationList={operations[`${listId}-${bundleId}`] || []}
+            token={localStorage.getItem("access_token")}
+            updateOperationList={(operationId) => updateOperationList(operationId, true)}
+          />
 
           </div>
         </div>

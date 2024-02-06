@@ -140,35 +140,64 @@ const OperationLibList = ({ operationLibs, listId, updateOperationList }) => {
 
   
   
-  return (
-    <Card>
-      <Card.Header>Operation Library</Card.Header>
-      <Card.Body>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>Operation Code</th>
-              <th>Name</th>
-              <th>Add</th>
+//   return (
+//     <Card>
+//       <Card.Header>Operation Library</Card.Header>
+//       <Card.Body>
+//         <Table striped hover>
+//           <thead>
+//             <tr>
+//               <th>Operation Code</th>
+//               <th>Name</th>
+//               <th>Add</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {operationLibs.map((operation) => (
+//               <tr key={operation.id}>
+//                 <td>{operation.operation_code}</td>
+//                 <td>{operation.name}</td>
+//                 <td>
+//                   <Button variant="dark" onClick={() => handleAddOperation(operation)}>
+//                     Add
+//                   </Button>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </Table>
+//       </Card.Body>
+//     </Card>
+//   );
+// };
+
+return (
+  <Card>
+    <Card.Header>Operation Library</Card.Header>
+    <Card.Body>
+      <Table striped hover>
+        <thead>
+          <tr>
+            <th>Operation Code</th>
+            <th>Name</th>
+            <th>Add</th>
+          </tr>
+        </thead>
+        <tbody>
+          {operationLibs.map((operation) => (
+            <tr key={operation.id}>
+              <td>{operation.operation_code}</td>
+              <td>{operation.name}</td>
+              <td>
+                {/* Button to handle adding operation */}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {operationLibs.map((operation) => (
-              <tr key={operation.id}>
-                <td>{operation.operation_code}</td>
-                <td>{operation.name}</td>
-                <td>
-                  <Button variant="dark" onClick={() => handleAddOperation(operation)}>
-                    Add
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Card.Body>
-    </Card>
-  );
+          ))}
+        </tbody>
+      </Table>
+    </Card.Body>
+  </Card>
+);
 };
 
 export default OperationLibList;
