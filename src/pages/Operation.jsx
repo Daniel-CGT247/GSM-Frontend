@@ -12,12 +12,10 @@ export default function Operation() {
   const styleNum = useGet(`${endpoint}/collection/${listId}`);
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
-  const jobGroup = useGet(`${endpoint}/job_group/${jobId}`);
-  const bundle_group =
-    jobGroup &&
-    jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id == bundleId);
-  const bundleName = bundle_group && bundle_group.name;
+  const jobGroup = useGet(`http://127.0.0.1:8000/job_group/${jobId}`);
+  const bundle_group = jobGroup?.bundle_groups?.find(bundle => bundle.id.toString() === bundleId);
+  const bundleName = bundle_group?.name ?? 'Loading...';
+  
   // re-render OperationList
   const [operationListKey, setOperationListKey] = useState(0);
 
@@ -30,8 +28,8 @@ export default function Operation() {
     <div className="p-5">
       <div className="flex flex-col space-y-2 items-center justify-center">
         <h1 className="font-bold">Build Operation - {bundleName}</h1>
-
         <h3 className="font-bold">Style {itemName}</h3>
+
         <div className="space-x-5">
           <Link to={`/${listId}/job_group`}>
             <Button variant="outline-secondary">Back to Job Group</Button>
