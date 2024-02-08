@@ -145,10 +145,9 @@ export default function Operation() {
   const styleNum = useGet(`${endpoint}/collection/${listId}`);
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
-  const jobGroup = useGet(`http://127.0.0.1:8000/job_group/${jobId}`);
+  const jobGroup = useGet(`${endpoint}/job_group/${jobId}`);
   const bundle_group = jobGroup?.bundle_groups?.find(bundle => bundle.id.toString() === bundleId);
   const bundleName = bundle_group?.name ?? 'Loading...';
-  
   // re-render OperationList
   const [operationListKey, setOperationListKey] = useState(0);
 
