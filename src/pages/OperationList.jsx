@@ -4,15 +4,13 @@ import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import headers from "../utils/headers";
 import endpoint from "../utils/endpoint";
+import Dropdown from "../components/Dropdown";
 
 export default function OperationList({ operationList, onDelete }) {
   const handleDelete = async (operationListId) => {
-    const response = await axios
+    await axios
       .delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: headers,
-      })
-      .then((response) => {
-        console.log("Data deleted:", response);
       })
       .catch((error) => {
         console.error("Error deleting data:", error);
@@ -41,7 +39,7 @@ export default function OperationList({ operationList, onDelete }) {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{item.operations.name}</td>
-                  <td></td>
+                  <td>{/* <Dropdown operationId={item.operationId} /> */}</td>
                   <td></td>
                   <td>
                     <Button

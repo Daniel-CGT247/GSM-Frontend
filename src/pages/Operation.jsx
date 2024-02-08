@@ -105,7 +105,6 @@ export default function Operation() {
                     ...operationList,
                     {
                       operations: operations[id - 1],
-                      id: operationList.length + 1,
                     },
                   ]);
                 }}
