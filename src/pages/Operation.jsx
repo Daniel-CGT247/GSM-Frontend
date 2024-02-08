@@ -21,8 +21,10 @@ export default function Operation() {
   const bundle_group =
     jobGroup &&
     jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id === bundleId);
+    jobGroup.bundle_groups.find((bundle) => bundle.id.toString() === bundleId);
   const bundleName = bundle_group && bundle_group.name;
+  // re-render OperationList
+  const [operationListKey, setOperationListKey] = useState(0);
 
   const [updateOperations, setUpdateOperations] = useState([]);
 
