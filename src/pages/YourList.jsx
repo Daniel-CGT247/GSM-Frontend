@@ -2,7 +2,7 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import BasicSpinner from "../components/Spinner";
-import useGet from "../customed_hook/getData";
+import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
 

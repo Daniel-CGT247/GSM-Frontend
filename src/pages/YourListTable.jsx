@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import { Link } from "react-router-dom";
 import BasicSpinner from "../components/Spinner";
-import useGet from "../customed_hook/getData";
+import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import headers from "../utils/headers";
 export default function YourListTable({ bundleId, listId }) {

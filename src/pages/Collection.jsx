@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
-import useGet from "../customed_hook/getData";
+import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
 export default function Collection() {

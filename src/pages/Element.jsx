@@ -2,7 +2,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useGet from "../customed_hook/getData";
+import useGet from "../customed_hook/useGet";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";

@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import JobGroupCard from "../components/JobGroupCard";
 import BasicSpinner from "../components/Spinner";
-import useGet from "../customed_hook/getData";
+import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
 export default function JobGroup() {
