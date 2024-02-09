@@ -89,19 +89,23 @@ export default function Collection() {
         </button>
       </div>
 
-      {isLoading && <CardSkeleton />}
+      <h3 className="text-slate-400">Recent Update</h3>
+      
+      {isLoading && (
+        <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
+          <CardSkeleton />
+        </div>
+      )}
 
-      {filteredData.length === 0 ? (
+      {!isLoading && filteredData.length === 0 ? (
         <div className="flex justify-center items-center flex-col">
           <h3>No List Found</h3>
-
           <Link to="/new-item">
             <Button>Create New Style</Button>
           </Link>
         </div>
       ) : (
         <>
-          <h3 className="text-slate-400">Recent Update</h3>
           <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
             {filteredData.slice(0, 4).map((list, index) => (
               <CollectionCard key={index} list={list} />
