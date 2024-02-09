@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
+import { Skeleton } from "@chakra-ui/react";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 

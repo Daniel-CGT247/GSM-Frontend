@@ -2,6 +2,7 @@ import Button from "react-bootstrap/Button";
 import { Link, useParams } from "react-router-dom";
 import JobGroupCard from "../components/JobGroupCard";
 import BasicSpinner from "../components/Spinner";
+import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
@@ -20,7 +21,7 @@ export default function JobGroup() {
       <div className="flex flex-col items-center justify-center space-y-2">
         <h1 className="font-bold">Job Group</h1>
         {styleLoading ? (
-          <BasicSpinner />
+          <StyleSkeleton />
         ) : (
           <h3 className="font-bold">Style {itemName}</h3>
         )}

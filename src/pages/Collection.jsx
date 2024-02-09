@@ -5,6 +5,7 @@ import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
+import CardSkeleton from "../components/CardSkeleton";
 
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
@@ -88,7 +89,9 @@ export default function Collection() {
         </button>
       </div>
 
-      {filteredData.length === 0 && (
+      {isLoading && <CardSkeleton />}
+
+      {filteredData.length === 0 ? (
         <div className="flex justify-center items-center flex-col">
           <h3>No List Found</h3>
 
@@ -96,9 +99,7 @@ export default function Collection() {
             <Button>Create New Style</Button>
           </Link>
         </div>
-      )}
-
-      {filteredData.length !== 0 && (
+      ) : (
         <>
           <h3 className="text-slate-400">Recent Update</h3>
           <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
@@ -106,8 +107,6 @@ export default function Collection() {
               <CollectionCard key={index} list={list} />
             ))}
           </div>
-
-          <hr />
 
           <h3 className="text-slate-400">Older</h3>
 
