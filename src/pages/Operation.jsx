@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { Button, Flex, Container, Heading } from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import OperationLib from "./OperationLib";
 import OperationList from "./OperationList";
+import { IoCheckmarkCircleOutline } from "react-icons/io5";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
@@ -27,25 +29,34 @@ export default function Operation() {
   const [updateOperations, setUpdateOperations] = useState([]);
 
   return (
-    <div className="p-5">
+    <Container maxW="7xl" className="p-5">
       <div className="flex flex-col space-y-2 items-center justify-center">
-        <h1 className="font-bold">
+        <Heading>
           Build Operation {!isJobLoading && <>- {bundleName}</>}
-        </h1>
+        </Heading>
 
         {isStyleLoading ? (
           <StyleSkeleton />
         ) : (
-          <h3 className="font-bold">Style {itemName}</h3>
+          <Heading size="lg">Style {itemName}</Heading>
         )}
-        <div className="space-x-5">
-          <Link to={`/${listId}/job_group`}>
-            <Button variant="outline-secondary">Back to Job Group</Button>
+        <Flex alignItems="center" gap={5} my={5}>
+          <Link to={`/collection`}>
+            <Button>
+              <Flex alignItems="center" gap={1}>
+                <IoArrowBackCircleOutline />
+                To Collection
+              </Flex>
+            </Button>
           </Link>
           <Link to={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}>
-            <Button>Complete</Button>
+            <Button colorScheme="blue">
+              <Flex alignItems="center" gap={1}>
+                Complete <IoCheckmarkCircleOutline />
+              </Flex>
+            </Button>
           </Link>
-        </div>
+        </Flex>
       </div>
       <div className="container text-center my-5">
         <div className="row">
@@ -65,6 +76,6 @@ export default function Operation() {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

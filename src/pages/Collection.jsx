@@ -1,36 +1,36 @@
 import {
   Button,
+  Container,
   Flex,
+  Heading,
   Icon,
-  Menu,
   Input,
   InputGroup,
   InputLeftElement,
+  Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Heading,
-  Container,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { GrPowerReset } from "react-icons/gr";
+import { IoSearch } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import CardSkeleton from "../components/CardSkeleton";
 import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import { IoSearch } from "react-icons/io5";
 
 import { FaChevronDown } from "react-icons/fa6";
+
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
   const [searchTerm, setSearchTerm] = useState(""); // search bar
   const [selectedSeason, setSelectedSeason] = useState(""); // season dropdown
   const [selectedProto, setSelectedProto] = useState("");
 
-  // reset filters
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedSeason("");
@@ -40,13 +40,10 @@ export default function Collection() {
   const filteredData = data.filter(
     (item) =>
       item.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      // dropdown for season
       (selectedSeason === "" || item.item.season === selectedSeason) &&
-      // dropdown for proto
       (selectedProto === "" || item.item.proto === parseInt(selectedProto))
   );
 
-  // get seasons for dropdown
   const uniqueSeasons = [
     ...new Set(data.map((item) => item.item.season)),
   ].sort();
@@ -59,7 +56,7 @@ export default function Collection() {
     <Container maxW="7xl" p={10}>
       <Heading size="xl">Collection</Heading>
 
-      <Flex alginItems="center" gap={4} my={5}>
+      <Flex alignItems="center" gap={4} my={5}>
         <InputGroup width="50%">
           <InputLeftElement pointerEvents="none">
             <IoSearch color="gray.300" />
@@ -127,7 +124,7 @@ export default function Collection() {
         </Menu>
 
         <Button colorScheme="red" onClick={resetFilters}>
-          <Flex alginItems="center" gap={2}>
+          <Flex alignItems="center" gap={2}>
             Reset filters
             <Icon as={GrPowerReset} />
           </Flex>

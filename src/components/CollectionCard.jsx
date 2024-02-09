@@ -2,60 +2,59 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
+  Flex,
   HStack,
   Heading,
   Image,
-  Link,
-  Stack,
   Text,
-  Divider,
-  Flex,
-  Box,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
+import JobDrawer from "./JobDrawer";
 
 export default function CollectionCard({ list, maxWidth }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const placeholderImage = "https://placehold.co/200x170";
-
-  // image url from api
   const imageUrl = list.item.image || placeholderImage;
 
   return (
-    <Card maxW={maxWidth} overflow="hidden" variant="outline">
-      <HStack>
-        <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
+    <>
+      <Card maxW={maxWidth} overflow="hidden" variant="outline">
+        <HStack>
+          <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
 
-        <CardBody>
-          <Heading size="md">{list.item.name}</Heading>
-          <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
+          <CardBody>
+            <Heading size="md">{list.item.name}</Heading>
+            <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
 
-          <Flex gap={4} mb={4}>
-            <Flex alignItems="center" gap={1}>
-              <LuFlower />
-              {list.item.season}
+            <Flex gap={4} mb={4}>
+              <Flex alignItems="center" gap={1}>
+                <LuFlower />
+                {list.item.season}
+              </Flex>
+              <Flex alignItems="center" gap={1}>
+                <HiPuzzle />
+                {list.item.proto}
+              </Flex>
             </Flex>
-            <Flex alignItems="center" gap={1}>
-              <HiPuzzle />
-              {list.item.proto}
-            </Flex>
-          </Flex>
-          <Link href={`/${list.id}/job_group`}>
-            <Button colorScheme="blue" variant="solid">
+            {/* <Link href={`/${list.id}/job_group`}> */}
+            <Button colorScheme="blue" variant="solid" onClick={onOpen}>
               Continue
             </Button>
-          </Link>
-        </CardBody>
-      </HStack>
-      <Flex
-        bgColor="gray.100"
-        height="50px"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Text my={0}>Last Update: {list.last_update}</Text>
-      </Flex>
-    </Card>
+            {/* </Link> */}
+          </CardBody>
+        </HStack>
+        <Flex
+          bgColor="gray.100"
+          height="50px"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text my={0}>Last Update: {list.last_update}</Text>
+        </Flex>
+      </Card>
+      <JobDrawer onClose={onClose} isOpen={isOpen} styleNum={list.item.name} listId={list.id}/>
+    </>
   );
 }
