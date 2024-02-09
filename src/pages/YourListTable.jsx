@@ -44,6 +44,7 @@ export default function YourListTable({ bundleId, listId }) {
           <tr>
             <th>Operation Code</th>
             <th>Name</th>
+            <th>Concat Name</th>
             <th>Total SAM</th>
             <th># of Elements</th>
             <th>Action</th>
@@ -52,7 +53,8 @@ export default function YourListTable({ bundleId, listId }) {
         <tbody>
           {operationList.map((item) => (
             <tr key={item.id}>
-              <td>{item.operations.operation_code}</td>
+              <td>{item.expanding_field ? item.expanding_field.operation_code : ''}</td>
+              <td>{item.expanding_field ? item.expanding_field.name : ''}</td>
               <td>{item.operations.name}</td>
               <td>{Number(item.total_sam).toFixed(2)}</td>
               <td>{item.element_count}</td>
