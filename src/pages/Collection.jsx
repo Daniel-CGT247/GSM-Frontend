@@ -1,12 +1,29 @@
+import {
+  Button,
+  Flex,
+  Icon,
+  Menu,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Heading,
+  Container,
+} from "@chakra-ui/react";
 import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
+import { GrPowerReset } from "react-icons/gr";
 import { Link } from "react-router-dom";
+import CardSkeleton from "../components/CardSkeleton";
 import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import CardSkeleton from "../components/CardSkeleton";
+import { IoSearch } from "react-icons/io5";
 
+import { FaChevronDown } from "react-icons/fa6";
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
   const [searchTerm, setSearchTerm] = useState(""); // search bar
@@ -20,8 +37,6 @@ export default function Collection() {
     setSelectedProto("");
   };
 
-  // search bar
-  // filter user input
   const filteredData = data.filter(
     (item) =>
       item.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -41,56 +56,86 @@ export default function Collection() {
   ].sort();
 
   return (
-    <div className="p-5">
-      <h1 className="font-bold">Collection</h1>
+    <Container maxW="7xl" p={10}>
+      <Heading size="xl">Collection</Heading>
 
-      {/* search bar for ref style */}
-      <div className="flex justify-center items-center gap-4 mb-6">
-        {/* search bar */}
-        <input
-          className="text-center"
-          type="text"
-          placeholder="Search by Reference Style"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <Flex alginItems="center" gap={4} my={5}>
+        <InputGroup width="50%">
+          <InputLeftElement pointerEvents="none">
+            <IoSearch color="gray.300" />
+          </InputLeftElement>
 
-        {/* season dropdown */}
-        <select
-          className="text-center"
-          value={selectedSeason}
-          onChange={(e) => setSelectedSeason(e.target.value)}
-        >
-          <option value="">Seasons</option>
-          {uniqueSeasons.map((season) => (
-            <option key={season} value={season}>
-              {season}
-            </option>
-          ))}
-        </select>
+          <Input
+            className="text-center"
+            type="text"
+            placeholder="Search a Style"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </InputGroup>
+        <Menu>
+          {({ isOpen }) => (
+            <>
+              <MenuButton
+                isActive={isOpen}
+                as={Button}
+                rightIcon={<FaChevronDown />}
+              >
+                {!selectedSeason ? "Season" : selectedSeason}
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup
+                  type="radio"
+                  onChange={(value) => setSelectedSeason(value)}
+                >
+                  <MenuItemOption value="">All</MenuItemOption>
+                  {uniqueSeasons.map((season) => (
+                    <MenuItemOption key={season} value={season}>
+                      {season}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </>
+          )}
+        </Menu>
+        <Menu>
+          {({ isOpen }) => (
+            <>
+              <MenuButton
+                isActive={isOpen}
+                as={Button}
+                rightIcon={<FaChevronDown />}
+              >
+                {!selectedProto ? "Proto" : selectedProto}
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup
+                  type="radio"
+                  onChange={(value) => setSelectedProto(value)}
+                >
+                  <MenuItemOption value="">All</MenuItemOption>
+                  {uniquePrototype.map((proto) => (
+                    <MenuItemOption key={proto} value={proto}>
+                      {proto}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </>
+          )}
+        </Menu>
 
-        {/* proto dropdown */}
-        <select
-          className="text-center"
-          value={selectedProto}
-          onChange={(e) => setSelectedProto(e.target.value)}
-        >
-          <option value="">Proto</option>
-          {uniquePrototype.map((proto) => (
-            <option key={proto} value={proto}>
-              {proto}
-            </option>
-          ))}
-        </select>
-
-        {/* reset btn */}
-        <button onClick={resetFilters} className="your-reset-button-class">
-          Reset filters
-        </button>
-      </div>
+        <Button colorScheme="red" onClick={resetFilters}>
+          <Flex alginItems="center" gap={2}>
+            Reset filters
+            <Icon as={GrPowerReset} />
+          </Flex>
+        </Button>
+      </Flex>
 
       <h3 className="text-slate-400">Recent Update</h3>
-      
+
       {isLoading && (
         <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
           <CardSkeleton />
@@ -108,7 +153,7 @@ export default function Collection() {
         <>
           <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
             {filteredData.slice(0, 4).map((list, index) => (
-              <CollectionCard key={index} list={list} />
+              <CollectionCard key={index} list={list} maxWidth="md" />
             ))}
           </div>
 
@@ -116,11 +161,11 @@ export default function Collection() {
 
           <CarouselCollection>
             {filteredData.slice(4).map((list, index) => (
-              <CollectionCard key={index} list={list} />
+              <CollectionCard key={index} list={list} maxWidth="sm" />
             ))}
           </CarouselCollection>
         </>
       )}
-    </div>
+    </Container>
   );
 }

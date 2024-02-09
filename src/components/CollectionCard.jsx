@@ -16,27 +16,27 @@ import {
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
 
-export default function CollectionCard({ list }) {
+export default function CollectionCard({ list, maxWidth }) {
   const placeholderImage = "https://placehold.co/200x170";
 
   // image url from api
   const imageUrl = list.item.image || placeholderImage;
 
   return (
-    <Card maxW="lg" overflow="hidden" variant="outline">
+    <Card maxW={maxWidth} overflow="hidden" variant="outline">
       <HStack>
         <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
 
         <CardBody>
-          <Heading size="lg">{list.item.name}</Heading>
+          <Heading size="md">{list.item.name}</Heading>
           <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
 
           <Flex gap={4} mb={4}>
-            <Flex alignItems="center">
+            <Flex alignItems="center" gap={1}>
               <LuFlower />
               {list.item.season}
             </Flex>
-            <Flex alignItems="center">
+            <Flex alignItems="center" gap={1}>
               <HiPuzzle />
               {list.item.proto}
             </Flex>
