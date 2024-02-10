@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Button, Flex, Container, Heading } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Container,
+  Heading,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
@@ -8,6 +14,7 @@ import OperationLib from "./OperationLib";
 import OperationList from "./OperationList";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
+import JobDrawer from "../components/JobDrawer";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
@@ -19,6 +26,7 @@ export default function Operation() {
   const { data: jobGroup, isLoading: isJobLoading } = useGet(
     `${endpoint}/job_group/${jobId}`
   );
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const bundle_group =
     jobGroup &&
@@ -41,14 +49,12 @@ export default function Operation() {
           <Heading size="lg">Style {itemName}</Heading>
         )}
         <Flex alignItems="center" gap={5} my={5}>
-          <Link to={`/collection`}>
-            <Button>
-              <Flex alignItems="center" gap={1}>
-                <IoArrowBackCircleOutline />
-                To Collection
-              </Flex>
-            </Button>
-          </Link>
+          <Button onClick={onOpen}>
+            <Flex alignItems="center" gap={1}>
+              <IoArrowBackCircleOutline />
+              Choose another jobs
+            </Flex>
+          </Button>
           <Link to={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}>
             <Button colorScheme="blue">
               <Flex alignItems="center" gap={1}>
@@ -76,6 +82,12 @@ export default function Operation() {
           </div>
         </div>
       </div>
+      <JobDrawer
+        onClose={onClose}
+        isOpen={isOpen}
+        styleNum={itemName}
+        listId={listId}
+      />
     </Container>
   );
 }

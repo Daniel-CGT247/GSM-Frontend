@@ -38,11 +38,9 @@ export default function CollectionCard({ list, maxWidth }) {
                 {list.item.proto}
               </Flex>
             </Flex>
-            {/* <Link href={`/${list.id}/job_group`}> */}
             <Button colorScheme="blue" variant="solid" onClick={onOpen}>
               Continue
             </Button>
-            {/* </Link> */}
           </CardBody>
         </HStack>
         <Flex

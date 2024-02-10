@@ -1,4 +1,11 @@
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+} from "@chakra-ui/react";
 import axios from "axios";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
@@ -20,17 +27,25 @@ export default function OperationList({
     setData: setOperationList,
     isLoading: isOperationListLoading,
   } = useGet(`${endpoint}/operation_list`, paramList, updateOperationList);
+
+  const [error, setError] = useState(false);
+
   const handleDelete = async (operationListId) => {
     try {
       await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: headers,
       });
+      setOperationList((operationList) =>
+        operationList.filter((item) => item.id !== operationListId)
+      );
+      setError(false);
     } catch (error) {
       console.error("Error deleting operation:", error);
+      setError(true);
+      setTimeout(() => {
+        setError(false);
+      }, 5000);
     }
-    setOperationList((operationList) =>
-      operationList.filter((item) => item.id !== operationListId)
-    );
   };
 
   return (
@@ -42,6 +57,16 @@ export default function OperationList({
           <Card.Header>
             <Card.Title>Operation List</Card.Title>
           </Card.Header>
+          {error && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle>Cannot Delete Operation</AlertTitle>
+              <AlertDescription>
+                Please remove the elements list first
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Card.Body>
             <Table striped hover>
               <thead>
