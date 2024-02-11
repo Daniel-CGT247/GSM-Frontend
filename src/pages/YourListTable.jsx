@@ -1,17 +1,30 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
-import { Link } from "react-router-dom";
-import BasicSpinner from "../components/Spinner";
+import {
+  Button,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  Card,
+  CardBody,
+  TableCaption,
+  Text,
+} from "@chakra-ui/react";
+import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import headers from "../utils/headers";
-export default function YourListTable({ bundleId, listId }) {
-  const tableStyle = {
-    maxWidth: "80%",
-    margin: "0 auto",
-  };
 
+const columns = [
+  "Name",
+  "Description",
+  "Job #",
+  "Total SAM",
+  "# of Elements",
+  "",
+];
+export default function YourListTable({ bundleId, listId }) {
   const params = {
     bundle_group: bundleId,
     listId: listId,
@@ -19,48 +32,60 @@ export default function YourListTable({ bundleId, listId }) {
 
   const { data: operationList, isLoading } = useGet(
     `${endpoint}/operation_list/`,
-    params,
-    headers
+    params
   );
   return (
-    <div className="my-5" style={{ display: "flex", justifyContent: "center" }}>
+    <>
       {isLoading ? (
-        <BasicSpinner />
+        <TableSkeleton header="Your List" columns={columns} />
       ) : (
-        <Table
-          striped
-          bordered
-          hover
-          style={{ ...tableStyle, textAlign: "center" }}
-        >
-          <thead>
-            <tr>
-              <th>Operation Code</th>
-              <th>Name</th>
-              <th>Total SAM</th>
-              <th># of Elements</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {operationList.map((item) => (
-              <tr key={item.id}>
-                <td>{item.operations.operation_code}</td>
-                <td>{item.operations.name}</td>
-                <td>{Number(item.total_sam).toFixed(2)}</td>
-                <td>{item.element_count}</td>
-                <td>
-                  <Link
-                    to={`/${listId}/operation/${item.operations.id}/${item.id}/element`}
-                  >
-                    <Button variant="success">Build Elements</Button>
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <Card>
+          <CardBody>
+            <TableContainer>
+              <Table variant="striped" colorScheme="gray">
+                <TableCaption placement="top" bgColor="gray.50">
+                  <Text as="h4">Your List</Text>
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th>Description</Th>
+                    <Th>Job #</Th>
+                    <Th isNumeric>Total SAM</Th>
+                    <Th isNumeric># of Elements</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {operationList.map((item) => (
+                    <Tr key={item.id}>
+                      <Td>{item.operations.name}</Td>
+                      <Td>
+                        {item.expanding_field && item.expanding_field.name}
+                      </Td>
+                      <Td>
+                        {item.expanding_field &&
+                          item.expanding_field.operation_code}
+                      </Td>
+                      <Td isNumeric>{Number(item.total_sam).toFixed(2)}</Td>
+                      <Td isNumeric>{item.element_count}</Td>
+                      <Td>
+                        <Button
+                          as="a"
+                          href={`/${listId}/operation/${item.operations.id}/${item.id}/element`}
+                          colorScheme="twitter"
+                        >
+                          Build Elements
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </CardBody>
+        </Card>
       )}
-    </div>
+    </>
   );
 }

@@ -16,17 +16,21 @@ import {
   Th,
   Thead,
   Tr,
+  Card,
+  CardBody,
+  CardHeader,
+  Text,
+  TableCaption,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
-import Card from "react-bootstrap/Card";
 import { FaChevronDown } from "react-icons/fa6";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import headers from "../utils/headers";
 
-const columns = ["#", "Name", "Description", "Job #", "Delete"];
+const columns = ["#", "Name", "Description", "Job #", ""];
 
 export default function OperationList({
   bundleId,
@@ -68,9 +72,6 @@ export default function OperationList({
         <TableSkeleton header="Operation List" columns={columns} />
       ) : (
         <Card>
-          <Card.Header>
-            <Card.Title>Operation List</Card.Title>
-          </Card.Header>
           {error && (
             <Alert status="error">
               <AlertIcon />
@@ -81,16 +82,20 @@ export default function OperationList({
             </Alert>
           )}
 
-          <Card.Body>
+          <CardBody>
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
+                <TableCaption placement="top" bgColor="gray.50">
+                  <Text as="h4">Operation List</Text>
+                </TableCaption>
+
                 <Thead>
                   <Tr>
                     <Th>#</Th>
                     <Th>Name</Th>
                     <Th>Description</Th>
                     <Th>Job #</Th>
-                    <Th>Delete</Th>
+                    <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -102,7 +107,6 @@ export default function OperationList({
                         <ExpandingName
                           operationId={item.operations.id}
                           operationListId={item.id}
-                          selectedDesc={selectedDesc}
                           setSelectedDesc={setSelectedDesc}
                           item={item}
                         />
@@ -131,7 +135,7 @@ export default function OperationList({
                 </Tbody>
               </Table>
             </TableContainer>
-          </Card.Body>
+          </CardBody>
         </Card>
       )}
     </>

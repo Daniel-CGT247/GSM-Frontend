@@ -1,22 +1,24 @@
 import {
   Button,
   Table,
+  TableCaption,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
+  Card,
+  CardBody,
 } from "@chakra-ui/react";
 import axios from "axios";
-import React from "react";
-import Card from "react-bootstrap/Card";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import headers from "../utils/headers";
 
-const columns = ["Name", "Add"];
+const columns = ["Name", ""];
 
 export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
   const paramLib = { bundle_group: bundleId };
@@ -55,16 +57,16 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
         <TableSkeleton header="Operation Library" columns={columns} />
       ) : (
         <Card>
-          <Card.Header>
-            <Card.Title>Operation Library</Card.Title>
-          </Card.Header>
-          <Card.Body>
+          <CardBody>
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
+                <TableCaption placement="top" bgColor="gray.50">
+                  <Text as="h4">Operation Library</Text>
+                </TableCaption>
                 <Thead>
                   <Tr>
                     <Th>Name</Th>
-                    <Th>Add</Th>
+                    <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -84,7 +86,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                 </Tbody>
               </Table>
             </TableContainer>
-          </Card.Body>
+          </CardBody>
         </Card>
       )}
     </>

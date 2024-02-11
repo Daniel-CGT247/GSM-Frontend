@@ -1,7 +1,7 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
-import { Link, useParams } from "react-router-dom";
-import BasicSpinner from "../components/Spinner";
+import { Button, Container, Flex, Heading } from "@chakra-ui/react";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { useParams } from "react-router-dom";
+import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
@@ -24,25 +24,31 @@ export default function YourList() {
   const bundleName = bundle_group && bundle_group.name;
 
   return (
-    <div className="p-5">
-      <div className="flex items-center justify-center space-y-2 flex-col">
-        <h1 className="font-bold">
-          Your List {!isJobLoading && <>- {bundleName}</>}
-        </h1>
+    <Container maxW="7xl" className="p-5">
+      <Flex
+        direction="column"
+        gap={2}
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Heading>Your List {!isJobLoading && <>- {bundleName}</>}</Heading>
         {isStyleLoading ? (
-          <BasicSpinner />
+          <StyleSkeleton />
         ) : (
-          <h3 className="font-bold">Style {itemName}</h3>
+          <Heading size="lg">Style {itemName}</Heading>
         )}
-        <Link to={`/${listId}/job_group/${jobId}/${bundleId}/operation`}>
-          <Button variant="outline-secondary">Edit Operation List</Button>
-        </Link>
-      </div>
-      <YourListTable
-        className="rounded-md"
-        bundleId={bundleId}
-        listId={listId}
-      />
-    </div>
+        <Button
+          as="a"
+          href={`/${listId}/job_group/${jobId}/${bundleId}/operation`}
+          variant="outline"
+          colorScheme="twitter"
+          leftIcon={<IoArrowBackCircleOutline />}
+          mb={5}
+        >
+          Edit Operation List
+        </Button>
+      </Flex>
+      <YourListTable bundleId={bundleId} listId={listId} />
+    </Container>
   );
 }

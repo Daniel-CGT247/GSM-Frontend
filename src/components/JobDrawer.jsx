@@ -5,6 +5,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   Link,
   List,
   ListIcon,
@@ -13,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { CiCircleRemove } from "react-icons/ci";
 import { FaCircleNotch } from "react-icons/fa";
+import { IoIosArrowBack } from "react-icons/io";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
@@ -71,6 +73,14 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
             </Accordion>
           ) : (
             <Text>Loading...</Text>
+          )}
+          {window.location.pathname !== "/collection" && (
+            <Link href={`/collection`}>
+              <Flex alignItems="center" gap={1} my={5}>
+                <IoIosArrowBack />
+                Back to Collection
+              </Flex>
+            </Link>
           )}
         </DrawerBody>
       </DrawerContent>

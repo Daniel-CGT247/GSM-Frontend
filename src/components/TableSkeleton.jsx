@@ -1,36 +1,51 @@
-import { Skeleton } from "@chakra-ui/react";
-import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
+import {
+  Card,
+  CardBody,
+  Skeleton,
+  Table,
+  TableCaption,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 
 export default function TableSkeleton({ header, columns }) {
   const rows = [1, 2, 3, 4, 5];
   return (
     <Card>
-      <Card.Header>
-        <Card.Title>{header}</Card.Title>
-      </Card.Header>
-      <Card.Body>
-        <Table striped hover>
-          <thead>
-            <tr>
-              {columns.map((col) => (
-                <th key={col} scope="col">{col}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row}>
+      <CardBody>
+        <TableContainer>
+          <Table variant="striped">
+            <TableCaption placement="top" bgColor="gray.50">
+              <Text as="h4">{header}</Text>
+            </TableCaption>
+            <Thead>
+              <Tr>
                 {columns.map((col) => (
-                  <td key={col}>
-                    <Skeleton mt={4} />
-                  </td>
+                  <Th key={col} scope="col">
+                    {col}
+                  </Th>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Card.Body>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {rows.map((row) => (
+                <Tr key={row}>
+                  {columns.map((col) => (
+                    <Td key={col}>
+                      <Skeleton mt={4} />
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </CardBody>
     </Card>
   );
 }
