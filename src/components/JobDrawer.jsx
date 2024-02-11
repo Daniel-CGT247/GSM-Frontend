@@ -5,11 +5,11 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  Link,
   List,
   ListIcon,
   ListItem,
   Text,
-  Link,
 } from "@chakra-ui/react";
 import { CiCircleRemove } from "react-icons/ci";
 import { FaCircleNotch } from "react-icons/fa";
@@ -27,7 +27,6 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
   const { isLoading, data } = useGet(`${endpoint}/job_group/`, {
     listId: listId,
   });
-  console.log(data);
 
   return (
     <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
@@ -40,7 +39,7 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
           {data ? (
             <Accordion allowToggle>
               {data.map((job_group) => (
-                <AccordionItem key={job_group}>
+                <AccordionItem key={job_group.id}>
                   <h2>
                     <AccordionButton>
                       <Box as="span" flex="1" textAlign="left">
@@ -52,7 +51,7 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
                   <AccordionPanel pb={4}>
                     <List spacing={3}>
                       {job_group.bundle_groups.map((bundle_group) => (
-                        <ListItem key={bundle_group}>
+                        <ListItem key={bundle_group.id}>
                           {bundle_group.operations_count === 0 ? (
                             <ListIcon as={CiCircleRemove} color="red.500" />
                           ) : (

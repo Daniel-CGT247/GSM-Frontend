@@ -1,8 +1,16 @@
+import {
+  Button,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import axios from "axios";
 import React from "react";
-import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
@@ -51,29 +59,31 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
             <Card.Title>Operation Library</Card.Title>
           </Card.Header>
           <Card.Body>
-            <Table striped hover>
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Add</th>
-                </tr>
-              </thead>
-              <tbody>
-                {operations.map((operation) => (
-                  <tr key={operation.id}>
-                    <td>{operation.name}</td>
-                    <td>
-                      <Button
-                        className="btn-success"
-                        onClick={() => addOperation(operation)}
-                      >
-                        Add
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <TableContainer>
+              <Table variant="striped" colorScheme="gray">
+                <Thead>
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th>Add</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {operations.map((operation) => (
+                    <Tr key={operation.id}>
+                      <Td>{operation.name}</Td>
+                      <Td>
+                        <Button
+                          colorScheme="green"
+                          onClick={() => addOperation(operation)}
+                        >
+                          Add
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </Card.Body>
         </Card>
       )}
