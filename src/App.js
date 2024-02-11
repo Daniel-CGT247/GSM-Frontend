@@ -3,7 +3,6 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navigation from "./components/NavBar";
 import Collection from "./pages/Collection";
 import Element from "./pages/Element";
-import JobGroup from "./pages/JobGroup";
 import Login from "./pages/Login";
 import Logout from "./pages/Logout";
 import NewItem from "./pages/NewItem";
@@ -22,7 +21,7 @@ export default function App() {
           <Route path="/logout" element={<Logout />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/new-item" element={<NewItem />} />
-          <Route path="/:listId/job_group" element={<JobGroup />} />
+          {/* <Route path="/:listId/job_group" element={<JobGroup />} /> */}
           <Route
             path="/:listId/job_group/:jobId/:bundleId/operation"
             element={<Operation />}
