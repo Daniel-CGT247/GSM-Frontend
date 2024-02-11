@@ -1,8 +1,7 @@
+import { Flex, Image, Link, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
 import userAuth from "../customed_hook/useAuth";
-
+import BrandLogo from "../images/Canada-Goose-Logo.png";
 export default function Navigation() {
   const user = userAuth();
 
@@ -11,27 +10,46 @@ export default function Navigation() {
     if (localStorage.getItem("access_token") !== null) {
       setIsAuth(true);
     }
-  }, [isAuth]);
-
+  }, [user]);
+  const navs = [
+    { name: "Collection", href: "/collection" },
+    { name: "Build New Item", href: "/new-item" },
+    { name: "Logout", href: "/Logout" },
+  ];
   return (
-    <>
-      <Navbar sticky="top" bg="dark" variant="dark" className="py-2 px-4">
-        <Navbar.Brand href="/collection">GSM Project</Navbar.Brand>
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      p={4}
+      pos="sticky"
+      top={0}
+      zIndex={10}
+      bgColor="gray.300"
+    >
+      <Flex alignItems="center" gap={10}>
+        <Flex alignItems="center">
+          <Image src={BrandLogo} w="100px" alt="brand-logo" />
+          <Text m={0} p={0} as="h5">
+            GSM Project
+          </Text>
+        </Flex>
         {isAuth && (
-          <div className="w-full flex justify-between items-center">
-            <Nav>
-              <Nav.Link href="/collection">Collection</Nav.Link>
-              <Nav.Link href="/new-item">Build New Item</Nav.Link>
-              <Nav.Link href="/Logout">Logout</Nav.Link>
-            </Nav>
-            <Nav>
-              <Navbar.Text className="text-lg font-semibold">
-                {user?.username}
-              </Navbar.Text>
-            </Nav>
-          </div>
+          <Flex justifyContent="space-between" gap={5}>
+            {navs.map((nav) => (
+              <Link href={nav.href} key={nav.href}>
+                <Text m={0} p={0} fontSize="lg">
+                  {nav.name}
+                </Text>
+              </Link>
+            ))}
+          </Flex>
         )}
-      </Navbar>
-    </>
+      </Flex>
+      {isAuth && (
+        <Text fontSize="md" m={0} p={0}>
+          Welcome back, {user?.username}
+        </Text>
+      )}
+    </Flex>
   );
 }

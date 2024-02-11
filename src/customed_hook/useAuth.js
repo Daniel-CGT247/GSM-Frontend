@@ -2,14 +2,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import endpoint from "../utils/endpoint";
+import headers from "../utils/headers";
 
 export default function useAuth() {
   const [user, setUser] = useState([]);
   const navigate = useNavigate();
-
-  const headers = {
-    Authorization: `JWT ${localStorage.getItem("access_token")}`,
-  };
 
   useEffect(() => {
     const checkAuth = async () => {
