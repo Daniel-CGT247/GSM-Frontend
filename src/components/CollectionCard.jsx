@@ -38,7 +38,7 @@ export default function CollectionCard({ list, maxWidth }) {
                 {list.item.proto}
               </Flex>
             </Flex>
-            <Button colorScheme="blue" variant="solid" onClick={onOpen}>
+            <Button colorScheme="twitter" variant="solid" onClick={onOpen}>
               Continue
             </Button>
           </CardBody>

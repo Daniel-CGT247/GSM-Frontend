@@ -37,7 +37,7 @@ export default function Navigation() {
           <Flex justifyContent="space-between" gap={5}>
             {navs.map((nav) => (
               <Link href={nav.href} key={nav.href}>
-                <Text m={0} p={0} fontSize="lg">
+                <Text m={0} p={0} fontSize="lg" color="gray.500">
                   {nav.name}
                 </Text>
               </Link>
@@ -46,7 +46,7 @@ export default function Navigation() {
         )}
       </Flex>
       {isAuth && (
-        <Text fontSize="md" m={0} p={0}>
+        <Text fontSize="md" m={0} p={0} color="gray.500">
           Welcome back, {user?.username}
         </Text>
       )}
