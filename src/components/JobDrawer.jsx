@@ -1,5 +1,11 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
+  Checkbox,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -18,13 +24,6 @@ import { IoIosArrowBack } from "react-icons/io";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-} from "@chakra-ui/react";
 export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
   const { isLoading, data } = useGet(`${endpoint}/job_group/`, {
     listId: listId,
@@ -64,6 +63,11 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
                           >
                             {bundle_group.name}
                           </Link>
+                          <Checkbox
+                            isDisabled={bundle_group.operations_count === 0}
+                            colorScheme="whatsapp"
+                            mx={5}
+                          ></Checkbox>
                         </ListItem>
                       ))}
                     </List>
