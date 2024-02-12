@@ -109,11 +109,14 @@ export default function Collection() {
               <MenuList>
                 <MenuOptionGroup
                   type="radio"
-                  onChange={(value) => setSelectedProto(value)}
+                  value={selectedProto.toString()}
+                  onChange={(value) => {
+                    setSelectedProto(parseInt(value))
+                  }}
                 >
                   <MenuItemOption value="">All</MenuItemOption>
                   {uniquePrototype.map((proto) => (
-                    <MenuItemOption key={proto} value={proto}>
+                    <MenuItemOption key={proto} value={proto.toString()}>
                       {proto}
                     </MenuItemOption>
                   ))}
