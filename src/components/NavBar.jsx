@@ -14,7 +14,7 @@ export default function Navigation() {
   const navs = [
     { name: "Collection", href: "/collection" },
     { name: "Build New Item", href: "/new-item" },
-    { name: "Logout", href: "/Logout" },
+    { name: "Logout", href: "/logout" }, 
   ];
   return (
     <Flex
@@ -28,7 +28,7 @@ export default function Navigation() {
     >
       <Flex alignItems="center" gap={10}>
         <Flex alignItems="center">
-          <Image src={BrandLogo} w="100px" alt="brand-logo" />
+          <Image src={BrandLogo} w="80px" h="auto" alt="brand-logo" /> {/* Adjusted width and height */}
           <Text m={0} p={0} as="h5">
             GSM Project
           </Text>
