@@ -1,7 +1,8 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -11,84 +12,157 @@ import {
   Tr,
   Card,
   CardBody,
+  Input,
+  Box,
+  Center,
+  Flex,
+  IconButton,
+  HStack,
 } from "@chakra-ui/react";
-import axios from "axios";
-import TableSkeleton from "../components/TableSkeleton";
-import useGet from "../customed_hook/useGet";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import endpoint from "../utils/endpoint";
-import headers from "../utils/headers";
 
-const columns = ["Name", ""];
+export default function OperationLib({ bundleGroup, listId, updateOperationLists }) {
+  const [operationLibs, setOperationLibs] = useState(null); 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredLibs, setFilteredLibs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
-export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
-  const paramLib = { bundle_group: bundleId };
-  const paramList = { bundle_group: bundleId, listId: listId };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${endpoint}/operation_lib/`,
+          { 
+            params: { bundle_group: bundleGroup }, 
+            headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
+          }
+        );
+        setOperationLibs(response.data);
+      } catch (error) {
+        console.error("Error fetching operation libraries:", error);
+        setOperationLibs([]);
+      }
+    };
 
-  const { data: operations, isLoading: isLibLoading } = useGet(
-    `${endpoint}/operation_lib`,
-    paramLib
-  );
+    fetchData();
+  }, [bundleGroup, listId, updateOperationLists]);
 
-  const { data: operationList } = useGet(
-    `${endpoint}/operation_list`,
-    paramList
-  );
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = operationLibs?.filter(item => {
+      return (
+        item.name.toLowerCase().includes(lowercasedFilter) || 
+        item.job_code.toString().includes(lowercasedFilter)
+      );
+    });
+    setFilteredLibs(filteredData || []);
+    setCurrentPage(1); 
+  }, [operationLibs, searchTerm]);
 
-  const addOperation = (operation) => {
-    const body = { list: listId, operations: operation.id };
+  const handleAddOperation = async (operation) => {
+    try {
+      const response = await axios.post(
+        `${endpoint}/operation_list/`, 
+        { operations: operation.id, list: listId }, 
+        { headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` } }
+      );
 
-    axios
-      .post(`${endpoint}/operation_list/`, body, { headers: headers })
-      .then(() => {
-        setUpdateFunc([
-          ...operationList,
-          {
-            list: listId,
-            operations: { id: operation.id, name: operation.name },
-          },
-        ]);
-      })
-      .catch((error) => console.error("Error adding operation:", error));
+      if (response.status === 200 || response.status === 201) {
+        console.log("Operation added successfully:", response.data);
+        updateOperationLists(response.data); 
+      } else {
+        console.error("Failed to add operation:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error adding operation:", error.response ? error.response.data : error);
+    }
+  };
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
+
+
+  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
+
+  const renderPaginationNumbers = () => {
+    let items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Button
+          key={number}
+          colorScheme={currentPage === number ? "blue" : "gray"}
+          onClick={() => setCurrentPage(number)}
+        >
+          {number}
+        </Button>
+      );
+    }
+    return items;
   };
 
   return (
-    <>
-      {isLibLoading ? (
-        <TableSkeleton header="Operation Library" columns={columns} />
-      ) : (
-        <Card>
-          <CardBody>
-            <TableContainer>
-              <Table variant="striped" colorScheme="gray">
-                <TableCaption placement="top" bgColor="gray.50">
-                  <Text as="h4">Operation Library</Text>
-                </TableCaption>
-                <Thead>
-                  <Tr>
-                    <Th>Name</Th>
-                    <Th></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {operations.map((operation) => (
-                    <Tr key={operation.id}>
-                      <Td>{operation.name}</Td>
-                      <Td>
-                        <Button
-                          colorScheme="green"
-                          onClick={() => addOperation(operation)}
-                        >
-                          Add
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </CardBody>
-        </Card>
-      )}
-    </>
+    <Card>
+      <CardBody>
+      <Box p={5}>
+          <Center>
+          <Text fontSize="2xl" fontWeight="bold" color="gray.700">Operation Library</Text>
+          </Center>
+          <Input
+            placeholder="Search by name or code"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTerm}
+            mb="4"
+          />
+        </Box>
+
+        <TableContainer>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Name</Th>
+                <Th>Code</Th>
+                <Th>Add</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {currentItems.map((operation) => (
+                <Tr key={operation.id}>
+                  <Td>{operation.name}</Td>
+                  <Td>{operation.job_code}</Td>
+                  <Td>
+                    <Button
+                      colorScheme="green"
+                      onClick={() => handleAddOperation(operation)}
+                    >
+                      Add
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+
+        <Flex mt="4" justifyContent="center" alignItems="center">
+          <IconButton
+            icon={<ChevronLeftIcon />}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            isDisabled={currentPage === 1}
+            mr="4"
+          />
+          <HStack spacing="20px">
+            {renderPaginationNumbers()}
+          </HStack>
+          <IconButton
+            icon={<ChevronRightIcon />}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            isDisabled={currentPage >= totalPages}
+            ml="4"
+          />
+        </Flex>
+      </CardBody>
+    </Card>
   );
 }

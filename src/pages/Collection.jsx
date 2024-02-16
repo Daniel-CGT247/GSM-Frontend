@@ -22,7 +22,6 @@ import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-
 import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {

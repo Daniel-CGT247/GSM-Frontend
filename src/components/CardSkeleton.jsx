@@ -12,7 +12,7 @@ export default function CardSkeleton() {
   return (
     <>
       {cards.map((card) => (
-        <Card key={card} maxW="lg">
+        <Card key={card} maxW="lg" minH="320px">
           <CardBody>
             <Flex gap={10} mb="2">
               <Skeleton w="200px" h="170px" />

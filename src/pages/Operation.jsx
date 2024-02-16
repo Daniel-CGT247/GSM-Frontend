@@ -1,103 +1,83 @@
-import {
-  Button,
-  Container,
-  Flex,
-  Heading,
-  useDisclosure,
-  SimpleGrid,
-  GridItem,
-} from "@chakra-ui/react";
 import React, { useState } from "react";
-import {
-  IoArrowBackCircleOutline,
-  IoCheckmarkCircleOutline,
-} from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import JobDrawer from "../components/JobDrawer";
-import StyleSkeleton from "../components/StyleSkeleton";
-import useGet from "../customed_hook/useGet";
-import endpoint from "../utils/endpoint";
-import OperationLib from "./OperationLib";
+import { Button, Container, Flex, Heading, SimpleGrid, GridItem } from "@chakra-ui/react";
+import { IoArrowBackCircleOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
+import useGet from "../customed_hook/getData";
+import OperationLibList from "./OperationLib";
 import OperationList from "./OperationList";
+import endpoint from "../utils/endpoint";
+import StyleSkeleton from "../components/StyleSkeleton";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
-  const { data: styleNum, isLoading: isStyleLoading } = useGet(
-    `${endpoint}/collection/${listId}`
-  );
+  const styleNum = useGet(`${endpoint}/collection/${listId}`);
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
-  const { data: jobGroup, isLoading: isJobLoading } = useGet(
-    `${endpoint}/job_group/${jobId}`
-  );
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const jobGroup = useGet(`${endpoint}/job_group/${jobId}`);
+  const bundle_group = jobGroup?.bundle_groups?.find(bundle => bundle.id.toString() === bundleId);
+  const bundleName = bundle_group?.name ?? 'Loading...';
 
-  const bundle_group =
-    jobGroup &&
-    jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id.toString() === bundleId);
-  const bundleName = bundle_group && bundle_group.name;
+  const [operationList, setOperationList] = useState([]);
 
-  const [updateOperations, setUpdateOperations] = useState([]);
+  const updateOperationLists = (newOperation) => {
+    setOperationList((prevOperationList) => {
+      const tempOperation = {
+        ...newOperation,
+        id: newOperation.id || `temp-${Date.now()}`,
+      };
+      return [...prevOperationList, tempOperation];
+    });
+  };
 
   return (
-    <Container maxW="7xl" className="p-5">
-      <Flex
-        direction="column"
-        gap={2}
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Heading>
-          Build Operation {!isJobLoading && <>- {bundleName}</>}
-        </Heading>
-
-        {isStyleLoading ? (
-          <StyleSkeleton />
+    <Container maxW="7xl" p={5}>
+      <Flex direction="column" gap={2} alignItems="center" justifyContent="center">
+        <Heading>Build Operation - {bundleName}</Heading>
+        {styleNum ? (
+          <Heading as="h3" size="lg" mb={6} color="gray.500">
+            Style {itemName}
+          </Heading>
         ) : (
-          <Heading size="lg">Style {itemName}</Heading>
+          <StyleSkeleton />
         )}
         <Flex alignItems="center" gap={5}>
           <Button
+            as={RouterLink}
+            to={`/${listId}/job_group`}
             variant="outline"
-            colorScheme="twitter"
-            onClick={onOpen}
             leftIcon={<IoArrowBackCircleOutline />}
           >
-            Choose another jobs
+            Back to Job Group
           </Button>
           <Button
-            as="a"
-            href={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}
-            colorScheme="twitter"
+            as={RouterLink}
+            to={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}
+            colorScheme="blue"
             rightIcon={<IoCheckmarkCircleOutline />}
           >
             Complete
           </Button>
         </Flex>
       </Flex>
-      <SimpleGrid columns={3} spacing={5} my={10}>
+      <SimpleGrid columns={{ base: 1, md: 5 }} spacing={5} my={10} templateColumns="1fr 1fr">
         <GridItem colSpan={1}>
-          <OperationLib
-            bundleId={bundleId}
+          <OperationLibList
+            bundleGroup={bundleId}
             listId={listId}
-            setUpdateFunc={setUpdateOperations}
+            updateOperationLists={updateOperationLists}
           />
         </GridItem>
-        <GridItem colSpan={2}>
+        <GridItem colSpan={1}>
           <OperationList
-            bundleId={bundleId}
+            key={operationList.length}
+            bundleGroup={bundleId}
             listId={listId}
-            updateOperationList={updateOperations}
+            operationListProp={operationList}
+            bundleName={bundleName}
           />
         </GridItem>
       </SimpleGrid>
-      <JobDrawer
-        onClose={onClose}
-        isOpen={isOpen}
-        styleNum={itemName}
-        listId={listId}
-      />
     </Container>
   );
 }

@@ -9,6 +9,7 @@ import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
 import Register from "./pages/Register";
 import YourList from "./pages/YourList";
+import JobGroup from "./pages/JobGroup";
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
           <Route path="/logout" element={<Logout />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/new-item" element={<NewItem />} />
-          {/* <Route path="/:listId/job_group" element={<JobGroup />} /> */}
+          <Route path="/:listId/job_group" element={<JobGroup />} />
           <Route
             path="/:listId/job_group/:jobId/:bundleId/operation"
             element={<Operation />}

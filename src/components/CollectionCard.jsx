@@ -8,44 +8,50 @@ import {
   Image,
   Text,
   useDisclosure,
+  Badge
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
 import JobDrawer from "./JobDrawer";
+import { Link } from "react-router-dom";
 
 export default function CollectionCard({ list, maxWidth }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onClose } = useDisclosure();
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
 
   return (
     <>
-      <Card maxW={maxWidth} overflow="hidden" variant="outline">
-        <HStack>
-          <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
+      <Card maxW={maxWidth || "full"} w="full" overflow="hidden" variant="outline">
+        <HStack w="full" spacing={4}>
+          <Image key={list.id} src={imageUrl} maxW="500px" maxH="300px" objectFit="cover" flexShrink={0} />
 
-          <CardBody>
+          <CardBody flex={1}>
             <Heading size="md">{list.item.name}</Heading>
-            <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
+            <Badge colorScheme={list.complete ? "green" : "orange"} mb={4}>
+              {list.complete ? "Completed" : "In-Progress"}
+            </Badge>
 
-            <Flex gap={4} mb={4}>
-              <Flex alignItems="center" gap={1}>
+            <Flex direction="column" gap={4} mb={4}>
+              <Flex alignItems="center" gap={2}>
                 <LuFlower />
                 {list.item.season}
               </Flex>
-              <Flex alignItems="center" gap={1}>
+              <Flex alignItems="center" gap={2}>
                 <HiPuzzle />
                 {list.item.proto}
               </Flex>
             </Flex>
-            <Button colorScheme="twitter" variant="solid" onClick={onOpen}>
-              Continue
-            </Button>
+            <Link to={`/${list.id}/job_group`}>
+              <Button w="full" mt={2} variant="solid" colorScheme="twitter"> 
+                Continue
+              </Button>
+            </Link>
           </CardBody>
         </HStack>
         <Flex
           bgColor="gray.100"
-          height="50px"
+          h="50px"
           justifyContent="center"
           alignItems="center"
         >
