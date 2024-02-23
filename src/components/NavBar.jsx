@@ -1,21 +1,19 @@
-import { Flex, Image, Link, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import userAuth from "../customed_hook/useAuth";
+import { Flex, Image, Text, Link } from "@chakra-ui/react";
 import BrandLogo from "../images/Canada-Goose-Logo.png";
-export default function Navigation() {
-  const user = userAuth();
+import SignInSignOutButton from "./SignInSignOutButton";
+import WelcomeName from "./WelcomeName";
 
-  const [isAuth, setIsAuth] = useState(false);
-  useEffect(() => {
-    if (localStorage.getItem("access_token") !== null) {
-      setIsAuth(true);
-    }
-  }, [user]);
-  const navs = [
-    { name: "Collection", href: "/collection" },
-    { name: "Build New Item", href: "/new-item" },
-    { name: "Logout", href: "/Logout" },
-  ];
+const navs = [
+  {
+    name: "Collection",
+    path: "/",
+  },
+  {
+    name: "New Item",
+    path: "/new-item",
+  },
+];
+export default function Navigation() {
   return (
     <Flex
       justifyContent="space-between"
@@ -28,28 +26,23 @@ export default function Navigation() {
     >
       <Flex alignItems="center" gap={10}>
         <Flex alignItems="center">
-          <Image src={BrandLogo} w="100px" alt="brand-logo" />
+          <Image src={BrandLogo} w="80px" alt="brand-logo" />
           <Text m={0} p={0} as="h5">
             GSM Project
           </Text>
         </Flex>
-        {isAuth && (
-          <Flex justifyContent="space-between" gap={5}>
-            {navs.map((nav) => (
-              <Link href={nav.href} key={nav.href}>
-                <Text m={0} p={0} fontSize="lg" color="gray.500">
-                  {nav.name}
-                </Text>
-              </Link>
-            ))}
-          </Flex>
-        )}
+        <Flex alignItems="center" justifyContent="space-around" gap={4}>
+          {navs.map((nav, index) => (
+            <Link key={index} href={nav.path}>
+              {nav.name}
+            </Link>
+          ))}
+        </Flex>
       </Flex>
-      {isAuth && (
-        <Text fontSize="md" m={0} p={0} color="gray.500">
-          Welcome back, {user?.username}
-        </Text>
-      )}
+      <Flex alignItems="center" justifyContent="space-around" gap={4}>
+        <WelcomeName />
+        <SignInSignOutButton />
+      </Flex>
     </Flex>
   );
 }

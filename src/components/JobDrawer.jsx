@@ -41,14 +41,12 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
             <Accordion allowToggle>
               {data.map((job_group) => (
                 <AccordionItem key={job_group.id}>
-                  <h2>
-                    <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
-                        <Text>{job_group.name}</Text>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </h2>
+                  <AccordionButton>
+                    <Box as="span" flex="1" textAlign="left">
+                      <Text>{job_group.name}</Text>
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
                   <AccordionPanel pb={4}>
                     <List spacing={3}>
                       {job_group.bundle_groups.map((bundle_group) => (
@@ -78,7 +76,7 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
           ) : (
             <Text>Loading...</Text>
           )}
-          {window.location.pathname !== "/collection" && (
+          {window.location.pathname !== "/" && (
             <Link href={`/collection`}>
               <Flex alignItems="center" gap={1} my={5}>
                 <IoIosArrowBack />

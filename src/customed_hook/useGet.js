@@ -1,34 +1,44 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import headers from "../utils/headers";
+import useHeaders from "./useHeader";
 
 export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const headers = useHeaders();
   useEffect(() => {
     setLoading(true);
-    if (localStorage.getItem("access_token") === null) {
-      window.location.href = "/login";
-      return;
-    }
     getData();
-  }, [deps]);
+  }, [endpoint, deps]);
 
-  let getData = async () => {
-    try {
-      let res = await axios.get(`${endpoint}`, {
-        params: params,
-        headers: headers,
+  let getData = () => {
+    axios
+      .get(endpoint, { params: params, headers: headers })
+      .then((res) => {
+        setData(res.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
       });
-      setData(res.data);
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
   };
 
-  return { isLoading, data, error, setData };
+  return { data, isLoading, error, setData };
 }
+
+// if (!accessToken) {
+//   const account = msalInstance.getActiveAccount();
+//   if (!account) {
+//     throw Error(
+//       "No active account! Verify a user has been signed in and setActiveAccount has been called."
+//     );
+//   }
+
+//   const response = await msalInstance.acquireTokenSilent({
+//     ...loginRequest,
+//     account: account,
+//   });
+//   accessToken = response.accessToken;
+// }

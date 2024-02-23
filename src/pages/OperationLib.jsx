@@ -16,7 +16,7 @@ import axios from "axios";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import headers from "../utils/headers";
+import headers from "../customed_hook/useHeader";
 
 const columns = ["Name", ""];
 
