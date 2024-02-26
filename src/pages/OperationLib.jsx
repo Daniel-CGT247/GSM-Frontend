@@ -21,8 +21,11 @@ import headers from "../customed_hook/useHeader";
 const columns = ["Name", ""];
 
 export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
-  const paramLib = { bundle_group: bundleId };
-  const paramList = { bundle_group: bundleId, listId: listId };
+  const paramLib = { bundle_group_id: bundleId };
+  const paramList = {
+    operations__bundle_group_id: bundleId,
+    list__item_id: listId,
+  };
 
   const { data: operations, isLoading: isLibLoading } = useGet(
     `${endpoint}/operation_lib`,

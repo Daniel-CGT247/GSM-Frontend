@@ -77,7 +77,7 @@ export default function JobDrawer({ onClose, isOpen, styleNum, listId }) {
             <Text>Loading...</Text>
           )}
           {window.location.pathname !== "/" && (
-            <Link href={`/collection`}>
+            <Link href={`/`}>
               <Flex alignItems="center" gap={1} my={5}>
                 <IoIosArrowBack />
                 Back to Collection

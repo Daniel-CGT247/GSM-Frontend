@@ -45,6 +45,7 @@ export const msalConfig = {
 
 export const loginRequest = {
   scopes: ["User.Read"],
+  // scopes: ["User.Read", "openid", "email", "profile", "offline_access"],
 };
 
 export function useAuth(token, setToken) {
@@ -52,6 +53,7 @@ export function useAuth(token, setToken) {
   if (!token) {
     const request = {
       scopes: ["User.Read", "openid", "email", "profile", "offline_access"],
+      // scopes: ["User.Read"],
       account: accounts[0],
     };
     instance
