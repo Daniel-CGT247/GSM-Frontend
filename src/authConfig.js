@@ -1,6 +1,6 @@
-import { LogLevel } from "@azure/msal-browser";
+import { InteractionRequiredAuthError, LogLevel } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { useEffect } from "react";
 
 export const msalConfig = {
   auth: {
@@ -44,30 +44,35 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
-  scopes: ["User.Read"],
-  // scopes: ["User.Read", "openid", "email", "profile", "offline_access"],
+  scopes: ["api://43877c69-35ac-40ba-8b81-1d75c3aeff81/read", "User.Read"],
 };
 
 export function useAuth(token, setToken) {
   const { instance, accounts } = useMsal();
-  if (!token) {
-    const request = {
-      scopes: ["User.Read", "openid", "email", "profile", "offline_access"],
-      // scopes: ["User.Read"],
-      account: accounts[0],
-    };
-    instance
-      .acquireTokenSilent(request)
-      .then((tokenResponse) => {
-        setToken(tokenResponse.accessToken);
-      })
-      .catch(async (error) => {
-        if (error instanceof InteractionRequiredAuthError) {
-          instance.acquireTokenRedirect(request).then(function (response) {
-            setToken(response.accessToken);
-          });
-          console.error(error);
-        }
-      });
-  }
+  useEffect(() => {
+    if (!token) {
+      const tokenRequest = {
+        scopes: [
+          "api://43877c69-35ac-40ba-8b81-1d75c3aeff81/read",
+          "User.Read",
+        ],
+        account: accounts[0],
+      };
+      instance
+        .acquireTokenSilent(tokenRequest)
+        .then((tokenResponse) => {
+          setToken(tokenResponse.accessToken);
+        })
+        .catch(async (error) => {
+          if (error instanceof InteractionRequiredAuthError) {
+            instance
+              .acquireTokenRedirect(tokenRequest)
+              .then(function (response) {
+                setToken(response.accessToken);
+              });
+            console.error(error);
+          }
+        });
+    }
+  }, [token, instance, accounts]);
 }

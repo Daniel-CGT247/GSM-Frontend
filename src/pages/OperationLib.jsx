@@ -17,6 +17,7 @@ import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import headers from "../customed_hook/useHeader";
+import { useEffect, useState } from "react";
 
 const columns = ["Name", ""];
 
@@ -29,12 +30,21 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
 
   const { data: operations, isLoading: isLibLoading } = useGet(
     `${endpoint}/operation_lib`,
-    paramLib
+    paramLib,
+    [bundleId]
   );
+
+  // const [operations, setOperations] = useState([]);
+  // useEffect(() => {
+  //   axios.get(`${endpoint}/operation_lib`, { params: paramLib }).then((res) => {
+  //     setOperations(res.data);
+  //   });
+  // }, [bundleId]);
 
   const { data: operationList } = useGet(
     `${endpoint}/operation_list`,
-    paramList
+    paramList,
+    [listId]
   );
 
   const addOperation = (operation) => {

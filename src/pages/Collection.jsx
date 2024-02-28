@@ -26,7 +26,7 @@ import endpoint from "../utils/endpoint";
 import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
-  const { data, isLoading } = useGet(`${endpoint}/collection/`);
+  const { data, isLoading } = useGet(`${endpoint}/collection/`, null, []);
   const [searchTerm, setSearchTerm] = useState(""); // search bar
   const [selectedSeason, setSelectedSeason] = useState(""); // season dropdown
   const [selectedProto, setSelectedProto] = useState("");

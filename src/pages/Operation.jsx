@@ -22,13 +22,15 @@ import OperationList from "./OperationList";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
-  const { data: styleNum, isLoading: isStyleLoading } = useGet(
-    `${endpoint}/collection/${listId}`
-  );
-  const itemName = styleNum && styleNum.item && styleNum.item.name;
+  // const { data: styleNum, isLoading: isStyleLoading } = useGet(
+  //   `${endpoint}/collection/${listId}`
+  // );
+  // const itemName = styleNum && styleNum.item && styleNum.item.name;
 
   const { data: jobGroup, isLoading: isJobLoading } = useGet(
-    `${endpoint}/job_group/${jobId}`
+    `${endpoint}/job_group/${jobId}`,
+    null,
+    [jobId]
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -52,11 +54,11 @@ export default function Operation() {
           Build Operation {!isJobLoading && <>- {bundleName}</>}
         </Heading>
 
-        {isStyleLoading ? (
+        {/* {isStyleLoading ? (
           <StyleSkeleton />
         ) : (
           <Heading size="lg">Style {itemName}</Heading>
-        )}
+        )} */}
         <Flex alignItems="center" gap={5}>
           <Button
             variant="outline"
@@ -92,12 +94,12 @@ export default function Operation() {
           />
         </GridItem>
       </SimpleGrid>
-      <JobDrawer
+      {/* <JobDrawer
         onClose={onClose}
         isOpen={isOpen}
         styleNum={itemName}
         listId={listId}
-      />
+      /> */}
     </Container>
   );
 }

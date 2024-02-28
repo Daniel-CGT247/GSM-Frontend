@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@azure/msal-browser": "^3.9.0",
     "@azure/msal-react": "^2.0.11",
@@ -16,6 +17,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.5",
     "bootstrap": "^5.3.2",
+    "cors": "^2.8.5",
     "framer-motion": "^11.0.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.2",
