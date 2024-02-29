@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 export default function JobGroupCard({ job_group, operationsChanged }) {
   const { listId } = useParams();
-  const [status, setStatus] = useState(getInitialStatus())
+  const [status, setStatus] = useState(getInitialStatus());
 
   const cardStyle = {
     width: "18rem",
@@ -32,17 +32,12 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
     color: "blue",
     cursor: "pointer",
   };
-  
+
   function getInitialStatus() {
     const uniqueKey = `status-${listId}-${job_group.id}`;
     const savedStatus = localStorage.getItem(uniqueKey);
 
-    console.log(
-      `getInitialStatus: Retrieved status for ${uniqueKey}:`,
-      savedStatus,
-    )
-
-    if (savedStatus) return savedStatus
+    if (savedStatus) return savedStatus;
 
     for (const bundleGroup of job_group.bundle_groups) {
       if (bundleGroup.operations_count > 0) return "in-progress";
@@ -52,24 +47,19 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
 
   function handleStatusChange() {
     const newStatus = status === "in-progress" ? "finished" : "in-progress";
-    setStatus(newStatus)
-    
-    const uniqueKey = `status-${listId}-${job_group.id}`;
-    localStorage.setItem(uniqueKey, newStatus)
+    setStatus(newStatus);
 
-    console.log(
-      `handleStatusChange: Updated status for ${uniqueKey}:`,
-      newStatus,
-    )
+    const uniqueKey = `status-${listId}-${job_group.id}`;
+    localStorage.setItem(uniqueKey, newStatus);
   }
 
   useEffect(() => {
     const uniqueKey = `status-${listId}-${job_group.id}`;
     const savedStatus = localStorage.getItem(uniqueKey);
     if (savedStatus) {
-      setStatus(savedStatus)
+      setStatus(savedStatus);
     }
-  }, [job_group.id, listId]);  
+  }, [job_group.id, listId]);
 
   useEffect(() => {
     function evaluateStatus() {
@@ -77,7 +67,7 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
       const currentStatus = localStorage.getItem(uniqueKey);
 
       if (currentStatus === "finished") {
-        return
+        return;
       }
 
       let newStatus = "no-progress";
@@ -88,15 +78,12 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
         }
       }
 
-      localStorage.setItem(uniqueKey, newStatus)
-      setStatus(newStatus)
-
+      localStorage.setItem(uniqueKey, newStatus);
+      setStatus(newStatus);
     }
 
-    evaluateStatus()
-    
+    evaluateStatus();
   }, [job_group.bundle_groups, job_group.id, listId, operationsChanged]);
-
 
   return (
     <Card key={job_group.id} style={cardStyle}>
@@ -119,8 +106,8 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
               status === "in-progress"
                 ? "orange"
                 : status === "finished"
-                  ? "green"
-                  : "red",
+                ? "green"
+                : "red",
           }}
         ></span>
 
@@ -138,7 +125,6 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
         <div style={cardTextStyle}>
           {job_group.bundle_groups.map((bundle_group) => (
             <Card.Text key={bundle_group.id}>
-
               {status === "finished" ? (
                 <span style={{ color: "grey" }}>{bundle_group.name}</span>
               ) : (
@@ -154,8 +140,6 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
                 >
                   {bundle_group.name}
                 </Link>
-
-
               )}
             </Card.Text>
           ))}

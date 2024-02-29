@@ -1,37 +1,48 @@
-import { useEffect, useState } from "react";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import userAuth from "../customed_hook/useAuth";
+import { Flex, Image, Text, Link } from "@chakra-ui/react";
+import BrandLogo from "../images/Canada-Goose-Logo.png";
+import SignInSignOutButton from "./SignInSignOutButton";
+import WelcomeName from "./WelcomeName";
 
+const navs = [
+  {
+    name: "Collection",
+    path: "/",
+  },
+  {
+    name: "New Item",
+    path: "/new-item",
+  },
+];
 export default function Navigation() {
-  const user = userAuth();
-
-  const [isAuth, setIsAuth] = useState(false);
-  useEffect(() => {
-    if (localStorage.getItem("access_token") !== null) {
-      setIsAuth(true);
-    }
-  }, [isAuth]);
-
   return (
-    <>
-      <Navbar sticky="top" bg="dark" variant="dark" className="py-2 px-4">
-        <Navbar.Brand href="/collection">GSM Project</Navbar.Brand>
-        {isAuth && (
-          <div className="w-full flex justify-between items-center">
-            <Nav>
-              <Nav.Link href="/collection">Collection</Nav.Link>
-              <Nav.Link href="/new-item">Build New Item</Nav.Link>
-              <Nav.Link href="/Logout">Logout</Nav.Link>
-            </Nav>
-            <Nav>
-              <Navbar.Text className="text-lg font-semibold">
-                {user?.username}
-              </Navbar.Text>
-            </Nav>
-          </div>
-        )}
-      </Navbar>
-    </>
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      p={4}
+      pos="sticky"
+      top={0}
+      zIndex={10}
+      bgColor="gray.300"
+    >
+      <Flex alignItems="center" gap={10}>
+        <Flex alignItems="center">
+          <Image src={BrandLogo} w="80px" alt="brand-logo" />
+          <Text fontWeight="bold" m={0} p={0} fontSize="lg">
+            GSM Project
+          </Text>
+        </Flex>
+        <Flex alignItems="center" justifyContent="space-around" gap={4}>
+          {navs.map((nav, index) => (
+            <Link key={index} href={nav.path}>
+              <Text fontSize="lg">{nav.name}</Text>
+            </Link>
+          ))}
+        </Flex>
+      </Flex>
+      <Flex alignItems="center" justifyContent="space-around" gap={4}>
+        <WelcomeName />
+        <SignInSignOutButton />
+      </Flex>
+    </Flex>
   );
 }

@@ -1,19 +1,46 @@
+import { EventType, PublicClientApplication } from "@azure/msal-browser";
+import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import App from "./App";
-// Bootstrap CSS
-import "bootstrap/dist/css/bootstrap.min.css";
-// Bootstrap Bundle JS
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import { msalConfig } from "./authConfig";
+import "./index.css";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export const msalInstance = new PublicClientApplication(msalConfig);
+msalInstance.initialize().then(() => {
+  // Default to using the first account if no account is active on page load
+  if (
+    !msalInstance.getActiveAccount() &&
+    msalInstance.getAllAccounts().length > 0
+  ) {
+    // Account selection logic is app dependent. Adjust as needed for different use cases.
+    msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
+  }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+  // Optional - This will update account state if a user signs in from another tab or window
+  msalInstance.enableAccountStorageEvents();
+
+  msalInstance.addEventCallback((event) => {
+    if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
+      const account = event.payload.account;
+      msalInstance.setActiveAccount(account);
+    }
+  });
+
+  // Listen for sign-in event and set active account
+  msalInstance.addEventCallback((event) => {
+    if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
+      const account = event.payload.account;
+      msalInstance.setActiveAccount(account);
+    }
+  });
+
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(
+    <React.StrictMode>
+      <ChakraProvider>
+        <App pca={msalInstance} />
+      </ChakraProvider>
+    </React.StrictMode>
+  );
+});

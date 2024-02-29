@@ -1,12 +1,21 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import useGet from "../customed_hook/useGet";
 import Card from "react-bootstrap/Card";
-import Form from "react-bootstrap/Form";
-import Pagination from "react-bootstrap/Pagination";
 import Table from "react-bootstrap/Table";
-import { useParams } from "react-router-dom";
-import useGet from "../customed_hook/getData";
+import Pagination from "react-bootstrap/Pagination";
+import {
+  Button,
+  Container,
+  Row,
+  Col,
+  InputGroup,
+  FormControl,
+} from "react-bootstrap";
+import { ChevronDown, ChevronUp } from "react-bootstrap-icons";
+import { Badge } from "react-bootstrap";
 import endpoint from "../utils/endpoint";
 
 const ElementLibList = () => {
@@ -18,6 +27,7 @@ const ElementLibList = () => {
   const itemName = styleNum && styleNum.item && styleNum.item.name;
   const [elementList, setElementList] = useState([]);
   const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
+  const navigate = useNavigate();
 
   const [searchFilter, setSearchFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,18 +53,21 @@ const ElementLibList = () => {
     indexOfLastItem
   );
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredElements.length / itemsPerPage); i++) {
-    pageNumbers.push(
-      <Pagination.Item
-        key={i}
-        active={i === currentPage}
-        onClick={() => handlePageChange(i)}
-      >
-        {i}
-      </Pagination.Item>
-    );
-  }
+  const renderPaginationItems = (totalItems, itemsPerPage) => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+      pageNumbers.push(
+        <Pagination.Item
+          key={i}
+          active={i === currentPage}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Pagination.Item>
+      );
+    }
+    return pageNumbers;
+  };
 
   const [currentOperation, setCurrentOperation] = useState(null);
   useEffect(() => {
@@ -436,221 +449,257 @@ const ElementLibList = () => {
     }
   };
 
-  return (
-    <div className="container p-5" style={{ fontFamily: "Arial, sans-serif" }}>
-      <h2 className="font-bold text-center">{title}</h2>
-      <h3 className="font-bold text-center">Style {itemName}</h3>
+  const [visibleOptions, setVisibleOptions] = useState({});
 
-      <div className="row my-2">
-        {/* Element Library Section */}
-        <div className="col-md-6">
+  const toggleOptionsVisibility = (elementId) => {
+    setVisibleOptions((prevVisibleOptions) => ({
+      ...prevVisibleOptions,
+      [elementId]: !prevVisibleOptions[elementId],
+    }));
+  };
+
+  return (
+    <Container fluid="lg" className="pt-5">
+      <Row>
+        <Col>
+          <h2 className="font-bold text-center">{title}</h2>
+          <h3 className="font-bold text-center">Style {itemName}</h3>
+        </Col>
+
+        <Row className="mt-4 d-flex justify-content-center">
+          <Col xs="auto">
+            <Button variant="success" onClick={() => navigate(-1)}>
+              Complete
+            </Button>
+          </Col>
+        </Row>
+      </Row>
+      <Row>
+        <InputGroup className="mb-6">
+          <FormControl
+            placeholder="Search Elements..."
+            value={searchFilter}
+            onChange={handleSearchChange}
+          />
+        </InputGroup>
+
+        <Col md={6}>
           <Card>
-            <Card.Header>
-              <h5 className="card-title">Element Library</h5>
-              <Form.Control
-                type="text"
-                placeholder="Search Elements..."
-                value={searchFilter}
-                onChange={handleSearchChange}
-                style={{ width: "300px", marginBottom: "10px" }}
-              />
-            </Card.Header>
-            <Card.Body>
-              <div style={scrollableTableStyle}>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Element Name</th>
-                      <th>Variable</th>
-                      <th>Add</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentItems.map((elementLib, index) => (
-                      <tr key={elementLib.id}>
-                        <td>{indexOfFirstItem + index + 1}</td>
-                        <td>{elementLib.name}</td>
-                        <td>
-                          {elementLib.variables.length > 0 ? (
-                            <div>
-                              {elementLib.variables.map((variable, index) => (
-                                <div key={index}>
-                                  <label htmlFor={variable.name}>
-                                    {variable.name}:
-                                  </label>
-                                  <select
-                                    className="form-select"
-                                    id={variable.name}
-                                    onChange={(e) =>
-                                      handleVariableChange(
-                                        elementLib.id,
-                                        variable.name,
-                                        e.target.value
-                                      )
-                                    }
-                                    value={
-                                      selectedVariables[
-                                        `${elementLib.id}_${variable.name}`
-                                      ] || ""
-                                    }
-                                  >
-                                    <option value="">Select an option</option>
-                                    {variable.options.map(
-                                      (option, optionIndex) => (
-                                        <option
-                                          key={optionIndex}
-                                          value={option.id}
-                                        >
-                                          {option.name}
-                                        </option>
-                                      )
-                                    )}
-                                  </select>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span>Not Available</span>
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-primary"
-                            disabled={!areAllVariablesSelected(elementLib.id)}
+            <Card.Header>Element Library</Card.Header>
+            <Card.Body
+              style={{
+                maxHeight: "550px",
+                overflowY: "auto",
+                minHeight: "550px",
+              }}
+            >
+              <Table>
+                <thead>
+                  <tr>
+                    <th style={{ width: "5%" }}>#</th>
+                    <th style={{ width: "30%" }}>Element Name</th>
+                    <th style={{ width: "45%" }}>Options</th>
+                    <th style={{ width: "10%" }}>Add</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((elementLib, index) => (
+                    <tr key={elementLib.id}>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td>{elementLib.name}</td>
+                      <td>
+                        {elementLib.variables.length > 0 ? (
+                          <Button
+                            variant="link"
                             onClick={() =>
-                              handleAddElement(elementLib.id, selectedVariables)
+                              toggleOptionsVisibility(elementLib.id)
+                            }
+                            style={{ textDecoration: "none" }}
+                          >
+                            {visibleOptions[elementLib.id] ? (
+                              <ChevronUp />
+                            ) : (
+                              <ChevronDown />
+                            )}
+                            {" Available"}
+                            <Badge pill bg="info" text="light" className="ms-2">
+                              {elementLib.variables.length}
+                            </Badge>
+                          </Button>
+                        ) : (
+                          "Not Available"
+                        )}
+                        {visibleOptions[elementLib.id] && (
+                          <div>
+                            {elementLib.variables.map((variable, index) => (
+                              <div key={index} className="mb-2">
+                                <label
+                                  htmlFor={variable.name}
+                                  className="form-label d-block"
+                                >
+                                  {variable.name}:
+                                </label>
+                                <select
+                                  className="form-select"
+                                  id={variable.name}
+                                  onChange={(e) =>
+                                    handleVariableChange(
+                                      elementLib.id,
+                                      variable.name,
+                                      e.target.value
+                                    )
+                                  }
+                                  value={
+                                    selectedVariables[
+                                      `${elementLib.id}_${variable.name}`
+                                    ] || ""
+                                  }
+                                >
+                                  <option value="">Select an option</option>
+                                  {variable.options.map(
+                                    (option, optionIndex) => (
+                                      <option
+                                        key={optionIndex}
+                                        value={option.id}
+                                      >
+                                        {option.name}
+                                      </option>
+                                    )
+                                  )}
+                                </select>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          disabled={!areAllVariablesSelected(elementLib.id)}
+                          onClick={() =>
+                            handleAddElement(elementLib.id, selectedVariables)
+                          }
+                        >
+                          Add
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+            <Card.Footer>
+              <Pagination className="justify-content-center">
+                {renderPaginationItems(filteredElements.length, itemsPerPage)}
+              </Pagination>
+            </Card.Footer>
+          </Card>
+        </Col>
+
+        <Col md={6}>
+          <Card>
+            <Card.Header>Selected Elements</Card.Header>
+            <Card.Body style={{ maxHeight: "580px", overflowY: "auto" }}>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Element Name</th>
+                    <th>Expanding Field</th>
+                    <th>Time</th>
+                    <th>Selected Options</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {selectedElements.map((element, index) => (
+                    <tr key={element.uniqueId}>
+                      <td>{index + 1}</td>
+                      <td>{element.name}</td>
+
+                      <td>
+                        <div>
+                          <select
+                            className="form-select"
+                            value={element.expandingName}
+                            onChange={(e) =>
+                              handleExpandingNameChange(
+                                element.uniqueId,
+                                e.target.value
+                              )
                             }
                           >
-                            Add
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <Pagination>{pageNumbers}</Pagination>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
+                            <option value="N/A">N/A</option>
+                            {expandingNamesList.map((expandingName) => (
+                              <option key={expandingName} value={expandingName}>
+                                {expandingName}
+                              </option>
+                            ))}
+                            <option value="__ADD_NEW__">Add New...</option>
+                          </select>
+                        </div>
 
-        <div className="col-md-6">
-          <Card>
-            <Card.Header>
-              <div className="d-flex justify-content-between align-items-center">
-                <Card.Title>Element List</Card.Title>
-                <div className="text-right">
-                  <strong>Total SAM: {totalSam}</strong>
-                </div>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              <div style={scrollableTableStyle}>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      {/* <th>ID</th> */}
-                      <th>Element Name</th>
-                      <th>Expanding Field</th>
-                      <th>Time</th>
-                      <th>Selected Options</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {selectedElements.map((selectedElement, index) => (
-                      <tr key={selectedElement.uniqueId}>
-                        <td>{index + 1}</td>
-                        {/* <td>{selectedElement.id}</td> */}
-                        <td>{selectedElement.name}</td>
-
-                        <td>
-                          <div>
-                            <select
-                              className="form-select"
-                              value={selectedElement.expandingName}
+                        {element.expandingName === "__ADD_NEW__" && (
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              value={newExpandingName}
                               onChange={(e) =>
-                                handleExpandingNameChange(
-                                  selectedElement.uniqueId,
-                                  e.target.value
-                                )
+                                setNewExpandingName(e.target.value)
+                              }
+                              placeholder="Enter new option..."
+                            />
+                            <button
+                              className="btn btn-primary ms-2"
+                              onClick={() =>
+                                handleAddNewExpandingName(element.uniqueId)
                               }
                             >
-                              <option value="N/A">N/A</option>
-                              {expandingNamesList.map((expandingName) => (
-                                <option
-                                  key={expandingName}
-                                  value={expandingName}
-                                >
-                                  {expandingName}
-                                </option>
-                              ))}
-                              <option value="__ADD_NEW__">Add New...</option>
-                            </select>
+                              Add
+                            </button>
                           </div>
-                          {selectedElement.expandingName === "__ADD_NEW__" && (
-                            <div className="mt-2">
-                              <input
-                                type="text"
-                                value={newExpandingName}
-                                onChange={(e) =>
-                                  setNewExpandingName(e.target.value)
-                                }
-                                placeholder="Enter new option..."
-                              />
-                              <button
-                                className="btn btn-primary ms-2"
-                                onClick={() =>
-                                  handleAddNewExpandingName(
-                                    selectedElement.uniqueId
-                                  )
-                                }
-                              >
-                                Add
-                              </button>
+                        )}
+                      </td>
+
+                      <td>
+                        {element.time === undefined
+                          ? "Loading..."
+                          : element.time}
+                      </td>
+
+                      <td>
+                        {Object.entries(element.selectedOptions).map(
+                          ([variableName, optionName], index) => (
+                            <div key={index}>
+                              {variableName}: {optionName}
                             </div>
-                          )}
-                        </td>
+                          )
+                        )}
+                      </td>
 
-                        <td>
-                          {selectedElement.time === undefined
-                            ? "Loading..."
-                            : selectedElement.time}
-                        </td>
-
-                        <td>
-                          {Object.entries(selectedElement.selectedOptions).map(
-                            ([variableName, optionName], index) => (
-                              <div key={index}>
-                                {variableName}: {optionName}
-                              </div>
-                            )
-                          )}
-                        </td>
-
-                        <td>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() =>
-                              handleDeleteElement(selectedElement.uniqueId)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                      <td>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => handleDeleteElement(element.uniqueId)}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </Card.Body>
+            <Card.Footer className="text-right">
+              <strong>Total SAM: {totalSam}</strong>
+            </Card.Footer>
           </Card>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
