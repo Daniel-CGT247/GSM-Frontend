@@ -185,12 +185,10 @@ export default function ElementLibList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Adjust the API request to include both operation_id and listId if needed
         const response = await axios.get(`${endpoint}/element_lib/`, {
           params: {
-            // Assuming your API expects both operation_id and listId for filtering
             operation_id: operationId,
-            listItem: listId, // Add this if your API endpoint requires it for additional filtering
+            listItem: listId,  
       
           },
           headers: {
@@ -198,11 +196,8 @@ export default function ElementLibList() {
           },
         });
   
-        // Filter elements if your backend doesn't handle it based on operation_id and listId
-        // This step might not be necessary if your backend API already returns the filtered list based on the params
         const filteredElements = response.data.filter(element => element.operation.includes(parseInt(operationId)));
-  
-        // Mapping through elements to adjust their structure if needed
+
         const updatedElementLibList = filteredElements.map((element) => {
           return {
             ...element,
