@@ -13,13 +13,30 @@ import {
   MenuList,
   MenuOptionGroup,
 } from "@chakra-ui/react";
+import {
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+} from "@chakra-ui/react";
 import React, { useState } from "react";
 import { GrAnalytics, GrPowerReset } from "react-icons/gr";
 import { IoSearch } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import CardSkeleton from "../components/CardSkeleton";
+import CardSkeleton from "../components/CardSkeleton";
 import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
+import useGet from "../customed_hook/useGet";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 

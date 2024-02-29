@@ -1,5 +1,5 @@
-import { useAuth } from "../authConfig";
 import { useState } from "react";
+import { useAuth } from "../authConfig";
 
 export default function useHeaders() {
   const [accessToken, setToken] = useState("");

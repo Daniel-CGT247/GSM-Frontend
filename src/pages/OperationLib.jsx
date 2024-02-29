@@ -17,6 +17,7 @@ import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import headers from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
+import TableSkeleton from "../components/TableSkeleton";
 
 const columns = ["Name", ""];
 
@@ -62,6 +63,28 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       })
       .catch((error) => console.error("Error adding operation:", error));
   };
+  
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
+
+  const renderPaginationNumbers = () => {
+    let items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Button
+          key={number}
+          colorScheme={currentPage === number ? "blue" : "gray"}
+          onClick={() => setCurrentPage(number)}
+        >
+          {number}
+        </Button>
+      );
+    }
+    return items;
+  };
 
   return (
     <>
@@ -104,3 +127,4 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
     </>
   );
 }
+

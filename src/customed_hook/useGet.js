@@ -1,9 +1,7 @@
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { useMsal } from "@azure/msal-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import useHeaders from "./useHeader";
-import { useAuth } from "../authConfig";
-import { useMsal } from "@azure/msal-react";
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);
