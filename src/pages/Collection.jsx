@@ -13,6 +13,7 @@ import {
   MenuList,
   MenuOptionGroup,
 } from "@chakra-ui/react";
+
 import React, { useState } from "react";
 import { GrPowerReset } from "react-icons/gr";
 import { IoSearch } from "react-icons/io5";
@@ -22,12 +23,13 @@ import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
+
 import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
-  const [searchTerm, setSearchTerm] = useState(""); // search bar
-  const [selectedSeason, setSelectedSeason] = useState(""); // season dropdown
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [selectedSeason, setSelectedSeason] = useState("");  
   const [selectedProto, setSelectedProto] = useState("");
 
   const resetFilters = () => {
@@ -56,18 +58,19 @@ export default function Collection() {
       <Heading size="xl">Collection</Heading>
 
       <Flex alignItems="center" gap={4} my={5}>
-      <InputGroup width="55%"> 
-        <InputLeftElement pointerEvents="none">
-          <IoSearch color="gray.300" />
-        </InputLeftElement>
-        <Input
-          type="text"
-          placeholder="Search a Style"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </InputGroup>
+        <InputGroup width="50%">
+          <InputLeftElement pointerEvents="none">
+            <IoSearch color="gray.300" />
+          </InputLeftElement>
 
+          <Input
+            className="text-center"
+            type="text"
+            placeholder="Search a Style"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </InputGroup>
         <Menu>
           {({ isOpen }) => (
             <>
@@ -84,11 +87,11 @@ export default function Collection() {
                   onChange={(value) => setSelectedSeason(value)}
                 >
                   <MenuItemOption value="">All</MenuItemOption>
-                  {uniqueSeasons.map((season) => (
-                    <MenuItemOption key={season} value={season}>
-                      {season}
-                    </MenuItemOption>
-                  ))}
+                    {uniqueSeasons.map((season) => (
+                      <MenuItemOption key={season} value={season}>
+                        {season}
+                      </MenuItemOption>
+                    ))}
                 </MenuOptionGroup>
               </MenuList>
             </>
@@ -108,9 +111,7 @@ export default function Collection() {
                 <MenuOptionGroup
                   type="radio"
                   value={selectedProto.toString()}
-                  onChange={(value) => {
-                    setSelectedProto(parseInt(value))
-                  }}
+                  onChange={(value) => setSelectedProto(value)}
                 >
                   <MenuItemOption value="">All</MenuItemOption>
                   {uniquePrototype.map((proto) => (
@@ -132,7 +133,9 @@ export default function Collection() {
         </Button>
       </Flex>
 
-      <h3 className="text-slate-400">Recent Update</h3>
+      <Heading size="lg" color="gray.500" my={5}>
+        Recent Update
+      </Heading>
 
       {isLoading && (
         <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
@@ -155,7 +158,9 @@ export default function Collection() {
             ))}
           </div>
 
-          <h3 className="text-slate-400">Older</h3>
+          <Heading size="lg" color="gray.500" my={5}>
+            Older
+          </Heading>
 
           <CarouselCollection>
             {filteredData.slice(4).map((list, index) => (

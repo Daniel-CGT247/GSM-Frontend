@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Card,
+  CardBody,
+  Flex,
+  HStack,
+  IconButton,
   Table,
+  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -10,88 +15,63 @@ import {
   Th,
   Thead,
   Tr,
-  Card,
-  CardBody,
-  Input,
-  Box,
-  Center,
-  Flex,
-  IconButton,
-  HStack,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import endpoint from "../utils/endpoint";
+import axios from "axios";
+import { useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
+import useGet from "../customed_hook/useGet";
+import headers from "../customed_hook/useHeader";
+import endpoint from "../utils/endpoint";
 
-export default function OperationLib({ bundleGroup, listId, updateOperationLists }) {
-  const [loading, setLoading] = useState(true);
-  const [operationLibs, setOperationLibs] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+const columns = ["Name", ""];
+
+export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredLibs, setFilteredLibs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [libsResponse] = await Promise.all([
-          axios.get(
-            `${endpoint}/operation_lib/`,
-            { 
-              params: { bundle_group_id: bundleGroup, }, 
-              headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` },
-            }
-          ),
-        ]);
-
-        setOperationLibs(libsResponse.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching operation libraries:", error);
-        setOperationLibs([]); // Set to an empty array on error to stop loading state
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [bundleGroup, listId, updateOperationLists]);
-
-  useEffect(() => {
-    const lowercasedFilter = searchTerm.toLowerCase();
-    const filteredData = operationLibs?.filter(item => {
-      return (
-        item.name.toLowerCase().includes(lowercasedFilter) || 
-        item.job_code.toString().includes(lowercasedFilter)
-      );
-    });
-    setFilteredLibs(filteredData || []);
-    setCurrentPage(1); // Reset to the first page on filter change
-  }, [operationLibs, searchTerm]);
-
-  const handleAddOperation = async (operation) => {
-    try {
-      const response = await axios.post(
-        `${endpoint}/operation_list/`, 
-        { 
-          operations: operation.id, 
-          list: listId 
-        }, 
-        { 
-          headers: { Authorization: `JWT ${localStorage.getItem("access_token")}` } 
-        }
-      );
-
-      if (response.status === 200 || response.status === 201) {
-        console.log("Operation added successfully:", response.data);
-        updateOperationLists(response.data); 
-      } else {
-        console.error("Failed to add operation:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error adding operation:", error.response ? error.response.data : error);
-    }
+  const paramLib = { bundle_group_id: bundleId };
+  const paramList = {
+    operations__bundle_group_id: bundleId,
+    list__item_id: listId,
   };
-  
+
+  const { data: operations, isLoading: isLibLoading } = useGet(
+    `${endpoint}/operation_lib`,
+    paramLib,
+    [bundleId]
+  );
+
+  // const [operations, setOperations] = useState([]);
+  // useEffect(() => {
+  //   axios.get(`${endpoint}/operation_lib`, { params: paramLib }).then((res) => {
+  //     setOperations(res.data);
+  //   });
+  // }, [bundleId]);
+
+  const { data: operationList } = useGet(
+    `${endpoint}/operation_list`,
+    paramList,
+    [listId]
+  );
+
+  const addOperation = (operation) => {
+    const body = { list: listId, operations: operation.id };
+
+    axios
+      .post(`${endpoint}/operation_list/`, body, { headers: headers })
+      .then(() => {
+        setUpdateFunc([
+          ...operationList,
+          {
+            list: listId,
+            operations: { id: operation.id, name: operation.name },
+          },
+        ]);
+      })
+      .catch((error) => console.error("Error adding operation:", error));
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
@@ -115,70 +95,60 @@ export default function OperationLib({ bundleGroup, listId, updateOperationLists
   };
 
   return (
-    <Card>
-      <CardBody>
-        <Box p={5}>
-          <Center>
-            <Text fontSize="2xl" fontWeight="bold" color="gray.700">Operation Library</Text>
-          </Center>
-          <Input
-            placeholder="Search by name or code"
-            onChange={(e) => setSearchTerm(e.target.value)}
-            value={searchTerm}
-            mb="4"
-          />
-        </Box>
-
-        <TableContainer height="300px" overflowY="auto">
-          {loading ? (
-            <TableSkeleton columns={["Name", "Code", "Add"]} />
-          ) : (
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Code</Th>
-                  <Th>Add</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {currentItems.map((operation) => (
-                  <Tr key={operation.id}>
-                    <Td>{operation.name}</Td>
-                    <Td>{operation.job_code}</Td>
-                    <Td>
-                      <Button
-                        colorScheme="green"
-                        onClick={() => handleAddOperation(operation)}
-                      >
-                        Add
-                      </Button>
-                    </Td>
+    <>
+      {isLibLoading ? (
+        <TableSkeleton header="Operation Library" columns={columns} />
+      ) : (
+        <Card>
+          <CardBody>
+            <TableContainer>
+              <Table variant="striped" colorScheme="gray">
+                <TableCaption placement="top" bgColor="gray.50">
+                  <Text as="h4">Operation Library</Text>
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th></Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          )}
-        </TableContainer>
-
-        <Flex mt="4" justifyContent="center" alignItems="center">
-          <IconButton
-            icon={<ChevronLeftIcon />}
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            isDisabled={currentPage === 1}
-            mr="4"
-          />
-          <HStack spacing="20px">
-            {renderPaginationNumbers()}
-          </HStack>
-          <IconButton
-            icon={<ChevronRightIcon />}
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            isDisabled={currentPage >= totalPages}
-            ml="4"
-          />
-        </Flex>
-      </CardBody>
-    </Card>
+                </Thead>
+                <Tbody>
+                  {operations.map((operation) => (
+                    <Tr key={operation.id}>
+                      <Td>{operation.name}</Td>
+                      <Td>
+                        <Button
+                          colorScheme="green"
+                          onClick={() => addOperation(operation)}
+                        >
+                          Add
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            <Flex mt="4" justifyContent="center" alignItems="center">
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isDisabled={currentPage === 1}
+                mr="4"
+              />
+              <HStack spacing="20px">{renderPaginationNumbers()}</HStack>
+              <IconButton
+                icon={<ChevronRightIcon />}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                isDisabled={currentPage >= totalPages}
+                ml="4"
+              />
+            </Flex>
+          </CardBody>
+        </Card>
+      )}
+    </>
   );
 }

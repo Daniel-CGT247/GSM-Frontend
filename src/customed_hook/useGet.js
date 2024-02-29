@@ -1,34 +1,59 @@
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { useMsal } from "@azure/msal-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import headers from "../utils/headers";
 
 export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [accessToken, setToken] = useState("");
+  const { instance, accounts } = useMsal();
+  const [headers, setHheaders] = useState({});
 
   useEffect(() => {
     setLoading(true);
-    if (localStorage.getItem("access_token") === null) {
-      window.location.href = "/login";
-      return;
-    }
-    getData();
-  }, [deps]);
+    if (!accessToken) {
+      const tokenRequest = {
+        scopes: [
+          "api://43877c69-35ac-40ba-8b81-1d75c3aeff81/read",
+          "User.Read",
+        ],
+        account: accounts[0],
+      };
+      instance
+        .acquireTokenSilent(tokenRequest)
+        .then((tokenResponse) => {
+          setToken(tokenResponse.accessToken);
+          setHheaders({
+            Authorization: `Bearer ${tokenResponse.accessToken}`,
+          });
+        })
 
-  let getData = async () => {
-    try {
-      let res = await axios.get(`${endpoint}`, {
-        params: params,
-        headers: headers,
-      });
-      setData(res.data);
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
+        .catch(async (error) => {
+          if (error instanceof InteractionRequiredAuthError) {
+            instance
+              .acquireTokenRedirect(tokenRequest)
+              .then(function (response) {
+                setToken(response.accessToken);
+              });
+            console.error(error);
+          }
+        });
     }
-  };
 
-  return { isLoading, data, error, setData };
+    accessToken &&
+      axios
+        .get(endpoint, { params: params, headers: headers })
+        .then((res) => {
+          setData(res.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error);
+          setLoading(false);
+        });
+  }, [...(deps ?? []), headers, instance, accounts]);
+
+  return { data, isLoading, error, setData };
 }

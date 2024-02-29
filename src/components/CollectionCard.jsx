@@ -7,75 +7,54 @@ import {
   Heading,
   Image,
   Text,
-  // useDisclosure,
-  Badge
+  useDisclosure,
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
-// import JobDrawer from "./JobDrawer";
-import { Link } from "react-router-dom";
 
 export default function CollectionCard({ list, maxWidth }) {
-  // const { isOpen, onClose } = useDisclosure();
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
 
   return (
     <>
-     <Card
-        maxW={maxWidth || "full"}
-        w="full"
-        overflow="hidden"
-        borderWidth={0}
-        boxShadow="0 0 10px rgba(0, 0, 0, 0.1)" // Increase the spread of the shadow
-        borderRadius="md"
-        bg="white"
-      >
+      <Card maxW={maxWidth} overflow="hidden" variant="outline">
+        <HStack>
+          <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
 
-        <HStack w="full" spacing={4}>
-          <Image 
-            key={list.id} 
-            src={imageUrl} 
-            maxW="500px" 
-            maxH="300px" 
-            objectFit="cover" 
-            flexShrink={0}
-            boxSize="200px" // images have same size
-          />
-
-          <CardBody flex={1}>
+          <CardBody>
             <Heading size="md">{list.item.name}</Heading>
-            <Badge colorScheme={list.complete ? "green" : "orange"} mb={4}>
-              {list.complete ? "Completed" : "In-Progress"}
-            </Badge>
+            <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
 
-            <Flex direction="column" gap={4} mb={4}>
-              <Flex alignItems="center" gap={2}>
+            <Flex gap={4} mb={4}>
+              <Flex alignItems="center" gap={1}>
                 <LuFlower />
                 {list.item.season}
               </Flex>
-              <Flex alignItems="center" gap={2}>
+              <Flex alignItems="center" gap={1}>
                 <HiPuzzle />
                 {list.item.proto}
               </Flex>
             </Flex>
-            <Link to={`/${list.id}/job_group`}>
-              <Button w="full" mt={2} variant="solid" colorScheme="twitter"> 
-                Continue
-              </Button>
-            </Link>
+            <Button
+              colorScheme="twitter"
+              variant="solid"
+              as="a"
+              href={`${list.id}/job_group`}
+            >
+              Continue
+            </Button>
           </CardBody>
         </HStack>
         <Flex
           bgColor="gray.100"
-          h="50px"
+          height="50px"
           justifyContent="center"
           alignItems="center"
         >
           <Text my={0}>Last Update: {list.last_update}</Text>
         </Flex>
       </Card>
-      {/* <JobDrawer onClose={onClose} isOpen={isOpen} styleNum={list.item.name} listId={list.id}/> */}
     </>
   );
 }

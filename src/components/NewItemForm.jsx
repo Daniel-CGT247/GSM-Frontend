@@ -3,12 +3,17 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../customed_hook/useAuth";
+import useGet from "../customed_hook/useGet";
+import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
-export default function NewItemForm() {
-  const user = useAuth();
-
+export default function NewItemForm({ username }) {
+  const { data: user } = useGet(`${endpoint}/user/`, {
+    username: username,
+  });
+  console.log(user);
+  const header = useHeaders();
+  console.log(header.Authorization);
   const [formData, setFormData] = useState({
     item: {
       name: "",
@@ -66,14 +71,12 @@ export default function NewItemForm() {
     formDataToSend.append("complete", formData.complete);
     formDataToSend.append("created_by", formData.created_by);
 
-    const headers = {
-      Authorization: `JWT ${localStorage.getItem("access_token")}`,
-    };
-
     try {
-      await axios.post(`${endpoint}/collection/`, formDataToSend, { headers });
+      await axios.post(`${endpoint}/collection/`, formDataToSend, {
+        headers: header,
+      });
       setErrors({});
-      navigate(`/collection`);
+      navigate(`/`);
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);
