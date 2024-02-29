@@ -28,8 +28,8 @@ import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [selectedSeason, setSelectedSeason] = useState("");  
+  const [searchTerm, setSearchTerm] = useState(""); // search bar
+  const [selectedSeason, setSelectedSeason] = useState(""); // season dropdown
   const [selectedProto, setSelectedProto] = useState("");
 
   const resetFilters = () => {
@@ -87,11 +87,11 @@ export default function Collection() {
                   onChange={(value) => setSelectedSeason(value)}
                 >
                   <MenuItemOption value="">All</MenuItemOption>
-                    {uniqueSeasons.map((season) => (
-                      <MenuItemOption key={season} value={season}>
-                        {season}
-                      </MenuItemOption>
-                    ))}
+                  {uniqueSeasons.map((season) => (
+                    <MenuItemOption key={season} value={season}>
+                      {season}
+                    </MenuItemOption>
+                  ))}
                 </MenuOptionGroup>
               </MenuList>
             </>
@@ -110,12 +110,11 @@ export default function Collection() {
               <MenuList>
                 <MenuOptionGroup
                   type="radio"
-                  value={selectedProto.toString()}
                   onChange={(value) => setSelectedProto(value)}
                 >
                   <MenuItemOption value="">All</MenuItemOption>
                   {uniquePrototype.map((proto) => (
-                    <MenuItemOption key={proto} value={proto.toString()}>
+                    <MenuItemOption key={proto} value={proto}>
                       {proto}
                     </MenuItemOption>
                   ))}

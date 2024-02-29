@@ -20,7 +20,7 @@ export default function YourList() {
   const bundle_group =
     jobGroup &&
     jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id === bundleId);
+    jobGroup.bundle_groups.find((bundle) => bundle.id == bundleId);
   const bundleName = bundle_group && bundle_group.name;
 
 

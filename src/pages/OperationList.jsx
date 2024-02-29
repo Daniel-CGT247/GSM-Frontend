@@ -18,6 +18,7 @@ import {
   Tr,
   Card,
   CardBody,
+  CardHeader,
   Text,
   TableCaption,
 } from "@chakra-ui/react";
