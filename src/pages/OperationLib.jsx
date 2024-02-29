@@ -1,7 +1,11 @@
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
   Button,
   Card,
   CardBody,
+  Flex,
+  HStack,
+  IconButton,
   Table,
   TableCaption,
   TableContainer,
@@ -13,15 +17,19 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import headers from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
-import TableSkeleton from "../components/TableSkeleton";
 
 const columns = ["Name", ""];
 
 export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredLibs, setFilteredLibs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
   const paramLib = { bundle_group_id: bundleId };
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -63,7 +71,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       })
       .catch((error) => console.error("Error adding operation:", error));
   };
-  
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
@@ -121,10 +129,26 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                 </Tbody>
               </Table>
             </TableContainer>
+            <Flex mt="4" justifyContent="center" alignItems="center">
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isDisabled={currentPage === 1}
+                mr="4"
+              />
+              <HStack spacing="20px">{renderPaginationNumbers()}</HStack>
+              <IconButton
+                icon={<ChevronRightIcon />}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                isDisabled={currentPage >= totalPages}
+                ml="4"
+              />
+            </Flex>
           </CardBody>
         </Card>
       )}
     </>
   );
 }
-

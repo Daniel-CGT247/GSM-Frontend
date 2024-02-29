@@ -11,10 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
-import JobDrawer from "./JobDrawer";
 
 export default function CollectionCard({ list, maxWidth }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
 

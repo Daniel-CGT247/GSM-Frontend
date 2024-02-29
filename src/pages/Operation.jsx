@@ -2,10 +2,10 @@ import {
   Button,
   Container,
   Flex,
-  Heading,
-  useDisclosure,
-  SimpleGrid,
   GridItem,
+  Heading,
+  SimpleGrid,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
@@ -13,7 +13,6 @@ import {
   IoCheckmarkCircleOutline,
 } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import JobDrawer from "../components/JobDrawer";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
