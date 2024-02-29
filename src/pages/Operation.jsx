@@ -31,7 +31,6 @@ export default function Operation() {
     null,
     [jobId]
   );
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const bundle_group =
     jobGroup &&

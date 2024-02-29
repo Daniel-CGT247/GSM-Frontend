@@ -20,8 +20,8 @@ import axios from "axios";
 import { useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
-import headers from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
+import useHeaders from "../customed_hook/useHeader";
 
 const columns = ["Name", ""];
 
@@ -30,6 +30,12 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
   const [filteredLibs, setFilteredLibs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
+  const headers = useHeaders();
+
   const paramLib = { bundle_group_id: bundleId };
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -42,13 +48,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
     [bundleId]
   );
 
-  // const [operations, setOperations] = useState([]);
-  // useEffect(() => {
-  //   axios.get(`${endpoint}/operation_lib`, { params: paramLib }).then((res) => {
-  //     setOperations(res.data);
-  //   });
-  // }, [bundleId]);
-
   const { data: operationList } = useGet(
     `${endpoint}/operation_list`,
     paramList,
@@ -57,7 +56,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
 
   const addOperation = (operation) => {
     const body = { list: listId, operations: operation.id };
-
     axios
       .post(`${endpoint}/operation_list/`, body, { headers: headers })
       .then(() => {
@@ -71,12 +69,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       })
       .catch((error) => console.error("Error adding operation:", error));
   };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
 
   const renderPaginationNumbers = () => {
     let items = [];

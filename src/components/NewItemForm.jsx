@@ -1,31 +1,39 @@
+import { Button } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import useGet from "../customed_hook/useGet";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
+import { useEffect } from "react";
 
 export default function NewItemForm({ username }) {
   const { data: user } = useGet(`${endpoint}/user/`, {
     username: username,
   });
-  console.log(user);
-  const header = useHeaders();
-  console.log(header.Authorization);
+  const headers = useHeaders();
   const [formData, setFormData] = useState({
     item: {
       name: "",
       description: "",
       season: "",
-      image: "",
+      image: null,
       proto: null,
     },
     complete: false,
-    created_by: user?.id,
+    created_by: null,
   });
 
+  useEffect(() => {
+    user &&
+      setFormData({
+        ...formData,
+        created_by: user[0]?.id,
+      });
+  }, [user]);
+
+  console.log(formData);
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -70,10 +78,11 @@ export default function NewItemForm({ username }) {
 
     formDataToSend.append("complete", formData.complete);
     formDataToSend.append("created_by", formData.created_by);
+    console.log("Form Data To Send: ", formDataToSend);
 
     try {
       await axios.post(`${endpoint}/collection/`, formDataToSend, {
-        headers: header,
+        headers: headers,
       });
       setErrors({});
       navigate(`/`);
@@ -171,7 +180,7 @@ export default function NewItemForm({ username }) {
         <Form.Text className="text-danger">{errors.item.proto}</Form.Text>
       )}
 
-      <Button variant="primary" className="w-full" type="submit">
+      <Button colorScheme="twitter" type="submit">
         Continue
       </Button>
     </Form>

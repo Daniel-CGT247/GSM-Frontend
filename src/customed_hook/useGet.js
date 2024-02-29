@@ -1,48 +1,15 @@
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { useMsal } from "@azure/msal-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import useHeaders from "./useHeader";
 
 export default function useGet(endpoint, params, deps) {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [accessToken, setToken] = useState("");
-  const { instance, accounts } = useMsal();
-  const [headers, setHheaders] = useState({});
-
+  const headers = useHeaders();
   useEffect(() => {
     setLoading(true);
-    if (!accessToken) {
-      const tokenRequest = {
-        scopes: [
-          "api://43877c69-35ac-40ba-8b81-1d75c3aeff81/read",
-          "User.Read",
-        ],
-        account: accounts[0],
-      };
-      instance
-        .acquireTokenSilent(tokenRequest)
-        .then((tokenResponse) => {
-          setToken(tokenResponse.accessToken);
-          setHheaders({
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-          });
-        })
-
-        .catch(async (error) => {
-          if (error instanceof InteractionRequiredAuthError) {
-            instance
-              .acquireTokenRedirect(tokenRequest)
-              .then(function (response) {
-                setToken(response.accessToken);
-              });
-            console.error(error);
-          }
-        });
-    }
-
-    accessToken &&
+    headers.Authorization &&
       axios
         .get(endpoint, { params: params, headers: headers })
         .then((res) => {
@@ -53,7 +20,7 @@ export default function useGet(endpoint, params, deps) {
           setError(error);
           setLoading(false);
         });
-  }, [...(deps ?? []), headers, instance, accounts]);
+  }, [...(deps ?? []), headers]);
 
   return { data, isLoading, error, setData };
 }
