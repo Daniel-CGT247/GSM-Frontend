@@ -1,63 +1,81 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import { LuFlower } from "react-icons/lu"; 
+import {
+  Button,
+  Card,
+  CardBody,
+  Flex,
+  HStack,
+  Heading,
+  Image,
+  Text,
+  // useDisclosure,
+  Badge
+} from "@chakra-ui/react";
+import { HiPuzzle } from "react-icons/hi";
+import { LuFlower } from "react-icons/lu";
+// import JobDrawer from "./JobDrawer";
 import { Link } from "react-router-dom";
-import { HiPuzzle } from 'react-icons/hi'; 
 
-
-export default function CollectionCard({ list }) {
+export default function CollectionCard({ list, maxWidth }) {
+  // const { isOpen, onClose } = useDisclosure();
   const placeholderImage = "https://placehold.co/200x170";
-
-  // image url from api
   const imageUrl = list.item.image || placeholderImage;
 
   return (
-    <Card style={{ width: "90%" }}>
-      <div className="grid grid-cols-10">
-        
-        <Card.Img
-          className="col-span-5"
-          key={list.id}
-          variant="top"
-          src={imageUrl} 
-          style={{ 
-            width: '200px', 
-            height: '190px', 
-            objectFit: 'contain' }}
-        />
+    <>
+     <Card
+        maxW={maxWidth || "full"}
+        w="full"
+        overflow="hidden"
+        borderWidth={0}
+        boxShadow="0 0 10px rgba(0, 0, 0, 0.1)" // Increase the spread of the shadow
+        borderRadius="md"
+        bg="white"
+      >
 
-        <Card.Body className="flex flex-col col-span-7">
-          <Card.Title>{list.item.name}</Card.Title>
-          <Card.Text>{list.complete ? "Completed" : "In-Progress"}</Card.Text>
-          
-          <div className="flex gap-3 items-center">
-            
-            <div className="flex gap-1 items-center">
-              <LuFlower />
-              <Card.Text>{list.item.season}</Card.Text>
-            </div>
-           
-            <div className="flex gap-1 items-center">
-              <HiPuzzle />
-              <Card.Text>{list.item.proto}</Card.Text>
-            </div>
-          
-          </div>
+        <HStack w="full" spacing={4}>
+          <Image 
+            key={list.id} 
+            src={imageUrl} 
+            maxW="500px" 
+            maxH="300px" 
+            objectFit="cover" 
+            flexShrink={0}
+            boxSize="200px" // images have same size
+          />
 
-          <Link to={`/${list.id}/job_group`}>
-            <Button className="w-1/2 mt-2" variant="primary">
-              Continue
-            </Button>
-          </Link>
+          <CardBody flex={1}>
+            <Heading size="md">{list.item.name}</Heading>
+            <Badge colorScheme={list.complete ? "green" : "orange"} mb={4}>
+              {list.complete ? "Completed" : "In-Progress"}
+            </Badge>
 
-        </Card.Body>
-        
-        <Card.Footer className="text-muted text-center col-span-12">
-          Last Update: {list.last_update}
-        </Card.Footer>
-
-      </div>
-    </Card>
+            <Flex direction="column" gap={4} mb={4}>
+              <Flex alignItems="center" gap={2}>
+                <LuFlower />
+                {list.item.season}
+              </Flex>
+              <Flex alignItems="center" gap={2}>
+                <HiPuzzle />
+                {list.item.proto}
+              </Flex>
+            </Flex>
+            <Link to={`/${list.id}/job_group`}>
+              <Button w="full" mt={2} variant="solid" colorScheme="twitter"> 
+                Continue
+              </Button>
+            </Link>
+          </CardBody>
+        </HStack>
+        <Flex
+          bgColor="gray.100"
+          h="50px"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text my={0}>Last Update: {list.last_update}</Text>
+        </Flex>
+      </Card>
+      {/* <JobDrawer onClose={onClose} isOpen={isOpen} styleNum={list.item.name} listId={list.id}/> */}
+    </>
   );
 }

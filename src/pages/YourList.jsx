@@ -1,38 +1,45 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
+import { Button, Container, Flex, Heading } from "@chakra-ui/react";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { Link, useParams } from "react-router-dom";
-import useGet from "../customed_hook/getData";
+import StyleSkeleton from "../components/StyleSkeleton";
+import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
 
 export default function YourList() {
   const { listId, jobId, bundleId } = useParams();
 
-  const styleNum = useGet(`${endpoint}/collection/${listId}`);
-  const itemName = styleNum && styleNum.item && styleNum.item.name;
-
-  const jobGroup = useGet(`${endpoint}/job_group/${jobId}`);
-  const bundle_group =
-    jobGroup &&
-    jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id == bundleId);
+  const { data: styleNum, isLoading: isStyleLoading } = useGet(`${endpoint}/collection/${listId}`);
+  const itemName = styleNum?.item?.name;
+  
+  const { data: jobGroup, isLoading: isJobLoading } = useGet(`${endpoint}/job_group/${jobId}`);
+  const bundle_group = jobGroup?.bundle_groups?.find(bundle => bundle.id === Number(bundleId));
   const bundleName = bundle_group && bundle_group.name;
 
+
   return (
-    <div className="p-5">
-      <div className="flex items-center justify-center space-y-2 flex-col">
-        <h1 className="font-bold">Your List - {bundleName}</h1>
-        <h3 className="font-bold">Style {itemName}</h3>
+    <Container maxW="container.xl" p={5}>
+      <Flex direction="column" align="center" justify="center" textAlign="center" mb={10}>
+        {isJobLoading || isStyleLoading ? (
+          <StyleSkeleton height="20px" width="200px" mb={4} />
+        ) : (
+          <>
+            <Heading as="h1" size="xl" mb={2} color="gray.800">
+              Your List - {bundleName}
+            </Heading>
+            <Heading as="h3" size="lg" mb={6} color="gray.500">
+              Style {itemName}
+            </Heading>
+          </>
+        )}
 
         <Link to={`/${listId}/job_group/${jobId}/${bundleId}/operation`}>
-          <Button variant="outline-secondary">Edit Operation List</Button>
+          <Button leftIcon={<IoArrowBackCircleOutline />} colorScheme="blue" variant="solid">
+            Edit Operation List
+          </Button>
         </Link>
-      </div>
-      <YourListTable
-        className="rounded-md"
-        bundleId={bundleId}
-        listId={listId}
-      />
-    </div>
+      </Flex>
+      <YourListTable bundleId={bundleId} listId={listId} />
+    </Container>
   );
 }

@@ -1,28 +1,49 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
-import Card from "react-bootstrap/Card";
-import Form from "react-bootstrap/Form";
+import { useNavigate, useParams } from "react-router-dom";
 import Pagination from "react-bootstrap/Pagination";
-import Table from "react-bootstrap/Table";
-import { useParams } from "react-router-dom";
-import useGet from "../customed_hook/getData";
+import { Button, Container, Row, Col, InputGroup, FormControl, Card, Table, Badge } from "react-bootstrap";
+import { ChevronDown, ChevronUp } from "react-bootstrap-icons";
 import endpoint from "../utils/endpoint";
 
-const ElementLibList = () => {
+export default function ElementLibList() {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
   const [selectedElements, setSelectedElements] = useState([]); // selected elements
   const [expandingNamesList, setExpandingNamesList] = useState([]); // concat input
   const { listId, operationId, operationListId } = useParams(); // extracts url param
-  const styleNum = useGet(`${endpoint}/collection/${listId}`);
-  const itemName = styleNum && styleNum.item && styleNum.item.name;
-  const [elementList, setElementList] = useState([]);
-  const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
 
-  const [searchFilter, setSearchFilter] = useState("");
+  const [styleNum, setStyleNum] = useState(null);
+  const itemName = styleNum && styleNum.item && styleNum.item.name;
+
+  const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
+  const navigate = useNavigate();
+  // pagination
+  const [searchFilter, setSearchFilter] = useState(""); 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
+
+  //==============================================
+  // - fetch the style number
+  //==============================================
+  useEffect(() => {
+    axios.get(`${endpoint}/collection/${listId}`, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("access_token")}`,
+      },
+    })
+    .then((response) => {
+      setStyleNum(response.data); 
+    })
+    .catch((error) => {
+      console.error("Error fetching collection item:", error);
+    });
+  }, [listId]);
+
+  //==============================================
+  // - pagination
+  //==============================================
   const handleSearchChange = (e) => {
     setSearchFilter(e.target.value);
     setCurrentPage(1);
@@ -38,24 +59,27 @@ const ElementLibList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredElements.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredElements.slice(indexOfFirstItem, indexOfLastItem);
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredElements.length / itemsPerPage); i++) {
-    pageNumbers.push(
-      <Pagination.Item
-        key={i}
-        active={i === currentPage}
-        onClick={() => handlePageChange(i)}
-      >
-        {i}
-      </Pagination.Item>
-    );
-  }
+  const renderPaginationItems = (totalItems, itemsPerPage) => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+      pageNumbers.push(
+        <Pagination.Item
+          key={i}
+          active={i === currentPage}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Pagination.Item>
+      );
+    }
+    return pageNumbers;
+  };
 
+  //==============================================
+  // - filter the elements based on the operations 
+  //==============================================
   const [currentOperation, setCurrentOperation] = useState(null);
   useEffect(() => {
     axios
@@ -77,11 +101,9 @@ const ElementLibList = () => {
     title += ` - ${currentOperation.bundle_group} - ${currentOperation.name}`;
   }
 
-  const scrollableTableStyle = {
-    maxHeight: "580px",
-    overflowY: "auto",
-  };
-
+  //==============================================
+  // - calculate total time
+  //==============================================
   const calculateTotalSam = () => {
     const totalTime = selectedElements.reduce((total, element) => {
       const elementTime = parseFloat(element.time) || 0;
@@ -123,8 +145,11 @@ const ElementLibList = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []);
+  }, []); 
 
+
+  
+  
   useEffect(() => {
     const fetchExpandingNames = async () => {
       try {
@@ -155,16 +180,30 @@ const ElementLibList = () => {
     fetchExpandingNames();
   }, []);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [elementLibResponse] = await Promise.all([
-          axios.get(`${endpoint}/element_lib/`, {
-            params: { operation_id: operationId },
-          }),
-        ]);
-
-        const updatedElementLibList = elementLibResponse.data.map((element) => {
+        // Adjust the API request to include both operation_id and listId if needed
+        const response = await axios.get(`${endpoint}/element_lib/`, {
+          params: {
+            // Assuming your API expects both operation_id and listId for filtering
+            operation_id: operationId,
+            listItem: listId, // Add this if your API endpoint requires it for additional filtering
+      
+          },
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("access_token")}`,
+          },
+        });
+  
+        // Filter elements if your backend doesn't handle it based on operation_id and listId
+        // This step might not be necessary if your backend API already returns the filtered list based on the params
+        const filteredElements = response.data.filter(element => element.operation.includes(parseInt(operationId)));
+  
+        // Mapping through elements to adjust their structure if needed
+        const updatedElementLibList = filteredElements.map((element) => {
           return {
             ...element,
             variables: element.variables.map((variable) => {
@@ -180,16 +219,16 @@ const ElementLibList = () => {
             }),
           };
         });
-
+  
         setElementLibList(updatedElementLibList);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
-  }, []);
-
+  }, [operationId, listId]); 
+  
   const saveSelectedElementsToLocalStorage = (elements) => {
     localStorage.setItem("selectedElements", JSON.stringify(elements));
   };
@@ -206,7 +245,7 @@ const ElementLibList = () => {
       console.error(`Element with ID ${elementId} not found.`);
       return;
     }
-
+  
     const uniqueId = Date.now();
     const newElement = {
       ...selectedElement,
@@ -216,7 +255,7 @@ const ElementLibList = () => {
       expandingName:
         userExpandingName || selectedElement.expandingName || "N/A",
     };
-
+  
     selectedElement.variables.forEach((variable) => {
       const selectedOptionId = parseInt(
         selectedOptions[`${elementId}_${variable.name}`],
@@ -224,33 +263,38 @@ const ElementLibList = () => {
       );
       newElement.selectedOptions[variable.name] = selectedOptionId;
     });
-
+  
     try {
       const postData = {
         listItem: operationListId,
         elements: newElement.id,
         expanding_name: newElement.expandingName,
         options: Object.values(newElement.selectedOptions),
-      };
 
+        listId: listId,
+        operationId: operationId
+        
+      };
+  
       const addResponse = await axios.post(
         `${endpoint}/element_list/`,
         postData,
-        {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
-        }
+        { headers: { Authorization: `JWT ${localStorage.getItem("access_token")}`} }
       );
-
+  
       const addedElement = {
         ...newElement,
         uniqueId: addResponse.data.id || uniqueId,
       };
-
+  
       setSelectedElements((prevElements) => [...prevElements, addedElement]);
-
+  
       const response = await axios.get(`${endpoint}/element_list/`, {
+        params: {
+          operationList: operationListId,
+          operation_id: operationId,
+          listItem: listId,
+        },
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
@@ -258,11 +302,11 @@ const ElementLibList = () => {
       const fetchedElement = response.data.find(
         (item) => item.id === addedElement.uniqueId
       );
-
+  
       const fetchedTime = fetchedElement
         ? (parseFloat(fetchedElement.nmt) || 0).toFixed(4)
         : "N/A";
-
+  
       setSelectedElements((prevElements) =>
         prevElements.map((el) =>
           el.uniqueId === addedElement.uniqueId
@@ -272,7 +316,7 @@ const ElementLibList = () => {
       );
     } catch (error) {
       console.error("Error in adding element", error);
-
+  
       setSelectedElements((prevElements) =>
         prevElements.map((el) =>
           el.uniqueId === newElement.uniqueId
@@ -282,98 +326,27 @@ const ElementLibList = () => {
       );
     }
   };
-
-  const fetchExpandingNameForElement = async (elementName, selectedOptions) => {
-    if (elementList.length === 0) {
-      return "N/A";
-    }
-
+  
+  const handleDeleteElement = async (elementId) => {
     try {
-      const matchingElement = elementList.find(
-        (element) => element.elements.name === elementName
-      );
-
-      if (!matchingElement) {
-        return "N/A";
-      }
-
-      const matchingOptionsElement = matchingElement.options.find((element) => {
-        const elementOptionNames = element.variables.map(
-          (variable) =>
-            selectedOptions[`${matchingElement.id}_${variable.name}`]
-        );
-
-        return (
-          elementOptionNames.join(",") ===
-          Object.values(selectedOptions).join(",")
-        );
-      });
-
-      return matchingOptionsElement
-        ? matchingOptionsElement.expanding_name || "N/A"
-        : "N/A";
-    } catch (error) {
-      console.error("Error fetching expanding name for element:", error);
-      return "N/A";
-    }
-  };
-
-  const fetchTimeForElement = async (elementName, selectedOptions) => {
-    if (elementList.length === 0) {
-      return "N/A";
-    }
-
-    try {
-      const matchingElement = elementList.find(
-        (element) => element.elements.name === elementName
-      );
-
-      if (!matchingElement) {
-        return "N/A";
-      }
-
-      const matchingOptionsElement = matchingElement.options.find((element) => {
-        const elementOptionNames = element.variables.map(
-          (variable) =>
-            selectedOptions[`${matchingElement.id}_${variable.name}`]
-        );
-
-        return (
-          elementOptionNames.join(",") ===
-          Object.values(selectedOptions).join(",")
-        );
-      });
-
-      return matchingOptionsElement
-        ? matchingOptionsElement.nmt || "N/A"
-        : "N/A";
-    } catch (error) {
-      console.error("Error fetching time for element:", error);
-      return "N/A";
-    }
-  };
-
-  const handleDeleteElement = (uniqueId) => {
-    axios
-      .delete(`${endpoint}/element_list/${uniqueId}`, {
+      const response = await axios.delete(`${endpoint}/element_list/${elementId}/`, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("access_token")}`,
         },
-      })
-      .then((response) => {
-        console.log("Element deleted successfully:", response.data);
-
-        const updatedElements = selectedElements.filter(
-          (element) => element.uniqueId !== uniqueId
-        );
-
-        setSelectedElements(updatedElements);
-        saveSelectedElementsToLocalStorage(updatedElements);
-      })
-      .catch((error) => {
-        console.error("Error deleting element:", error);
       });
+      // Assuming the backend responds with a successful status code upon deletion
+      if (response.status >= 200 && response.status < 300) {
+        setSelectedElements(prevElements => 
+          prevElements.filter(element => element.uniqueId !== elementId)
+        );
+      } else {
+        throw new Error('Failed to delete the element from the backend.');
+      }
+    } catch (error) {
+      console.error('Error deleting element:', error);
+    }
   };
+  
 
   const [selectedVariables, setSelectedVariables] = useState({});
   const handleVariableChange = (elementId, variableName, selectedOptionId) => {
@@ -436,222 +409,257 @@ const ElementLibList = () => {
     }
   };
 
-  return (
-    <div className="container p-5" style={{ fontFamily: "Arial, sans-serif" }}>
-      <h2 className="font-bold text-center">{title}</h2>
-      <h3 className="font-bold text-center">Style {itemName}</h3>
+  const [visibleOptions, setVisibleOptions] = useState({});
 
-      <div className="row my-2">
-        {/* Element Library Section */}
-        <div className="col-md-6">
+  const toggleOptionsVisibility = (elementId) => {
+    setVisibleOptions((prevVisibleOptions) => ({
+      ...prevVisibleOptions,
+      [elementId]: !prevVisibleOptions[elementId],
+    }));
+  };
+
+  return (
+    <Container fluid="lg" className="pt-5">
+      <Row>
+        <Col>
+          <h2 className="font-bold text-center">{title}</h2>
+          <h3 className="font-bold text-center">Style {itemName}</h3>
+        </Col>
+
+        <Row className="mt-4 d-flex justify-content-center">
+          <Col xs="auto">
+            <Button variant="success" onClick={() => navigate(-1)}>
+              Complete
+            </Button>            
+          </Col>
+        </Row>
+      </Row>
+      <Row>
+        <InputGroup className="mb-6">
+          <FormControl
+            placeholder="Search Elements..."
+            value={searchFilter}
+            onChange={handleSearchChange}
+          />
+        </InputGroup>
+
+        <Col md={6}>
           <Card>
-            <Card.Header>
-              <h5 className="card-title">Element Library</h5>
-              <Form.Control
-                type="text"
-                placeholder="Search Elements..."
-                value={searchFilter}
-                onChange={handleSearchChange}
-                style={{ width: "300px", marginBottom: "10px" }}
-              />
-            </Card.Header>
-            <Card.Body>
-              <div style={scrollableTableStyle}>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Element Name</th>
-                      <th>Variable</th>
-                      <th>Add</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentItems.map((elementLib, index) => (
-                      <tr key={elementLib.id}>
-                        <td>{indexOfFirstItem + index + 1}</td>
-                        <td>{elementLib.name}</td>
-                        <td>
-                          {elementLib.variables.length > 0 ? (
-                            <div>
-                              {elementLib.variables.map((variable, index) => (
-                                <div key={index}>
-                                  <label htmlFor={variable.name}>
-                                    {variable.name}:
-                                  </label>
-                                  <select
-                                    className="form-select"
-                                    id={variable.name}
-                                    onChange={(e) =>
-                                      handleVariableChange(
-                                        elementLib.id,
-                                        variable.name,
-                                        e.target.value
-                                      )
-                                    }
-                                    value={
-                                      selectedVariables[
-                                        `${elementLib.id}_${variable.name}`
-                                      ] || ""
-                                    }
-                                  >
-                                    <option value="">Select an option</option>
-                                    {variable.options.map(
-                                      (option, optionIndex) => (
-                                        <option
-                                          key={optionIndex}
-                                          value={option.id}
-                                        >
-                                          {option.name}
-                                        </option>
-                                      )
-                                    )}
-                                  </select>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span>Not Available</span>
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-primary"
-                            disabled={!areAllVariablesSelected(elementLib.id)}
+            <Card.Header>Element Library</Card.Header>
+            <Card.Body
+              style={{
+                maxHeight: "550px",
+                overflowY: "auto",
+                minHeight: "550px",
+              }}
+            >
+              <Table>
+                <thead>
+                  <tr>
+                    <th style={{ width: "5%" }}>#</th>
+                    <th style={{ width: "30%" }}>Name</th>
+                    <th style={{ width: "45%" }}>Options</th>
+                    <th style={{ width: "10%" }}>Add</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((elementLib, index) => (
+                    <tr key={elementLib.id}>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td>{elementLib.name}</td>
+                      <td>
+                        {elementLib.variables.length > 0 ? (
+                          <Button
+                            variant="link"
                             onClick={() =>
-                              handleAddElement(elementLib.id, selectedVariables)
+                              toggleOptionsVisibility(elementLib.id)
+                            }
+                            style={{ textDecoration: "none" }}
+                          >
+                            {visibleOptions[elementLib.id] ? (
+                              <ChevronUp />
+                            ) : (
+                              <ChevronDown />
+                            )}
+                            {" Available"}
+                            <Badge pill bg="info" text="light" className="ms-2">
+                              {elementLib.variables.length}
+                            </Badge>
+                          </Button>
+                        ) : (
+                          "Not Available"
+                        )}
+                        {visibleOptions[elementLib.id] && (
+                          <div>
+                            {elementLib.variables.map((variable, index) => (
+                              <div key={index} className="mb-2">
+                                <label
+                                  htmlFor={variable.name}
+                                  className="form-label d-block"
+                                >
+                                  {variable.name}:
+                                </label>
+                                <select
+                                  className="form-select"
+                                  id={variable.name}
+                                  onChange={(e) =>
+                                    handleVariableChange(
+                                      elementLib.id,
+                                      variable.name,
+                                      e.target.value
+                                    )
+                                  }
+                                  value={
+                                    selectedVariables[
+                                      `${elementLib.id}_${variable.name}`
+                                    ] || ""
+                                  }
+                                >
+                                  <option value="">Select an option</option>
+                                  {variable.options.map(
+                                    (option, optionIndex) => (
+                                      <option
+                                        key={optionIndex}
+                                        value={option.id}
+                                      >
+                                        {option.name}
+                                      </option>
+                                    )
+                                  )}
+                                </select>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          disabled={!areAllVariablesSelected(elementLib.id)}
+                          onClick={() =>
+                            handleAddElement(elementLib.id, selectedVariables)
+                          }
+                        >
+                          Add
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+            <Card.Footer>
+              <Pagination className="justify-content-center">
+                {renderPaginationItems(filteredElements.length, itemsPerPage)}
+              </Pagination>
+            </Card.Footer>
+          </Card>
+        </Col>
+
+        <Col md={6}>
+          <Card>
+            <Card.Header>Selected Elements</Card.Header>
+            <Card.Body style={{ maxHeight: "580px", overflowY: "auto" }}>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Expanding Field</th>
+                    <th>Time</th>
+                    <th>Selected Options</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {selectedElements.map((element, index) => (
+                    <tr key={element.uniqueId}>
+                      <td>{index + 1}</td>
+                      <td>{element.name}</td>
+
+                      <td>
+                        <div>
+                          <select
+                            className="form-select"
+                            value={element.expandingName}
+                            onChange={(e) =>
+                              handleExpandingNameChange(
+                                element.uniqueId,
+                                e.target.value
+                              )
                             }
                           >
-                            Add
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-                <Pagination>{pageNumbers}</Pagination>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
+                            <option value="N/A">N/A</option>
+                            {expandingNamesList.map((expandingName) => (
+                              <option key={expandingName} value={expandingName}>
+                                {expandingName}
+                              </option>
+                            ))}
+                            <option value="__ADD_NEW__">Add New...</option>
+                          </select>
+                        </div>
 
-        <div className="col-md-6">
-          <Card>
-            <Card.Header>
-              <div className="d-flex justify-content-between align-items-center">
-                <Card.Title>Element List</Card.Title>
-                <div className="text-right">
-                  <strong>Total SAM: {totalSam}</strong>
-                </div>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              <div style={scrollableTableStyle}>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      {/* <th>ID</th> */}
-                      <th>Element Name</th>
-                      <th>Expanding Field</th>
-                      <th>Time</th>
-                      <th>Selected Options</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {selectedElements.map((selectedElement, index) => (
-                      <tr key={selectedElement.uniqueId}>
-                        <td>{index + 1}</td>
-                        {/* <td>{selectedElement.id}</td> */}
-                        <td>{selectedElement.name}</td>
-
-                        <td>
-                          <div>
-                            <select
-                              className="form-select"
-                              value={selectedElement.expandingName}
+                        {element.expandingName === "__ADD_NEW__" && (
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              value={newExpandingName}
                               onChange={(e) =>
-                                handleExpandingNameChange(
-                                  selectedElement.uniqueId,
-                                  e.target.value
-                                )
+                                setNewExpandingName(e.target.value)
+                              }
+                              placeholder="Enter new option..."
+                            />
+                            <button
+                              className="btn btn-primary ms-2"
+                              onClick={() =>
+                                handleAddNewExpandingName(element.uniqueId)
                               }
                             >
-                              <option value="N/A">N/A</option>
-                              {expandingNamesList.map((expandingName) => (
-                                <option
-                                  key={expandingName}
-                                  value={expandingName}
-                                >
-                                  {expandingName}
-                                </option>
-                              ))}
-                              <option value="__ADD_NEW__">Add New...</option>
-                            </select>
+                              Add
+                            </button>
                           </div>
-                          {selectedElement.expandingName === "__ADD_NEW__" && (
-                            <div className="mt-2">
-                              <input
-                                type="text"
-                                value={newExpandingName}
-                                onChange={(e) =>
-                                  setNewExpandingName(e.target.value)
-                                }
-                                placeholder="Enter new option..."
-                              />
-                              <button
-                                className="btn btn-primary ms-2"
-                                onClick={() =>
-                                  handleAddNewExpandingName(
-                                    selectedElement.uniqueId
-                                  )
-                                }
-                              >
-                                Add
-                              </button>
+                        )}
+                      </td>
+
+                      <td>
+                        {element.time === undefined
+                          ? "Loading..."
+                          : element.time}
+                      </td>
+
+                      <td>
+                        {Object.entries(element.selectedOptions).map(
+                          ([variableName, optionName], index) => (
+                            <div key={index}>
+                              {variableName}: {optionName}
                             </div>
-                          )}
-                        </td>
+                          )
+                        )}
+                      </td>
 
-                        <td>
-                          {selectedElement.time === undefined
-                            ? "Loading..."
-                            : selectedElement.time}
-                        </td>
-
-                        <td>
-                          {Object.entries(selectedElement.selectedOptions).map(
-                            ([variableName, optionName], index) => (
-                              <div key={index}>
-                                {variableName}: {optionName}
-                              </div>
-                            )
-                          )}
-                        </td>
-
-                        <td>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() =>
-                              handleDeleteElement(selectedElement.uniqueId)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                      <td>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => handleDeleteElement(element.uniqueId)}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </Card.Body>
+            <Card.Footer className="text-right">
+              <strong>Total SAM: {totalSam}</strong>
+            </Card.Footer>
           </Card>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
-export default ElementLibList;
