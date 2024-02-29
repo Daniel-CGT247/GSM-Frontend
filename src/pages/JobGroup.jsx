@@ -1,5 +1,5 @@
-import { Button, Container, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
+import { Button, Container, Flex, Heading } from "@chakra-ui/react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import JobGroupCard from "../components/JobGroupCard";
@@ -24,6 +24,7 @@ export default function JobGroup() {
         justifyContent="center"
       >
         <Heading>Job Group</Heading>
+
         {isStyleLoading ? (
           <StyleSkeleton />
         ) : (
@@ -42,9 +43,21 @@ export default function JobGroup() {
           Back to Collection
         </Button>
       </Flex>
-      <Flex gap={5} alignItems="center" justifyContent="center" flexWrap="wrap">
+      
+      <Flex 
+        gap={5} 
+        alignItems="stretch" 
+        justifyContent="center" 
+        flexWrap="nowrap"  
+        marginTop="20px"  
+      >
         {data.map((job_group) => (
-          <JobGroupCard job_group={job_group} listId={listId} />
+          <JobGroupCard 
+            key={job_group.id}  
+            job_group={job_group} 
+            listId={listId} 
+            style={{ flex: "0 0 calc(20% - 10px)", marginBottom: "10px" }} 
+          />
         ))}
       </Flex>
     </Container>
