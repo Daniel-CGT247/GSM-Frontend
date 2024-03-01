@@ -1,29 +1,26 @@
+import { Button, Container, Heading } from "@chakra-ui/react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
+import { Badge, Col, FormControl, InputGroup, Row } from "react-bootstrap";
+import { ChevronDown, ChevronUp } from "react-bootstrap-icons";
+import Card from "react-bootstrap/Card";
+import Pagination from "react-bootstrap/Pagination";
+import Table from "react-bootstrap/Table";
 import { useNavigate, useParams } from "react-router-dom";
 import useGet from "../customed_hook/useGet";
-import Card from "react-bootstrap/Card";
-import Table from "react-bootstrap/Table";
-import Pagination from "react-bootstrap/Pagination";
-import {
-  Button,
-  Container,
-  Row,
-  Col,
-  InputGroup,
-  FormControl,
-} from "react-bootstrap";
-import { ChevronDown, ChevronUp } from "react-bootstrap-icons";
-import { Badge } from "react-bootstrap";
+import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
+import StyleSkeleton from "../components/StyleSkeleton";
 
 const ElementLibList = () => {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
   const [selectedElements, setSelectedElements] = useState([]); // selected elements
   const [expandingNamesList, setExpandingNamesList] = useState([]); // concat input
   const { listId, operationId, operationListId } = useParams(); // extracts url param
-  const styleNum = useGet(`${endpoint}/collection/${listId}`);
+  const { data: styleNum, isLoading: isStyleLoading } = useGet(
+    `${endpoint}/collection/${listId}`
+  );
   const itemName = styleNum && styleNum.item && styleNum.item.name;
   const [elementList, setElementList] = useState([]);
   const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
@@ -53,6 +50,8 @@ const ElementLibList = () => {
     indexOfLastItem
   );
 
+  const headers = useHeaders();
+
   const renderPaginationItems = (totalItems, itemsPerPage) => {
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
@@ -69,26 +68,13 @@ const ElementLibList = () => {
     return pageNumbers;
   };
 
-  const [currentOperation, setCurrentOperation] = useState(null);
-  useEffect(() => {
-    axios
-      .get(`${endpoint}/operation_lib/${operationId}`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
-      })
-      .then((response) => {
-        setCurrentOperation(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching operation details:", error);
-      });
-  }, [operationId]);
-
-  let title = "Build Elements";
-  if (currentOperation) {
-    title += ` - ${currentOperation.bundle_group} - ${currentOperation.name}`;
-  }
+  const { data: currentOperation, isLoading: isTitleLoading } = useGet(
+    `${endpoint}/operation_lib/${operationId}`
+  );
+  const title =
+    currentOperation &&
+    "Build Element" +
+      ` - ${currentOperation.bundle_group} - ${currentOperation.name}`;
 
   const scrollableTableStyle = {
     maxHeight: "580px",
@@ -112,10 +98,8 @@ const ElementLibList = () => {
   useEffect(() => {
     axios
       .get(`${endpoint}/element_list/`, {
-        params: { operationList: operationListId },
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
+        params: { listItem_id: operationListId },
+        headers: headers,
       })
       .then((response) => {
         const combinedData = response.data.map((item) => ({
@@ -145,10 +129,8 @@ const ElementLibList = () => {
         const elementListResponse = await axios.get(
           `${endpoint}/element_list/`,
           {
-            params: { operationList: operationListId },
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
+            params: { listItem_id: operationListId },
+            headers: headers,
           }
         );
 
@@ -250,9 +232,7 @@ const ElementLibList = () => {
         `${endpoint}/element_list/`,
         postData,
         {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
+          headers: headers,
         }
       );
 
@@ -264,9 +244,7 @@ const ElementLibList = () => {
       setSelectedElements((prevElements) => [...prevElements, addedElement]);
 
       const response = await axios.get(`${endpoint}/element_list/`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
+        headers: headers,
       });
       const fetchedElement = response.data.find(
         (item) => item.id === addedElement.uniqueId
@@ -369,9 +347,7 @@ const ElementLibList = () => {
   const handleDeleteElement = (uniqueId) => {
     axios
       .delete(`${endpoint}/element_list/${uniqueId}`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
+        headers: headers,
       })
       .then((response) => {
         console.log("Element deleted successfully:", response.data);
@@ -436,9 +412,7 @@ const ElementLibList = () => {
             expanding_name: newExpandingName,
           },
           {
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
+            headers: headers,
           }
         );
 
@@ -459,21 +433,24 @@ const ElementLibList = () => {
   };
 
   return (
-    <Container fluid="lg" className="pt-5">
-      <Row>
-        <Col>
-          <h2 className="font-bold text-center">{title}</h2>
-          <h3 className="font-bold text-center">Style {itemName}</h3>
-        </Col>
+    <Container maxW="7xl" p="5" centerContent>
+      {isTitleLoading ? (
+        <Heading>Build Element</Heading>
+      ) : (
+        <Heading>{title}</Heading>
+      )}
+      {isStyleLoading ? (
+        <StyleSkeleton />
+      ) : (
+        <Heading color="gray.500" size="lg">
+          Style {itemName}
+        </Heading>
+      )}
+      <Button my="5" colorScheme="twitter" onClick={() => navigate(-1)}>
+        Complete
+      </Button>
 
-        <Row className="mt-4 d-flex justify-content-center">
-          <Col xs="auto">
-            <Button variant="success" onClick={() => navigate(-1)}>
-              Complete
-            </Button>
-          </Col>
-        </Row>
-      </Row>
+      <Row className="mt-4 d-flex justify-content-center"></Row>
       <Row>
         <InputGroup className="mb-6">
           <FormControl
