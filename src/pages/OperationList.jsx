@@ -1,34 +1,35 @@
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Alert,
   AlertDescription,
   AlertIcon,
   AlertTitle,
   Button,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
+  ButtonGroup,
+  Card,
+  CardBody,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  IconButton,
+  Input,
   Table,
+  TableCaption,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
-  Card,
-  CardBody,
-  Text,
-  TableCaption,
+  useEditableControls,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
-import { FaChevronDown } from "react-icons/fa6";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
-import endpoint from "../utils/endpoint";
 import useHeaders from "../customed_hook/useHeader";
-
+import endpoint from "../utils/endpoint";
 const columns = ["#", "Name", "Description", "Job #", ""];
 
 export default function OperationList({
@@ -51,7 +52,6 @@ export default function OperationList({
   const [error, setError] = useState(false);
 
   const handleDelete = async (operationListId) => {
-    console.log("OperationId: ", operationListId);
     try {
       await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: headers,
@@ -68,6 +68,40 @@ export default function OperationList({
       }, 5000);
     }
   };
+
+  const [inputVal, setInputVal] = useState("");
+
+  const handleUpdate = (operationListId) => {
+    axios.patch(
+      `${endpoint}/operation_list/${operationListId}/`,
+      { expanding_name: inputVal },
+      { headers: headers }
+    );
+  };
+
+  function EditableControls({ handleUpdate }) {
+    const { isEditing, getSubmitButtonProps, getCancelButtonProps } =
+      useEditableControls();
+
+    return (
+      isEditing && (
+        <ButtonGroup ml="2" size="sm">
+          <IconButton
+            colorScheme="green"
+            icon={<CheckIcon w="3" />}
+            {...getSubmitButtonProps({
+              onClick: handleUpdate,
+            })}
+          />
+          <IconButton
+            colorScheme="red"
+            icon={<CloseIcon w="3" />}
+            {...getCancelButtonProps()}
+          />
+        </ButtonGroup>
+      )
+    );
+  }
 
   return (
     <>
@@ -108,7 +142,25 @@ export default function OperationList({
                     <Tr key={item.id}>
                       <Td>{index + 1}</Td>
                       <Td>{item.operations.name}</Td>
-                      <Td>{item.expanding_field}</Td>
+                      <Td>
+                        <Editable
+                          defaultValue={
+                            item.expanding_name ? item.expanding_name : "N/A"
+                          }
+                          onChange={(value) => {
+                            setInputVal(value);
+                          }}
+                          onSubmit={() => {
+                            handleUpdate(item.id);
+                          }}
+                        >
+                          <EditablePreview />
+                          <Input as={EditableInput} />
+                          <EditableControls
+                            handleUpdate={() => handleUpdate(item.id)}
+                          />
+                        </Editable>
+                      </Td>
                       <Td>{item.operations.job_code}</Td>
                       <Td>
                         <Button
