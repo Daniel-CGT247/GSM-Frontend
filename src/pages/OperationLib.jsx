@@ -96,7 +96,9 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
                 <TableCaption placement="top" bgColor="gray.50">
-                  <Text as="h4">Operation Library</Text>
+                  <Text color="gray.700" fontWeight="bold" fontSize="lg">
+                    Operation Library
+                  </Text>
                 </TableCaption>
                 <Thead>
                   <Tr>

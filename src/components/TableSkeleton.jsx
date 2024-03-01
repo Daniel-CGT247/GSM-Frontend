@@ -21,7 +21,9 @@ export default function TableSkeleton({ header, columns }) {
         <TableContainer>
           <Table variant="striped">
             <TableCaption placement="top" bgColor="gray.50">
-              <Text as="h4">{header}</Text>
+              <Text color="gray.700" fontWeight="bold" fontSize="lg">
+                {header}
+              </Text>
             </TableCaption>
             <Thead>
               <Tr>

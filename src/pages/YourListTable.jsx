@@ -1,16 +1,17 @@
 import {
   Button,
+  Card,
+  CardBody,
+  Heading,
+  Text,
   Table,
+  TableCaption,
   TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
-  Card,
-  CardBody,
-  TableCaption,
-  Text,
 } from "@chakra-ui/react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
@@ -26,8 +27,8 @@ const columns = [
 ];
 export default function YourListTable({ bundleId, listId }) {
   const params = {
-    bundle_group: bundleId,
-    listId: listId,
+    bundle_group_id: bundleId,
+    list__item_id: listId,
   };
 
   const { data: operationList, isLoading } = useGet(
@@ -44,7 +45,9 @@ export default function YourListTable({ bundleId, listId }) {
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
                 <TableCaption placement="top" bgColor="gray.50">
-                  <Text as="h4">Your List</Text>
+                  <Text fontSize="lg" color="gray.700" fontWeight="bold">
+                    Your List
+                  </Text>
                 </TableCaption>
                 <Thead>
                   <Tr>
@@ -60,13 +63,8 @@ export default function YourListTable({ bundleId, listId }) {
                   {operationList.map((item) => (
                     <Tr key={item.id}>
                       <Td>{item.operations.name}</Td>
-                      <Td>
-                        {item.expanding_field && item.expanding_field.name}
-                      </Td>
-                      <Td>
-                        {item.expanding_field &&
-                          item.expanding_field.operation_code}
-                      </Td>
+                      <Td>{item.expanding_name}</Td>
+                      <Td>{item.operations.job_code}</Td>
                       <Td isNumeric>{Number(item.total_sam).toFixed(2)}</Td>
                       <Td isNumeric>{item.element_count}</Td>
                       <Td>

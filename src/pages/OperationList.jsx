@@ -27,7 +27,7 @@ import { FaChevronDown } from "react-icons/fa6";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import headers from "../customed_hook/useHeader";
+import useHeaders from "../customed_hook/useHeader";
 
 const columns = ["#", "Name", "Description", "Job #", ""];
 
@@ -36,18 +36,22 @@ export default function OperationList({
   listId,
   updateOperationList,
 }) {
-  const paramList = { bundle_group: bundleId, listId: listId };
+  const paramList = {
+    operations__bundle_group_id: bundleId,
+    list__item_id: listId,
+  };
   const {
     data: operationList,
     setData: setOperationList,
     isLoading: isOperationListLoading,
-  } = useGet(`${endpoint}/operation_list`, paramList, updateOperationList);
+  } = useGet(`${endpoint}/operation_list`, paramList, [updateOperationList]);
 
-  const [selectedDesc, setSelectedDesc] = useState("");
+  const headers = useHeaders();
 
   const [error, setError] = useState(false);
 
   const handleDelete = async (operationListId) => {
+    console.log("OperationId: ", operationListId);
     try {
       await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
         headers: headers,
@@ -85,7 +89,9 @@ export default function OperationList({
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
                 <TableCaption placement="top" bgColor="gray.50">
-                  <Text as="h4">Operation List</Text>
+                  <Text color="gray.700" fontWeight="bold" fontSize="lg">
+                    Operation List
+                  </Text>
                 </TableCaption>
 
                 <Thead>
@@ -102,25 +108,8 @@ export default function OperationList({
                     <Tr key={item.id}>
                       <Td>{index + 1}</Td>
                       <Td>{item.operations.name}</Td>
-                      <Td>
-                        <ExpandingName
-                          operationId={item.operations.id}
-                          operationListId={item.id}
-                          setSelectedDesc={setSelectedDesc}
-                          item={item}
-                        />
-                      </Td>
-                      <Td>
-                        {item.expanding_field &&
-                        item.expanding_field.operation_code ? (
-                          item.expanding_field.operation_code
-                        ) : (
-                          <JobCode
-                            operationId={item.operations.id}
-                            description={selectedDesc}
-                          />
-                        )}
-                      </Td>
+                      <Td>{item.expanding_field}</Td>
+                      <Td>{item.operations.job_code}</Td>
                       <Td>
                         <Button
                           colorScheme="red"
@@ -138,68 +127,5 @@ export default function OperationList({
         </Card>
       )}
     </>
-  );
-}
-
-export function JobCode({ operationId, description }) {
-  const { data: descList } = useGet(
-    `${endpoint}/operation_code/?operation=${operationId}`
-  );
-  const desc = descList && descList.filter((desc) => desc.name === description);
-  const jobNumber = desc && desc[0] && desc[0].operation_code;
-  return <>{jobNumber}</>;
-}
-
-export function ExpandingName({
-  operationId,
-  operationListId,
-  item,
-  setSelectedDesc,
-}) {
-  const { data: descList } = useGet(
-    `${endpoint}/operation_code/?operation=${operationId}`
-  );
-
-  const handleSelectDesc = (value) => {
-    axios
-      .patch(
-        `${endpoint}/operation_list/${operationListId}`,
-        { expanding_field: value.id },
-        { headers: headers }
-      )
-      .then(setSelectedDesc(value.name))
-      .catch((error) => console.error("Error updating operation:", error));
-  };
-
-  return (
-    <Menu>
-      {({ isOpen }) => (
-        <>
-          <MenuButton
-            isActive={isOpen}
-            as={Button}
-            rightIcon={<FaChevronDown />}
-          >
-            {item.expanding_field && item.expanding_field.name
-              ? item.expanding_field.name
-              : "N/A"}
-          </MenuButton>
-          <MenuList>
-            <MenuOptionGroup
-              type="radio"
-              onChange={(value) => {
-                handleSelectDesc(value);
-              }}
-            >
-              {descList.map((desc) => (
-                <MenuItemOption key={desc.id} value={desc}>
-                  {desc.name}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </>
-      )}
-    </Menu>
   );
 }

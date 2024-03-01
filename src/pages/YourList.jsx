@@ -15,14 +15,16 @@ export default function YourList() {
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
   const { data: jobGroup, isLoading: isJobLoading } = useGet(
-    `${endpoint}/job_group/${jobId}`
+    `${endpoint}/job_group/${jobId}`,
+    null,
+    [jobId]
   );
+
   const bundle_group =
     jobGroup &&
     jobGroup.bundle_groups &&
-    jobGroup.bundle_groups.find((bundle) => bundle.id === bundleId);
+    jobGroup.bundle_groups.find((bundle) => bundle.id.toString() === bundleId);
   const bundleName = bundle_group && bundle_group.name;
-
 
   return (
     <Container maxW="7xl" className="p-5">
@@ -36,7 +38,9 @@ export default function YourList() {
         {isStyleLoading ? (
           <StyleSkeleton />
         ) : (
-          <Heading size="lg">Style {itemName}</Heading>
+          <Heading color="gray.500" size="lg">
+            Style {itemName}
+          </Heading>
         )}
         <Button
           as="a"
