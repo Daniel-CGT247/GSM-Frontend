@@ -68,20 +68,8 @@ export default function NewItemForm({ username }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // prepare FormData - file uploads
-    const formDataToSend = new FormData();
-
-    // append item properties to the FormData
-    Object.keys(formData.item).forEach((key) => {
-      formDataToSend.append(`item.${key}`, formData.item[key]);
-    });
-
-    formDataToSend.append("complete", formData.complete);
-    formDataToSend.append("created_by", formData.created_by);
-    console.log("Form Data To Send: ", formDataToSend);
-
     try {
-      await axios.post(`${endpoint}/collection/`, formDataToSend, {
+      await axios.post(`${endpoint}/collection/`, formData, {
         headers: headers,
       });
       setErrors({});

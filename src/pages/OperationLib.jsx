@@ -39,7 +39,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
   const paramLib = { bundle_group_id: bundleId };
   const paramList = {
     operations__bundle_group_id: bundleId,
-    list__item_id: listId,
+    list_id: listId,
   };
 
   const { data: operations, isLoading: isLibLoading } = useGet(

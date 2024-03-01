@@ -39,7 +39,7 @@ export default function OperationList({
 }) {
   const paramList = {
     operations__bundle_group_id: bundleId,
-    list__item_id: listId,
+    list_id: listId,
   };
   const {
     data: operationList,

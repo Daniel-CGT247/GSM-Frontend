@@ -28,7 +28,7 @@ const columns = [
 export default function YourListTable({ bundleId, listId }) {
   const params = {
     bundle_group_id: bundleId,
-    list__item_id: listId,
+    list_id: listId,
   };
 
   const { data: operationList, isLoading } = useGet(
