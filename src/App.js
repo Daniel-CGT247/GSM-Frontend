@@ -8,11 +8,11 @@ import React from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navigation from "./components/NavBar";
 import Collection from "./pages/Collection";
-import Element from "./pages/Element";
+import ElementPage from "./pages/ElementPage";
+import JobGroup from "./pages/JobGroup";
 import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
 import YourList from "./pages/YourList";
-import JobGroup from "./pages/JobGroup";
 
 export default function App({ pca }) {
   return (
@@ -41,7 +41,7 @@ export default function App({ pca }) {
             />
             <Route
               path="/:listId/operation/:operationId/:operationListId/element"
-              element={<Element />}
+              element={<ElementPage />}
             ></Route>
           </Routes>
         </Router>

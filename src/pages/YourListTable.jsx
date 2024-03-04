@@ -27,7 +27,7 @@ const columns = [
 ];
 export default function YourListTable({ bundleId, listId }) {
   const params = {
-    bundle_group_id: bundleId,
+    operations__bundle_group_id: bundleId,
     list_id: listId,
   };
 

@@ -1,8 +1,20 @@
+import {
+  Box,
+  Button,
+  Center,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import endpoint from "../utils/endpoint";
 import { useParams } from "react-router-dom";
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Button, Text, Center } from "@chakra-ui/react";
+import useHeaders from "../customed_hook/useHeader";
+import endpoint from "../utils/endpoint";
 
 export default function ElementList() {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
@@ -10,8 +22,9 @@ export default function ElementList() {
   const [expandingNamesList, setExpandingNamesList] = useState([]); // concat input
   const { listId, operationId, operationListId } = useParams(); // extracts url param
   // const styleNum = useGet(`${endpoint}/collection/${listId}`);
+  const headers = useHeaders();
   const [totalSam, setTotalSam] = useState("Loading..."); // calculate total time
- 
+
   //==============================================
   // - calculate total time
   //==============================================
@@ -29,21 +42,15 @@ export default function ElementList() {
     setTotalSam(finalTotalTime);
   }, [selectedElements]);
 
-
   useEffect(() => {
     axios
       .get(`${endpoint}/element_list/`, {
-        params: { 
-          operationList: operationListId, 
-          operation_id: operationId,
-          listId: listId, 
-          
+        params: {
+          listItem_id: operationListId,
         },
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
+        headers: headers,
       })
-     
+
       .then((response) => {
         const combinedData = response.data.map((item) => ({
           uniqueId: item.id,
@@ -63,9 +70,7 @@ export default function ElementList() {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, [listId,operationListId,  operationId]);
-
- 
+  }, [listId, operationListId, operationId, headers]);
 
   useEffect(() => {
     const fetchExpandingNames = async () => {
@@ -73,10 +78,8 @@ export default function ElementList() {
         const elementListResponse = await axios.get(
           `${endpoint}/element_list/`,
           {
-            params: { operationList: operationListId },
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
+            params: { listItem_id: operationListId },
+            headers: headers,
           }
         );
 
@@ -101,15 +104,14 @@ export default function ElementList() {
       try {
         const response = await axios.get(`${endpoint}/element_lib/`, {
           params: {
-            operation_id: operationId,
-            listId: listId, 
+            operation: operationId,
           },
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
+          headers: headers,
         });
-  
-        const filteredElements = response.data.filter(element => element.operation.includes(parseInt(operationId)));
+
+        const filteredElements = response.data.filter((element) =>
+          element.operation.includes(parseInt(operationId))
+        );
 
         const updatedElementLibList = filteredElements.map((element) => {
           return {
@@ -127,39 +129,39 @@ export default function ElementList() {
             }),
           };
         });
-  
+
         setElementLibList(updatedElementLibList);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
-  }, [operationId, listId]); 
-  
+  }, [operationId, listId, headers]);
+
   const saveSelectedElementsToLocalStorage = (elements) => {
     localStorage.setItem("selectedElements", JSON.stringify(elements));
-  }; 
+  };
 
   const handleDeleteElement = async (elementId) => {
     try {
-      const response = await axios.delete(`${endpoint}/element_list/${elementId}/`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
-      });
+      const response = await axios.delete(
+        `${endpoint}/element_list/${elementId}/`,
+        {
+          headers: headers,
+        }
+      );
       if (response.status >= 200 && response.status < 300) {
-        setSelectedElements(prevElements => 
-          prevElements.filter(element => element.uniqueId !== elementId)
+        setSelectedElements((prevElements) =>
+          prevElements.filter((element) => element.uniqueId !== elementId)
         );
       } else {
-        throw new Error('Failed to delete the element from the backend.');
+        throw new Error("Failed to delete the element from the backend.");
       }
     } catch (error) {
-      console.error('Error deleting element:', error);
+      console.error("Error deleting element:", error);
     }
   };
-  
 
   const handleExpandingNameChange = (uniqueId, expandingName) => {
     const updatedSelectedElements = selectedElements.map((element) =>
@@ -192,9 +194,7 @@ export default function ElementList() {
             expanding_name: newExpandingName,
           },
           {
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("access_token")}`,
-            },
+            headers: headers,
           }
         );
 
@@ -205,41 +205,47 @@ export default function ElementList() {
     }
   };
   return (
-    
     <Box height="650px" overflowY="auto" maxH="50vh" mb="4">
-       <Center>
-          <Text fontSize="2xl" fontWeight="bold" color="gray.700">Operation List</Text>
-        </Center>
+      <Center>
+        <Text fontSize="2xl" fontWeight="bold" color="gray.700">
+          Element List
+        </Text>
+      </Center>
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>#</Th>
+            <Th style={{ width: "2%" }}>#</Th>
             <Th style={{ width: "45%" }}>Name</Th>
-            <Th>Expanding Field</Th>
-            <Th>Time</Th>
-            <Th>Selected Options</Th>
-            <Th>Action</Th> 
+            <Th style={{ width: "15%" }}>Expanding Field</Th>
+            <Th style={{ width: "10%" }}>Time</Th>
+            <Th style={{ width: "20%" }}>Selected Options</Th>
+            <Th style={{ width: "8%" }}>Action</Th>
           </Tr>
         </Thead>
         <Tbody>
           {selectedElements.map((element, index) => (
             <Tr key={element.uniqueId}>
               <Td>{index + 1}</Td>
-              <Td>
-                {element.name}
-              </Td>
+              <Td>{element.name}</Td>
               <Td>{element.expandingName}</Td>
               <Td>{element.time}</Td>
               <Td>
                 {/* format the selected options */}
-                {element.selectedOptions && Object.entries(element.selectedOptions).map(([key, value], idx) => (
-                  <Text key={idx} isTruncated maxWidth="100px">
-                    {`${key}: ${value}`}
-                  </Text>
-                ))}
+                {element.selectedOptions &&
+                  Object.entries(element.selectedOptions).map(
+                    ([key, value], idx) => (
+                      <Text key={idx} isTruncated maxWidth="100px">
+                        {`${key}: ${value}`}
+                      </Text>
+                    )
+                  )}
               </Td>
               <Td>
-                <Button colorScheme="red" size="sm" onClick={() => handleDeleteElement(element.uniqueId)}>
+                <Button
+                  colorScheme="red"
+                  size="sm"
+                  onClick={() => handleDeleteElement(element.uniqueId)}
+                >
                   Delete
                 </Button>
               </Td>
@@ -249,6 +255,4 @@ export default function ElementList() {
       </Table>
     </Box>
   );
-};
-
-
+}
