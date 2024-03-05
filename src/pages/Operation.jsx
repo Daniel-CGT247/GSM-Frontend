@@ -64,6 +64,7 @@ export default function Operation() {
             as={RouterLink}
             to={`/${listId}/job_group`}
             variant="outline"
+            colorScheme="twitter"
             leftIcon={<IoArrowBackCircleOutline />}
           >
             Back to Job Group
@@ -71,7 +72,7 @@ export default function Operation() {
           <Button
             as={RouterLink}
             to={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}
-            colorScheme="blue"
+            colorScheme="twitter"
             rightIcon={<IoCheckmarkCircleOutline />}
           >
             Complete
@@ -95,7 +96,6 @@ export default function Operation() {
           />
         </GridItem>
       </SimpleGrid>
-
     </Container>
   );
 }

@@ -17,7 +17,9 @@ import {
   Tr,
   Box,
   Center,
-  Input
+  Input,
+  InputGroup,
+  InputLeftElement,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -25,7 +27,7 @@ import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import useHeaders from "../customed_hook/useHeader";
-
+import { Search2Icon } from "@chakra-ui/icons";
 const columns = ["Name", ""];
 
 export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
@@ -79,7 +81,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       items.push(
         <Button
           key={number}
-          colorScheme={currentPage === number ? "blue" : "gray"}
+          colorScheme={currentPage === number ? "twitter" : "gray"}
           onClick={() => setCurrentPage(number)}
         >
           {number}
@@ -93,11 +95,12 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
     const filtered = operations.filter((operation) => {
       return (
         operation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (operation.code && operation.code.toLowerCase().includes(searchTerm.toLowerCase()))
+        (operation.code &&
+          operation.code.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     });
     setFilteredLibs(filtered);
-  }, [operations, searchTerm]); 
+  }, [operations, searchTerm]);
 
   return (
     <>
@@ -112,20 +115,25 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                   <Text color="gray.700" fontWeight="bold" fontSize="lg">
                     Operation Library
                   </Text>
-                  <Box p={5}>
-                    <Input
-                      placeholder="Search by name"
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      value={searchTerm}
-                      mb="4"
-                    />
+                  <Box mt={3}>
+                    <InputGroup>
+                      <InputLeftElement pointerEvents="none">
+                        <Search2Icon />
+                      </InputLeftElement>
+                      <Input
+                        placeholder="Search by name"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={searchTerm}
+                        mb="4"
+                      />
+                    </InputGroup>
                   </Box>
                 </TableCaption>
-                
-               <Thead>
+
+                <Thead>
                   <Tr>
                     <Th textAlign="center">Name</Th>
-                    <Th textAlign="center">Action</Th> 
+                    <Th textAlign="center">Action</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -134,7 +142,10 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                       <Td textAlign="center">{operation.name}</Td>
                       <Td textAlign="center">
                         <Flex justifyContent="center">
-                          <Button colorScheme="green" onClick={() => addOperation(operation)}>
+                          <Button
+                            colorScheme="green"
+                            onClick={() => addOperation(operation)}
+                          >
                             Add
                           </Button>
                         </Flex>

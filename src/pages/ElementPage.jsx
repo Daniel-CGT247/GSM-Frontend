@@ -91,17 +91,10 @@ export default function ElementPage() {
       {/* <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5} my={10}> */}
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5} my={5}>
         <GridItem colSpan={1}>
-          <ElementLib
-            listId={listId}
-            updateSelectedElements={updateSelectedElements}
-          />
+          <ElementLib />
         </GridItem>
         <GridItem colSpan={1}>
-          <ElementList
-            key={selectedElements.length}
-            listId={listId}
-            selectedElements={selectedElements}
-          />
+          <ElementList />
         </GridItem>
       </SimpleGrid>
     </Container>

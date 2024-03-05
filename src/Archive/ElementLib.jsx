@@ -1,17 +1,16 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@chakra-ui/icons";
+import {
   Box,
   Button,
   Center,
   Flex,
   HStack,
   IconButton,
-  Select,
   Table,
   Tbody,
   Td,
@@ -28,31 +27,142 @@ import endpoint from "../utils/endpoint";
 
 export default function ElementLib() {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
+  const [selectedElements, setSelectedElements] = useState([]);
   const { listId, operationId, operationListId } = useParams();
-
   const headers = useHeaders();
-  const handleAddElement = async (elementId) => {
+  const handleAddElement = async (
+    elementId,
+    selectedOptions,
+    userExpandingName
+  ) => {
+    const selectedElement = elementLibList.find(
+      (element) => element.id === elementId
+    );
+    if (!selectedElement) {
+      console.error(`Element with ID ${elementId} not found.`);
+      return;
+    }
+
+    const uniqueId = Date.now();
+    const newElement = {
+      ...selectedElement,
+      selectedOptions: {},
+      uniqueId: uniqueId,
+      time: "Fetching...",
+      expandingName:
+        userExpandingName || selectedElement.expandingName || "N/A",
+    };
+
+    selectedElement.variables.forEach((variable) => {
+      const selectedOptionId = parseInt(
+        selectedOptions[`${elementId}_${variable.name}`],
+        10
+      );
+      newElement.selectedOptions[variable.name] = selectedOptionId;
+    });
+
     try {
       const postData = {
         listItem: operationListId,
-        elements: elementId,
-        options: [],
+        elements: newElement.id,
+        expanding_name: newElement.expandingName,
+        options: Object.values(newElement.selectedOptions),
       };
 
-      await axios.post(`${endpoint}/element_list/`, postData, {
+      const addResponse = await axios.post(
+        `${endpoint}/element_list/`,
+        postData,
+        {
+          headers: headers,
+        }
+      );
+
+      const addedElement = {
+        ...newElement,
+        uniqueId: addResponse.data.id || uniqueId,
+      };
+
+      setSelectedElements((prevElements) => [...prevElements, addedElement]);
+
+      const response = await axios.get(`${endpoint}/element_list/`, {
+        params: {
+          listItem_id: operationListId,
+        },
         headers: headers,
       });
+      const fetchedElement = response.data.find(
+        (item) => item.id === addedElement.uniqueId
+      );
+
+      const fetchedTime = fetchedElement
+        ? (parseFloat(fetchedElement.nmt) || 0).toFixed(4)
+        : "N/A";
+
+      setSelectedElements((prevElements) =>
+        prevElements.map((el) =>
+          el.uniqueId === addedElement.uniqueId
+            ? { ...el, time: fetchedTime }
+            : el
+        )
+      );
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error in adding element", error);
+
+      setSelectedElements((prevElements) =>
+        prevElements.map((el) =>
+          el.uniqueId === newElement.uniqueId
+            ? { ...el, time: "Error fetching time" }
+            : el
+        )
+      );
     }
   };
+
   //==============================================
   // - show available options in variables
   //==============================================
+  const [visibleOptions, setVisibleOptions] = useState({});
 
+  const toggleOptionsVisibility = (elementId) => {
+    setVisibleOptions((prevVisibleOptions) => ({
+      ...prevVisibleOptions,
+      [elementId]: !prevVisibleOptions[elementId],
+    }));
+  };
+
+  const [selectedVariables, setSelectedVariables] = useState({});
+  const handleVariableChange = (elementId, variableName, selectedOptionId) => {
+    setSelectedVariables((prevSelectedVariables) => ({
+      ...prevSelectedVariables,
+      [`${elementId}_${variableName}`]: selectedOptionId,
+    }));
+  };
+
+  const areAllVariablesSelected = (elementId) => {
+    const elementVariables =
+      elementLibList.find((element) => element.id === elementId)?.variables ||
+      [];
+    return elementVariables.every((variable) =>
+      selectedVariables.hasOwnProperty(`${elementId}_${variable.name}`)
+    );
+  };
+
+  const saveSelectedElementsToLocalStorage = (elements) => {
+    localStorage.setItem("selectedElements", JSON.stringify(elements));
+  };
+
+  const handleExpandingNameChange = (uniqueId, expandingName) => {
+    const updatedSelectedElements = selectedElements.map((element) =>
+      element.uniqueId === uniqueId ? { ...element, expandingName } : element
+    );
+
+    setSelectedElements(updatedSelectedElements);
+    saveSelectedElementsToLocalStorage(updatedSelectedElements);
+  };
   //==============================================
   // - pagination
   //==============================================
+  const [searchFilter, setSearchFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const pageCount = Math.ceil(elementLibList.length / itemsPerPage);
@@ -97,7 +207,14 @@ export default function ElementLib() {
     fetchData();
   }, [operationId, listId, headers]);
 
-  const [searchFilter, setSearchFilter] = useState("");
+  const handleSearchChange = (e) => {
+    setSearchFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const filteredElements = elementLibList.filter((element) =>
     element.name.toLowerCase().includes(searchFilter.toLowerCase())
@@ -133,15 +250,21 @@ export default function ElementLib() {
                 <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
                 <Td>{element.name}</Td>
                 <Td>
-                  {element.variables && element.variables.length > 0
-                    ? element.variables.map((variable) => (
-                        <Select placeholder={variable.name} value="">
-                          {variable.options.map((option) => (
-                            <option value={option.name}>{option.name}</option>
-                          ))}
-                        </Select>
-                      ))
-                    : "N/A"}
+                  {element.variables && element.variables.length > 0 ? (
+                    <IconButton
+                      aria-label="Options"
+                      icon={
+                        element.isExpanded ? (
+                          <ChevronUpIcon />
+                        ) : (
+                          <ChevronDownIcon />
+                        )
+                      }
+                      onClick={() => toggleOptionsVisibility(element.id)}
+                    />
+                  ) : (
+                    "N/A"
+                  )}
                 </Td>
                 <Td>
                   <Button
@@ -193,36 +316,3 @@ export default function ElementLib() {
     </Flex>
   );
 }
-
-// export function OptionMenu(variable) {
-//   const [selectedOptions, setSelectedOptions] = useState([]);
-//   return (
-//     <Menu>
-//       {({ isOpen }) => (
-//         <>
-//           <Text>{variable.name}</Text>
-//           <MenuButton
-//             isActive={isOpen}
-//             as={Button}
-//             rightIcon={<FaChevronDown />}
-//           >
-//             {!selectedOptions ? "Options" : selectedOptions}
-//           </MenuButton>
-//           <MenuList>
-//             <MenuOptionGroup
-//               type="radio"
-//               onChange={(value) => setSelectedOptions(value)}
-//             >
-//               {variable.options &&
-//                 variable.options.map((option) => (
-//                   <MenuItemOption key={option.id} value={option}>
-//                     {option.name}
-//                   </MenuItemOption>
-//                 ))}
-//             </MenuOptionGroup>
-//           </MenuList>
-//         </>
-//       )}
-//     </Menu>
-//   );
-// }
