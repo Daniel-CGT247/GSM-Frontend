@@ -4,6 +4,7 @@ import JobGroupCard from "../components/JobGroupCard";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
+import { Container, Heading, Flex } from "@chakra-ui/react";
 
 export default function JobGroup() {
   const { listId } = useParams();
@@ -16,9 +17,16 @@ export default function JobGroup() {
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
   return (
-    <div className="p-5">
-      <div className="flex flex-col items-center justify-center space-y-2">
-        <h1 className="font-bold">Job Group</h1>
+    <Container maxW="8xl" mt={4}>
+      <Flex
+        gap={2}
+        alignItems="center"
+        justifyContent="space-between"
+        p={2}
+        shadow="md"
+        borderRadius="md"
+      >
+        <Heading className="font-bold">Job Group</Heading>
         {styleLoading ? (
           <StyleSkeleton />
         ) : (
@@ -27,7 +35,7 @@ export default function JobGroup() {
         <Link to="/Collection">
           <Button variant="outline-secondary">Back to Collection</Button>
         </Link>
-      </div>
+      </Flex>
       {isLoading ? (
         <div className="flex justify-center flex-wrap gap-10 my-5">
           <BasicSpinner />
@@ -43,6 +51,6 @@ export default function JobGroup() {
           ))}
         </div>
       )}
-    </div>
+    </Container>
   );
 }

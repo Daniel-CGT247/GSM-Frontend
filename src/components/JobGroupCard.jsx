@@ -87,7 +87,7 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
 
   return (
     <Card key={job_group.id} style={cardStyle}>
-      <Card.Img variant="top" src="https://placehold.co/200x100" />
+      <Card.Img variant="top" src="https://placehold.co/300x200" />
 
       <div
         style={{

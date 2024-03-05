@@ -57,7 +57,14 @@ export default function Collection() {
 
   return (
     <Container maxW="8xl" py={8}>
-      <Box p={2} shadow="md">
+      <Box
+        p={2}
+        shadow="md"
+        bgColor="white"
+        position="sticky"
+        top={"50px"}
+        zIndex={9}
+      >
         <Flex alignItems="center" my={0} justifyContent="space-between" gap={4}>
           <Heading size="lg">Collection</Heading>
           <InputGroup width="50%">
@@ -163,15 +170,18 @@ export default function Collection() {
             ))}
           </SimpleGrid>
 
-          <Heading size="md" color="gray.500" my={5}>
-            Older
-          </Heading>
-
-          <CarouselCollection>
-            {filteredData.slice(3).map((list, index) => (
-              <CollectionCard key={index} list={list} maxWidth="sm" />
-            ))}
-          </CarouselCollection>
+          {filteredData.length > 3 && (
+            <>
+              <Heading size="md" color="gray.500" my={5}>
+                Older
+              </Heading>
+              <CarouselCollection>
+                {filteredData.slice(3).map((list, index) => (
+                  <CollectionCard key={index} list={list} maxWidth="sm" />
+                ))}
+              </CarouselCollection>
+            </>
+          )}
         </>
       )}
     </Container>
