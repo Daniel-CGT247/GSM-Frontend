@@ -1,9 +1,9 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
   Heading,
-  Icon,
   Input,
   InputGroup,
   InputLeftElement,
@@ -12,8 +12,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Box,
-  SimpleGrid,
+  SimpleGrid
 } from "@chakra-ui/react";
 
 import React, { useState } from "react";

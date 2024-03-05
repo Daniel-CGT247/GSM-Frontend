@@ -1,37 +1,20 @@
-import React, { useState, useEffect } from "react";
-import Card from "react-bootstrap/Card";
-import { Link, useParams } from "react-router-dom";
+import {
+  Card,
+  CardBody,
+  Flex,
+  Heading,
+  Icon,
+  Image,
+  Link,
+  Text,
+} from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { TbCircleFilled } from "react-icons/tb";
+import { useParams } from "react-router-dom";
 
 export default function JobGroupCard({ job_group, operationsChanged }) {
   const { listId } = useParams();
   const [status, setStatus] = useState(getInitialStatus());
-
-  const cardStyle = {
-    width: "18rem",
-    boxShadow: "0 4px 8px 0 rgba(0,0,0,0.2)",
-    transition: "0.3s",
-    borderRadius: "10px",
-    height: "auto",
-  };
-
-  const cardTextStyle = {
-    maxHeight: "20em",
-    overflowY: "auto",
-    paddingRight: "5px",
-  };
-
-  const cardBodyStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-  };
-
-  const linkStyle = {
-    textDecoration: "none",
-    color: "blue",
-    cursor: "pointer",
-  };
 
   function getInitialStatus() {
     const uniqueKey = `status-${listId}-${job_group.id}`;
@@ -86,10 +69,12 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
   }, [job_group.bundle_groups, job_group.id, listId, operationsChanged]);
 
   return (
-    <Card key={job_group.id} style={cardStyle}>
-      <Card.Img variant="top" src="https://placehold.co/300x200" />
-
-      <div
+    <Card
+      overflow="hidden"
+      key={job_group.id}
+      boxShadow="0 4px 8px 0 rgba(0,0,0,0.2)"
+    >
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -116,34 +101,37 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
         {status === "finished" && (
           <button onClick={handleStatusChange}>✔️</button>
         )}
-      </div>
+      </div> */}
+      <Image objectFit="cover" src="https://placehold.co/300x200" />
 
-      <Card.Body style={cardBodyStyle}>
-        <Card.Title>{job_group.name}</Card.Title>
+      <CardBody>
+        <Flex alignItems="center" gap={2}>
+          <Heading size="md">{job_group.name}</Heading>
+          <Icon as={TbCircleFilled} color="orange" boxSize="3" />
+        </Flex>
 
-        <div style={cardTextStyle}>
-          {job_group.bundle_groups.map((bundle_group) => (
-            <Card.Text key={bundle_group.id}>
+        {job_group.bundle_groups.map((bundle_group) => (
+          <Flex
+            key={bundle_group.id}
+            alignItems="center"
+            gap={2}
+            justifyContent="space-between"
+          >
+            <Text>
               {status === "finished" ? (
-                <span style={{ color: "grey" }}>{bundle_group.name}</span>
+                <Text style={{ color: "green" }}>{bundle_group.name}</Text>
               ) : (
                 <Link
-                  to={`/${listId}/job_group/${job_group.id}/${bundle_group.id}/operation`}
-                  style={linkStyle}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.textDecoration = "underline")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.textDecoration = "none")
-                  }
+                  href={`/${listId}/job_group/${job_group.id}/${bundle_group.id}/operation`}
                 >
                   {bundle_group.name}
                 </Link>
               )}
-            </Card.Text>
-          ))}
-        </div>
-      </Card.Body>
+            </Text>
+            <Text>{bundle_group.operations_count}</Text>
+          </Flex>
+        ))}
+      </CardBody>
     </Card>
   );
 }

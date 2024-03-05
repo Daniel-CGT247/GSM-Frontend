@@ -9,7 +9,7 @@ import endpoint from "../utils/endpoint";
 
 export default function JobGroup() {
   const { listId } = useParams();
-  const { data } = useGet(`${endpoint}/job_group`);
+  const { data } = useGet(`${endpoint}/job_group`, { listId: listId });
   const { data: styleNum, isLoading: isStyleLoading } = useGet(
     `${endpoint}/collection/${listId}`
   );
