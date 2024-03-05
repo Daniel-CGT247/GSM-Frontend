@@ -1,4 +1,4 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Alert,
   AlertDescription,
@@ -23,6 +23,7 @@ import {
   Thead,
   Tr,
   useEditableControls,
+  HStack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
@@ -143,23 +144,26 @@ export default function OperationList({
                       <Td>{index + 1}</Td>
                       <Td>{item.operations.name}</Td>
                       <Td>
-                        <Editable
-                          defaultValue={
-                            item.expanding_name ? item.expanding_name : "N/A"
-                          }
-                          onChange={(value) => {
-                            setInputVal(value);
-                          }}
-                          onSubmit={() => {
-                            handleUpdate(item.id);
-                          }}
-                        >
-                          <EditablePreview />
-                          <Input as={EditableInput} />
-                          <EditableControls
-                            handleUpdate={() => handleUpdate(item.id)}
-                          />
-                        </Editable>
+                        <HStack>
+                          <Editable
+                            defaultValue={
+                              item.expanding_name ? item.expanding_name : "N/A"
+                            }
+                            onChange={(value) => {
+                              setInputVal(value);
+                            }}
+                            onSubmit={() => {
+                              handleUpdate(item.id);
+                            }}
+                          >
+                            <EditablePreview />
+                            <Input as={EditableInput} />
+                            <EditableControls
+                              handleUpdate={() => handleUpdate(item.id)}
+                            />
+                          </Editable>
+                          <EditIcon />
+                        </HStack>
                       </Td>
                       <Td>{item.operations.job_code}</Td>
                       <Td>

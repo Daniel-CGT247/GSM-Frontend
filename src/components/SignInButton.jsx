@@ -15,6 +15,7 @@ export const SignInButton = () => {
           handleLogin();
         }}
         colorScheme="facebook"
+        size="sm"
       >
         Login
       </Button>

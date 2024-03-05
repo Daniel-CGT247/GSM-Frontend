@@ -27,7 +27,7 @@ export default function YourList() {
   const bundleName = bundle_group && bundle_group.name;
 
   return (
-    <Container maxW="7xl" className="p-5">
+    <Container maxW="7xl" py={8}>
       <Flex
         direction="column"
         gap={2}
@@ -48,7 +48,6 @@ export default function YourList() {
           variant="outline"
           colorScheme="twitter"
           leftIcon={<IoArrowBackCircleOutline />}
-          mb={5}
         >
           Edit Operation List
         </Button>

@@ -1,24 +1,23 @@
-import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Container,
   Flex,
+  GridItem,
   Heading,
   SimpleGrid,
-  GridItem,
 } from "@chakra-ui/react";
+import React, { useState } from "react";
 import {
   IoArrowBackCircleOutline,
   IoCheckmarkCircleOutline,
 } from "react-icons/io5";
+import { useNavigate, useParams } from "react-router-dom";
+import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
+import useHeaders from "../customed_hook/useHeader";
+import endpoint from "../utils/endpoint";
 import ElementLib from "./ElementLib";
 import ElementList from "./ElementList";
-import endpoint from "../utils/endpoint";
-import StyleSkeleton from "../components/StyleSkeleton";
-import useHeaders from "../customed_hook/useHeader";
 
 export default function ElementPage() {
   const { listId, operationId } = useParams();

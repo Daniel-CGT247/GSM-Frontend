@@ -16,7 +16,7 @@ const WelcomeName = () => {
   }, [activeAccount]);
 
   if (name) {
-    return <Text fontSize="lg">Welcome, {name}</Text>;
+    return <Text fontSize="md">Welcome, {name}</Text>;
   } else {
     return null;
   }
