@@ -5,7 +5,6 @@ import {
   GridItem,
   Heading,
   SimpleGrid,
-  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
@@ -18,6 +17,7 @@ import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import OperationLib from "./OperationLib";
 import OperationList from "./OperationList";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Operation() {
   const { listId, jobId, bundleId } = useParams();
@@ -61,25 +61,25 @@ export default function Operation() {
         )}
         <Flex alignItems="center" gap={5}>
           <Button
+            as={RouterLink}
+            to={`/${listId}/job_group`}
             variant="outline"
-            colorScheme="twitter"
-            as="a"
-            href={`/${listId}/job_group/`}
             leftIcon={<IoArrowBackCircleOutline />}
           >
-            Choose another jobs
+            Back to Job Group
           </Button>
           <Button
-            as="a"
-            href={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}
-            colorScheme="twitter"
+            as={RouterLink}
+            to={`/${listId}/job_group/${jobId}/${bundleId}/your_list`}
+            colorScheme="blue"
             rightIcon={<IoCheckmarkCircleOutline />}
           >
             Complete
           </Button>
         </Flex>
       </Flex>
-      <SimpleGrid columns={3} spacing={5} my={10}>
+
+      <SimpleGrid columns={2} spacing={5} my={10}>
         <GridItem colSpan={1}>
           <OperationLib
             bundleId={bundleId}
@@ -87,7 +87,7 @@ export default function Operation() {
             setUpdateFunc={setUpdateOperations}
           />
         </GridItem>
-        <GridItem colSpan={2}>
+        <GridItem colSpan={1}>
           <OperationList
             bundleId={bundleId}
             listId={listId}
@@ -95,6 +95,7 @@ export default function Operation() {
           />
         </GridItem>
       </SimpleGrid>
+
     </Container>
   );
 }

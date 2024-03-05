@@ -1,12 +1,11 @@
 import { Button } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import useGet from "../customed_hook/useGet";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
-import { useEffect } from "react";
 
 export default function NewItemForm({ username }) {
   const { data: user } = useGet(`${endpoint}/user/`, {
@@ -18,11 +17,11 @@ export default function NewItemForm({ username }) {
       name: "",
       description: "",
       season: "",
-      image: null,
+      image: "",
       proto: null,
     },
     complete: false,
-    created_by: null,
+    created_by: user?.id,
   });
 
   useEffect(() => {
@@ -67,10 +66,36 @@ export default function NewItemForm({ username }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    const formDataToSend = new FormData();
 
+    Object.keys(formData.item).forEach(key => {
+      if (key !== 'image') {
+        formDataToSend.append(`item.${key}`, formData.item[key]);
+      }
+    });
+  
+    formDataToSend.append('complete', formData.complete);
+    if (formData.created_by) formDataToSend.append('created_by', formData.created_by);
+  
+    if (formData.item.image) {
+      formDataToSend.append('image', formData.item.image);
+    } 
+
+    formDataToSend.append('proto', formData.item.proto);
+    formDataToSend.append('complete', formData.complete);
+    formDataToSend.append('created_by', formData.created_by);
+  
+    Object.keys(formData.item).forEach(key => {
+      formDataToSend.append(`item.${key}`, formData.item[key]);
+    });
+
+ 
     try {
-      await axios.post(`${endpoint}/collection/`, formData, {
-        headers: headers,
+      await axios.post(`${endpoint}/collection/`, formDataToSend, {
+        headers: {
+          'Authorization': headers.Authorization,
+        },
       });
       setErrors({});
       navigate(`/`);
@@ -82,7 +107,7 @@ export default function NewItemForm({ username }) {
       }
     }
   };
-
+  
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">

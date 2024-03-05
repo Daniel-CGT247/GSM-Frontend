@@ -7,7 +7,6 @@ import {
   Heading,
   Image,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
@@ -15,13 +14,23 @@ import { LuFlower } from "react-icons/lu";
 export default function CollectionCard({ list, maxWidth }) {
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
+  console.log(list.item.image)
+
 
   return (
     <>
       <Card maxW={maxWidth} overflow="hidden" variant="outline">
         <HStack>
-          <Image key={list.id} src={imageUrl} maxW="200px" objectFit="cover" />
-
+        <Image
+          key={list.id}
+          src={imageUrl}
+          objectFit="cover"
+          maxW="500px" 
+          maxH="300px" 
+          flexShrink={0}
+          boxSize="200px"
+          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }}
+        />
           <CardBody>
             <Heading size="md">{list.item.name}</Heading>
             <Text>{list.complete ? "Completed" : "In-Progress"}</Text>

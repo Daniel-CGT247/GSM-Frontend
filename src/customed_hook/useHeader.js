@@ -14,5 +14,6 @@ export default function useHeaders() {
         Authorization: `Bearer ${accessToken}`,
       });
   }, [accessToken]);
+  console.log(headers)
   return headers;
 }

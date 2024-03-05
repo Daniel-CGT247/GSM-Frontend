@@ -15,9 +15,12 @@ import {
   Th,
   Thead,
   Tr,
+  Box,
+  Center,
+  Input
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
@@ -86,6 +89,16 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
     return items;
   };
 
+  useEffect(() => {
+    const filtered = operations.filter((operation) => {
+      return (
+        operation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (operation.code && operation.code.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    });
+    setFilteredLibs(filtered);
+  }, [operations, searchTerm]); 
+
   return (
     <>
       {isLibLoading ? (
@@ -99,24 +112,32 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                   <Text color="gray.700" fontWeight="bold" fontSize="lg">
                     Operation Library
                   </Text>
+                  <Box p={5}>
+                    <Input
+                      placeholder="Search by name"
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      value={searchTerm}
+                      mb="4"
+                    />
+                  </Box>
                 </TableCaption>
-                <Thead>
+                
+               <Thead>
                   <Tr>
-                    <Th>Name</Th>
-                    <Th></Th>
+                    <Th textAlign="center">Name</Th>
+                    <Th textAlign="center">Action</Th> 
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {operations.map((operation) => (
+                  {currentItems.map((operation) => (
                     <Tr key={operation.id}>
-                      <Td>{operation.name}</Td>
-                      <Td>
-                        <Button
-                          colorScheme="green"
-                          onClick={() => addOperation(operation)}
-                        >
-                          Add
-                        </Button>
+                      <Td textAlign="center">{operation.name}</Td>
+                      <Td textAlign="center">
+                        <Flex justifyContent="center">
+                          <Button colorScheme="green" onClick={() => addOperation(operation)}>
+                            Add
+                          </Button>
+                        </Flex>
                       </Td>
                     </Tr>
                   ))}
