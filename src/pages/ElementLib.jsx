@@ -1,30 +1,35 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import endpoint from "../utils/endpoint";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
+  Center,
   Flex,
+  HStack,
+  IconButton,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
-  IconButton,
-  HStack,
-  Center,
-  Text
 } from "@chakra-ui/react";
-import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import useHeaders from "../customed_hook/useHeader";
+import endpoint from "../utils/endpoint";
 
 export default function ElementLib() {
   const [elementLibList, setElementLibList] = useState([]); // list of elements
-  const [selectedElements, setSelectedElements] = useState([]); 
+  const [selectedElements, setSelectedElements] = useState([]);
   const { listId, operationId, operationListId } = useParams();
-  
+  const headers = useHeaders();
   const handleAddElement = async (
     elementId,
     selectedOptions,
@@ -62,13 +67,14 @@ export default function ElementLib() {
         elements: newElement.id,
         expanding_name: newElement.expandingName,
         options: Object.values(newElement.selectedOptions),
-        
       };
 
       const addResponse = await axios.post(
         `${endpoint}/element_list/`,
         postData,
-        { headers: { Authorization: `JWT ${localStorage.getItem("access_token")}`} }
+        {
+          headers: headers,
+        }
       );
 
       const addedElement = {
@@ -79,9 +85,10 @@ export default function ElementLib() {
       setSelectedElements((prevElements) => [...prevElements, addedElement]);
 
       const response = await axios.get(`${endpoint}/element_list/`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
+        params: {
+          listItem_id: operationListId,
         },
+        headers: headers,
       });
       const fetchedElement = response.data.find(
         (item) => item.id === addedElement.uniqueId
@@ -112,7 +119,7 @@ export default function ElementLib() {
   };
 
   //==============================================
-  // - show available options in variables 
+  // - show available options in variables
   //==============================================
   const [visibleOptions, setVisibleOptions] = useState({});
 
@@ -144,7 +151,6 @@ export default function ElementLib() {
     localStorage.setItem("selectedElements", JSON.stringify(elements));
   };
 
-
   const handleExpandingNameChange = (uniqueId, expandingName) => {
     const updatedSelectedElements = selectedElements.map((element) =>
       element.uniqueId === uniqueId ? { ...element, expandingName } : element
@@ -156,7 +162,7 @@ export default function ElementLib() {
   //==============================================
   // - pagination
   //==============================================
-  const [searchFilter, setSearchFilter] = useState(""); 
+  const [searchFilter, setSearchFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const pageCount = Math.ceil(elementLibList.length / itemsPerPage);
@@ -166,16 +172,15 @@ export default function ElementLib() {
       try {
         const response = await axios.get(`${endpoint}/element_lib/`, {
           params: {
-            operation_id: operationId,
-            listId: listId, 
+            operation: operationId,
           },
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("access_token")}`,
-          },
+          headers: headers,
         });
 
-        const filteredElements = response.data.filter(element => element.operation.includes(parseInt(operationId)));
-  
+        const filteredElements = response.data.filter((element) =>
+          element.operation.includes(parseInt(operationId))
+        );
+
         const updatedElementLibList = filteredElements.map((element) => {
           return {
             ...element,
@@ -192,15 +197,15 @@ export default function ElementLib() {
             }),
           };
         });
-  
+
         setElementLibList(updatedElementLibList);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
-  }, [operationId, listId]); 
+  }, [operationId, listId, headers]);
 
   const handleSearchChange = (e) => {
     setSearchFilter(e.target.value);
@@ -225,47 +230,64 @@ export default function ElementLib() {
   return (
     <Flex direction="column" maxW="4xl" margin="auto">
       <Box height="650px" overflowY="auto" maxH="50vh" mb="4">
-          <Center>
-            <Text fontSize="2xl" fontWeight="bold" color="gray.700">Operation Library</Text>
-          </Center>
-        <Table variant="simple" >
+        <Center>
+          <Text fontSize="2xl" fontWeight="bold" color="gray.700">
+            Element Library
+          </Text>
+        </Center>
+        <Table variant="simple">
           <Thead>
-              <Tr>
-                <Th style={{ width: "5%" }}>#</Th>
-                <Th style={{ width: "30%" }}>Name</Th>
-                <Th style={{ width: "45%" }}>Options</Th>
-                <Th style={{ width: "10%" }}>Add</Th>
+            <Tr>
+              <Th style={{ width: "2%" }}>#</Th>
+              <Th style={{ width: "48%" }}>Name</Th>
+              <Th style={{ width: "35%" }}>Options</Th>
+              <Th style={{ width: "15%" }}>Add</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {currentItems.map((element, index) => (
+              <Tr key={element.id}>
+                <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
+                <Td>{element.name}</Td>
+                <Td>
+                  {element.variables && element.variables.length > 0 ? (
+                    <IconButton
+                      aria-label="Options"
+                      icon={
+                        element.isExpanded ? (
+                          <ChevronUpIcon />
+                        ) : (
+                          <ChevronDownIcon />
+                        )
+                      }
+                      onClick={() => toggleOptionsVisibility(element.id)}
+                    />
+                  ) : (
+                    "N/A"
+                  )}
+                </Td>
+                <Td>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAddElement(element.id)}
+                  >
+                    Add
+                  </Button>
+                </Td>
               </Tr>
-            </Thead>
-            <Tbody>
-              {currentItems.map((element, index) => (
-                <Tr key={element.id}>
-                  <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
-                  <Td>{element.name}</Td>
-                  <Td>
-                    {element.variables && element.variables.length > 0 ? (
-                      <IconButton
-                        aria-label="Options"
-                        icon={element.isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                        onClick={() => toggleOptionsVisibility(element.id)}
-                        variant="ghost"
-                      />
-                    ) : (
-                      'N/A'
-                    )}
-                  </Td>
-                  <Td>
-                    <Button size="sm" onClick={() => handleAddElement(element.id)}>
-                      Add
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
+            ))}
+          </Tbody>
         </Table>
       </Box>
-      
-      <Flex justify="center" align="center" p="4" boxShadow="base" rounded="md" bg="white">
+
+      <Flex
+        justify="center"
+        align="center"
+        p="4"
+        boxShadow="base"
+        rounded="md"
+        bg="white"
+      >
         <IconButton
           icon={<ChevronLeftIcon />}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -275,7 +297,7 @@ export default function ElementLib() {
           {Array.from({ length: pageCount }, (_, i) => (
             <Button
               key={i + 1}
-              colorScheme={currentPage === i + 1 ? 'blue' : 'gray'}
+              colorScheme={currentPage === i + 1 ? "blue" : "gray"}
               onClick={() => setCurrentPage(i + 1)}
             >
               {i + 1}
@@ -284,7 +306,9 @@ export default function ElementLib() {
         </HStack>
         <IconButton
           icon={<ChevronRightIcon />}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, pageCount))
+          }
           isDisabled={currentPage >= pageCount}
         />
       </Flex>

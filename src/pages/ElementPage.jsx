@@ -1,69 +1,88 @@
-
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Container, Flex, Heading, SimpleGrid, GridItem, } from "@chakra-ui/react";
-import { IoArrowBackCircleOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
-import useGet from "../customed_hook/getData"; 
+import {
+  Button,
+  Container,
+  Flex,
+  Heading,
+  SimpleGrid,
+  GridItem,
+} from "@chakra-ui/react";
+import {
+  IoArrowBackCircleOutline,
+  IoCheckmarkCircleOutline,
+} from "react-icons/io5";
+import useGet from "../customed_hook/useGet";
 import ElementLib from "./ElementLib";
 import ElementList from "./ElementList";
 import endpoint from "../utils/endpoint";
 import StyleSkeleton from "../components/StyleSkeleton";
+import useHeaders from "../customed_hook/useHeader";
 
 export default function ElementPage() {
   const { listId, operationId } = useParams();
-  const styleNum = useGet(`${endpoint}/collection/${listId}`);
+  const { data: styleNum, isLoading: isStyleLoading } = useGet(
+    `${endpoint}/collection/${listId}`
+  );
   const itemName = styleNum && styleNum.item && styleNum.item.name;
+  const { data: currentOperation, isLoading: isTitleLoading } = useGet(
+    `${endpoint}/operation_lib/${operationId}`
+  );
+  const title =
+    currentOperation &&
+    "Build Element" +
+      ` - ${currentOperation.bundle_group} - ${currentOperation.name}`;
+
   const [selectedElements, setSelectedElements] = useState([]);
   const navigate = useNavigate();
-  
+  const headers = useHeaders();
   const updateSelectedElements = (newElement) => {
-    setSelectedElements((prevSelectedElements) => [...prevSelectedElements, newElement]);
+    setSelectedElements((prevSelectedElements) => [
+      ...prevSelectedElements,
+      newElement,
+    ]);
   };
 
-////==============================================
-//// - filter the elements based on the operations 
-////==============================================
-  const [currentOperation, setCurrentOperation] = useState(null);
-  useEffect(() => {
-    axios
-      .get(`${endpoint}/operation_lib/${operationId}`, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("access_token")}`,
-        },
-      })
-      .then((response) => {
-        setCurrentOperation(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching operation details:", error);
-      });
-  }, [operationId]);
-
+  ////==============================================
+  //// - filter the elements based on the operations
+  ////==============================================
 
   return (
-    <Container maxW="8xl" p={4}>
-      <Flex direction="column" gap={2} alignItems="center" justifyContent="center">
-        <Heading>Build Elements - {currentOperation?.bundle_group} - {currentOperation?.name} </Heading>
-        {styleNum ? (
-          <Heading as="h3" size="lg" mb={6} color="gray.500">
+    <Container maxW="7xl" p={4}>
+      <Flex
+        direction="column"
+        gap={2}
+        alignItems="center"
+        justifyContent="center"
+      >
+        {isTitleLoading ? (
+          <Heading>Build Element</Heading>
+        ) : (
+          <Heading>{title}</Heading>
+        )}
+        {isStyleLoading ? (
+          <StyleSkeleton />
+        ) : (
+          <Heading color="gray.500" size="lg">
             Style {itemName}
           </Heading>
-        ) : (
-          <StyleSkeleton />
         )}
         <Flex alignItems="center" gap={5}>
           <Button
-            onClick={() => navigate(-1)} 
             variant="outline"
+            colorScheme="twitter"
+            as="a"
+            onClick={() => navigate(-1)}
             leftIcon={<IoArrowBackCircleOutline />}
           >
-            Back
+            Choose Another Operation
           </Button>
           <Button
-            onClick={() => navigate(-1)}
-            colorScheme="blue"
+            as="a"
+            colorScheme="twitter"
             rightIcon={<IoCheckmarkCircleOutline />}
+            onClick={() => navigate(-1)}
           >
             Complete
           </Button>
