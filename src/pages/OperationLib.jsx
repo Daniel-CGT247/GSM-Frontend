@@ -1,4 +1,8 @@
-import { ChevronLeftIcon, ChevronRightIcon, Search2Icon } from "@chakra-ui/icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  Search2Icon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -18,7 +22,7 @@ import {
   Text,
   Th,
   Thead,
-  Tr
+  Tr,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";

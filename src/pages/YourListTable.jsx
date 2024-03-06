@@ -72,6 +72,7 @@ export default function YourListTable({ bundleId, listId }) {
                           as="a"
                           href={`/${listId}/operation/${item.operations.id}/${item.id}/element`}
                           colorScheme="twitter"
+                          size="sm"
                         >
                           Build Elements
                         </Button>
