@@ -1,4 +1,17 @@
-import { Button, Container, Flex, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  StatGroup,
+  HStack,
+} from "@chakra-ui/react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import StyleSkeleton from "../components/StyleSkeleton";
@@ -27,28 +40,60 @@ export default function YourList() {
   const bundleName = bundle_group && bundle_group.name;
 
   return (
-    <Container maxW="7xl" className="p-5">
+    <Container maxW="8xl" mt={4}>
       <Flex
-        direction="column"
         gap={2}
         alignItems="center"
-        justifyContent="center"
+        justifyContent="space-between"
+        p={2}
+        shadow="md"
+        borderRadius="md"
+        mb={5}
       >
-        <Heading>Your List {!isJobLoading && <>- {bundleName}</>}</Heading>
-        {isStyleLoading ? (
-          <StyleSkeleton />
-        ) : (
-          <Heading color="gray.500" size="lg">
-            Style {itemName}
+        <Box bgColor="white" position="sticky" top={"50px"} zIndex={9}>
+          <Heading size="lg">
+            Your List {!isJobLoading && <>- {bundleName}</>}
           </Heading>
-        )}
+          {isStyleLoading ? (
+            <StyleSkeleton />
+          ) : (
+            <Heading color="gray.500" size="md">
+              Style {itemName}
+            </Heading>
+          )}
+        </Box>
+        <HStack alignItems="baseline" justifyContent="space-between" w="400px">
+          <Stat
+            px="2"
+            shadow="sm"
+            border="1px solid #e2e8f0"
+            borderRadius="md"
+            _hover={{ borderColor: "blue", shadow: "lg" }}
+            transition={"all 0.3s ease"}
+          >
+            <StatLabel fontSize="lg">Total SAM</StatLabel>
+            <StatNumber>34.24</StatNumber>
+          </Stat>
+
+          <Stat
+            px="2"
+            shadow="sm"
+            border="1px solid #e2e8f0"
+            borderRadius="md"
+            _hover={{ borderColor: "blue", shadow: "lg" }}
+            transition={"all 0.3s ease"}
+          >
+            <StatLabel fontSize="lg">Count</StatLabel>
+            <StatNumber>3</StatNumber>
+          </Stat>
+        </HStack>
         <Button
           as="a"
           href={`/${listId}/job_group/${jobId}/${bundleId}/operation`}
           variant="outline"
+          size="sm"
           colorScheme="twitter"
           leftIcon={<IoArrowBackCircleOutline />}
-          mb={5}
         >
           Edit Operation List
         </Button>

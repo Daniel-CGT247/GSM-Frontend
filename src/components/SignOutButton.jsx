@@ -13,6 +13,7 @@ export const SignOutButton = () => {
         onClick={() => handleLogout()}
         colorScheme="facebook"
         variant="outline"
+        size={"sm"}
       >
         Sign Out
       </Button>

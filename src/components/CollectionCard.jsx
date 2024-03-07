@@ -5,46 +5,66 @@ import {
   Flex,
   HStack,
   Heading,
+  Icon,
   Image,
   Text,
 } from "@chakra-ui/react";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
+import { TbCircleFilled } from "react-icons/tb";
+import { RxLapTimer } from "react-icons/rx";
 
 export default function CollectionCard({ list, maxWidth }) {
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
-  console.log(list.item.image)
-
+  console.log(list.item.image);
 
   return (
     <>
-      <Card maxW={maxWidth} overflow="hidden" variant="outline">
+      <Card
+        maxW={maxWidth}
+        overflow="hidden"
+        variant="outline"
+        _hover={{ shadow: "md", borderColor: "twitter.500" }}
+        transition="all 0.3s ease"
+      >
         <HStack>
-        <Image
-          key={list.id}
-          src={imageUrl}
-          objectFit="cover"
-          maxW="500px" 
-          maxH="300px" 
-          flexShrink={0}
-          boxSize="200px"
-          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }}
-        />
+          <Image
+            key={list.id}
+            src={imageUrl}
+            objectFit="cover"
+            maxW="500px"
+            maxH="300px"
+            flexShrink={0}
+            boxSize="200px"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = placeholderImage;
+            }}
+          />
           <CardBody>
-            <Heading size="md">{list.item.name}</Heading>
-            <Text>{list.complete ? "Completed" : "In-Progress"}</Text>
-
-            <Flex gap={4} mb={4}>
-              <Flex alignItems="center" gap={1}>
-                <LuFlower />
-                {list.item.season}
-              </Flex>
-              <Flex alignItems="center" gap={1}>
-                <HiPuzzle />
-                {list.item.proto}
-              </Flex>
-            </Flex>
+            <HStack>
+              <Heading size="md">{list.item.name}</Heading>
+              <Icon
+                as={TbCircleFilled}
+                color={list.complete ? "green" : "orange"}
+                boxSize={3}
+              />
+            </HStack>
+            <HStack my={2} gap={2}>
+              <HStack gap={1}>
+                <LuFlower color="gray" />
+                <Text color="gray">{list.item.season}</Text>
+              </HStack>
+              <HStack gap={1}>
+                <HiPuzzle color="gray" />
+                <Text color="gray">{list.item.proto}</Text>
+              </HStack>
+            </HStack>
+            <HStack gap={1} my={2}>
+              <RxLapTimer />
+              <Text fontWeight="semibold">23.4</Text>
+            </HStack>
             <Button
               colorScheme="twitter"
               variant="solid"

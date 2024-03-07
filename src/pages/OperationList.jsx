@@ -1,4 +1,11 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { 
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CheckIcon, 
+  CloseIcon, 
+  EditIcon, 
+  Search2Icon 
+} from "@chakra-ui/icons";
 import {
   Alert,
   AlertDescription,
@@ -14,7 +21,6 @@ import {
   IconButton,
   Input,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -23,9 +29,14 @@ import {
   Thead,
   Tr,
   useEditableControls,
+  HStack,
+  Center,
+  InputLeftElement,
+  InputGroup,
+  Flex
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import useHeaders from "../customed_hook/useHeader";
@@ -37,6 +48,17 @@ export default function OperationList({
   listId,
   updateOperationList,
 }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredOperations, setFilteredOperations] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredLibs, setFilteredLibs] = useState([]);
+  const [itemsPerPage] = useState(5);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
+
   const paramList = {
     operations__bundle_group_id: bundleId,
     list_id: listId,
@@ -103,80 +125,111 @@ export default function OperationList({
     );
   }
 
+  
+  useEffect(() => {
+    const filtered = operationList.filter((operation) =>
+      operation.operations.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (operation.operations.job_code && operation.operations.job_code.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredOperations(filtered);
+  }, [searchTerm, operationList]); 
+
+  
   return (
     <>
       {isOperationListLoading ? (
         <TableSkeleton header="Operation List" columns={columns} />
       ) : (
         <Card>
-          {error && (
-            <Alert status="error">
-              <AlertIcon />
-              <AlertTitle>Cannot Delete Operation</AlertTitle>
-              <AlertDescription>
-                Please remove the elements list first
-              </AlertDescription>
-            </Alert>
-          )}
+        {error && (
+          <Alert status="error">
+            <AlertIcon />
+            <AlertTitle>Cannot Delete Operation</AlertTitle>
+            <AlertDescription>
+              Please remove the elements list first
+            </AlertDescription>
+          </Alert>
+        )}
 
-          <CardBody>
-            <TableContainer>
-              <Table variant="striped" colorScheme="gray">
-                <TableCaption placement="top" bgColor="gray.50">
-                  <Text color="gray.700" fontWeight="bold" fontSize="lg">
-                    Operation List
-                  </Text>
-                </TableCaption>
+        <CardBody>
+          <Flex justifyContent="space-between" alignItems="center" mb="4">
+            <Center flexGrow={1}>
+              <Text color="gray.700" fontWeight="bold" fontSize="lg" mb="4">
+                Operation List
+              </Text>
+            </Center>
+            <Flex alignItems="center">
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isDisabled={currentPage === 1}
+                mr="2"
+              />
+              <Text>{currentPage}</Text> {/* page number */}
+              <IconButton
+                icon={<ChevronRightIcon />}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                isDisabled={currentPage >= totalPages}
+                ml="2"
+              />
+            </Flex>
+          </Flex>
 
-                <Thead>
-                  <Tr>
-                    <Th>#</Th>
-                    <Th>Name</Th>
-                    <Th>Description</Th>
-                    <Th>Job #</Th>
-                    <Th></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {operationList.map((item, index) => (
-                    <Tr key={item.id}>
-                      <Td>{index + 1}</Td>
-                      <Td>{item.operations.name}</Td>
-                      <Td>
+          <InputGroup mb="4">
+            <InputLeftElement pointerEvents="none">
+                <Search2Icon />
+            </InputLeftElement>
+            <Input
+                placeholder="Search by name or job ID"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                mb="4"
+              />
+          </InputGroup>
+
+          <TableContainer>
+            <Table variant="striped" colorScheme="gray">
+              <Thead>
+                <Tr>
+                  <Th>#</Th>
+                  <Th>Name</Th>
+                  <Th>Description</Th>
+                  <Th>Job #</Th>
+                  <Th></Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {filteredOperations.map((item, index) => (
+                  <Tr key={item.id}>
+                    <Td>{index + 1}</Td>
+                    <Td>{item.operations.name}</Td>
+                    <Td>
+                      <HStack>
                         <Editable
-                          defaultValue={
-                            item.expanding_name ? item.expanding_name : "N/A"
-                          }
-                          onChange={(value) => {
-                            setInputVal(value);
-                          }}
-                          onSubmit={() => {
-                            handleUpdate(item.id);
-                          }}
+                          defaultValue={item.expanding_name ? item.expanding_name : "N/A"}
+                          onChange={(value) => setInputVal(value)}
+                          onSubmit={() => handleUpdate(item.id)}
                         >
                           <EditablePreview />
                           <Input as={EditableInput} />
-                          <EditableControls
-                            handleUpdate={() => handleUpdate(item.id)}
-                          />
+                          <EditableControls handleUpdate={() => handleUpdate(item.id)} />
                         </Editable>
-                      </Td>
-                      <Td>{item.operations.job_code}</Td>
-                      <Td>
-                        <Button
-                          colorScheme="red"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          Delete
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </CardBody>
-        </Card>
+                        <EditIcon />
+                      </HStack>
+                    </Td>
+                    <Td>{item.operations.job_code}</Td>
+                    <Td>
+                      <Button colorScheme="red" onClick={() => handleDelete(item.id)}>
+                        Delete
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </CardBody>
+      </Card>
       )}
     </>
   );

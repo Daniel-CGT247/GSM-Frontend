@@ -1,9 +1,9 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
   Heading,
-  Icon,
   Input,
   InputGroup,
   InputLeftElement,
@@ -12,6 +12,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  SimpleGrid
 } from "@chakra-ui/react";
 
 import React, { useState } from "react";
@@ -28,8 +29,8 @@ import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
   const { data, isLoading } = useGet(`${endpoint}/collection/`);
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [selectedSeason, setSelectedSeason] = useState("");  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedProto, setSelectedProto] = useState("");
 
   const resetFilters = () => {
@@ -54,93 +55,103 @@ export default function Collection() {
   ].sort();
 
   return (
-    <Container maxW="7xl" p={10}>
-      <Heading size="xl">Collection</Heading>
+    <Container maxW="8xl" py={8}>
+      <Box
+        p={2}
+        shadow="md"
+        bgColor="white"
+        position="sticky"
+        top={"50px"}
+        zIndex={9}
+      >
+        <Flex alignItems="center" my={0} justifyContent="space-between" gap={4}>
+          <Heading size="lg">Collection</Heading>
+          <InputGroup width="50%">
+            <InputLeftElement pointerEvents="none">
+              <IoSearch color="gray.300" />
+            </InputLeftElement>
 
-      <Flex alignItems="center" gap={4} my={5}>
-        <InputGroup width="50%">
-          <InputLeftElement pointerEvents="none">
-            <IoSearch color="gray.300" />
-          </InputLeftElement>
-
-          <Input
-            className="text-center"
-            type="text"
-            placeholder="Search a Style"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </InputGroup>
-        <Menu>
-          {({ isOpen }) => (
-            <>
-              <MenuButton
-                isActive={isOpen}
-                as={Button}
-                rightIcon={<FaChevronDown />}
-              >
-                {!selectedSeason ? "Season" : selectedSeason}
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  type="radio"
-                  onChange={(value) => setSelectedSeason(value)}
-                >
-                  <MenuItemOption value="">All</MenuItemOption>
-                    {uniqueSeasons.map((season) => (
-                      <MenuItemOption key={season} value={season}>
-                        {season}
-                      </MenuItemOption>
-                    ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </>
-          )}
-        </Menu>
-        <Menu>
-          {({ isOpen }) => (
-            <>
-              <MenuButton
-                isActive={isOpen}
-                as={Button}
-                rightIcon={<FaChevronDown />}
-              >
-                {!selectedProto ? "Proto" : selectedProto}
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  type="radio"
-                  value={selectedProto.toString()}
-                  onChange={(value) => setSelectedProto(value)}
-                >
-                  <MenuItemOption value="">All</MenuItemOption>
-                  {uniquePrototype.map((proto) => (
-                    <MenuItemOption key={proto} value={proto.toString()}>
-                      {proto}
-                    </MenuItemOption>
-                  ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </>
-          )}
-        </Menu>
-
-        <Button colorScheme="red" onClick={resetFilters}>
-          <Flex alignItems="center" gap={2}>
-            Reset filters
-            <Icon as={GrPowerReset} />
+            <Input
+              className="text-center"
+              type="text"
+              placeholder="Search a Style"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+          <Flex alignItems="center" gap="2">
+            <Menu>
+              {({ isOpen }) => (
+                <>
+                  <MenuButton
+                    isActive={isOpen}
+                    as={Button}
+                    rightIcon={<FaChevronDown />}
+                  >
+                    {!selectedSeason ? "Season" : selectedSeason}
+                  </MenuButton>
+                  <MenuList>
+                    <MenuOptionGroup
+                      type="radio"
+                      onChange={(value) => setSelectedSeason(value)}
+                    >
+                      <MenuItemOption value="">All</MenuItemOption>
+                      {uniqueSeasons.map((season) => (
+                        <MenuItemOption key={season} value={season}>
+                          {season}
+                        </MenuItemOption>
+                      ))}
+                    </MenuOptionGroup>
+                  </MenuList>
+                </>
+              )}
+            </Menu>
+            <Menu>
+              {({ isOpen }) => (
+                <>
+                  <MenuButton
+                    isActive={isOpen}
+                    as={Button}
+                    rightIcon={<FaChevronDown />}
+                  >
+                    {!selectedProto ? "Proto" : selectedProto}
+                  </MenuButton>
+                  <MenuList>
+                    <MenuOptionGroup
+                      type="radio"
+                      value={selectedProto.toString()}
+                      onChange={(value) => setSelectedProto(value)}
+                    >
+                      <MenuItemOption value="">All</MenuItemOption>
+                      {uniquePrototype.map((proto) => (
+                        <MenuItemOption key={proto} value={proto.toString()}>
+                          {proto}
+                        </MenuItemOption>
+                      ))}
+                    </MenuOptionGroup>
+                  </MenuList>
+                </>
+              )}
+            </Menu>
+            <Button
+              rightIcon={GrPowerReset}
+              colorScheme="red"
+              onClick={resetFilters}
+            >
+              Reset filters
+            </Button>
           </Flex>
-        </Button>
-      </Flex>
+        </Flex>
+      </Box>
 
-      <Heading size="lg" color="gray.500" my={5}>
+      <Heading size="md" color="gray.500" my={5}>
         Recent Update
       </Heading>
 
       {isLoading && (
-        <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
+        <SimpleGrid columns={3} spacing={10}>
           <CardSkeleton />
-        </div>
+        </SimpleGrid>
       )}
 
       {!isLoading && filteredData.length === 0 ? (
@@ -152,21 +163,24 @@ export default function Collection() {
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-5 pb-5">
-            {filteredData.slice(0, 4).map((list, index) => (
+          <SimpleGrid columns={3} spacing={10}>
+            {filteredData.slice(0, 3).map((list, index) => (
               <CollectionCard key={index} list={list} maxWidth="md" />
             ))}
-          </div>
+          </SimpleGrid>
 
-          <Heading size="lg" color="gray.500" my={5}>
-            Older
-          </Heading>
-
-          <CarouselCollection>
-            {filteredData.slice(4).map((list, index) => (
-              <CollectionCard key={index} list={list} maxWidth="sm" />
-            ))}
-          </CarouselCollection>
+          {filteredData.length > 3 && (
+            <>
+              <Heading size="md" color="gray.500" my={5}>
+                Older
+              </Heading>
+              <CarouselCollection>
+                {filteredData.slice(3).map((list, index) => (
+                  <CollectionCard key={index} list={list} maxWidth="sm" />
+                ))}
+              </CarouselCollection>
+            </>
+          )}
         </>
       )}
     </Container>

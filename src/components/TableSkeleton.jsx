@@ -39,7 +39,7 @@ export default function TableSkeleton({ header, columns }) {
                 <Tr key={row}>
                   {columns.map((col) => (
                     <Td key={col}>
-                      <Skeleton mt={4} />
+                      <Skeleton mt={4}></Skeleton>
                     </Td>
                   ))}
                 </Tr>

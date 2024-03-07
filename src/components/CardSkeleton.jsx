@@ -8,11 +8,11 @@ import {
 } from "@chakra-ui/react";
 
 export default function CardSkeleton() {
-  const cards = [1, 2];
+  const cards = [1, 2, 3];
   return (
     <>
       {cards.map((card) => (
-        <Card key={card} maxW="lg">
+        <Card key={card} maxW="md">
           <CardBody>
             <Flex gap={10} mb="2">
               <Skeleton w="200px" h="170px" />

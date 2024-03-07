@@ -98,7 +98,7 @@ const ElementLibList = () => {
   useEffect(() => {
     axios
       .get(`${endpoint}/element_list/`, {
-        params: { listItem_id: operationListId },
+        params: { operation: operationId },
         headers: headers,
       })
       .then((response) => {
@@ -129,7 +129,7 @@ const ElementLibList = () => {
         const elementListResponse = await axios.get(
           `${endpoint}/element_list/`,
           {
-            params: { listItem_id: operationListId },
+            params: { operation: operationId },
             headers: headers,
           }
         );
@@ -150,32 +150,59 @@ const ElementLibList = () => {
     fetchExpandingNames();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [elementLibResponse] = await Promise.all([
+  //         axios.get(`${endpoint}/element_lib/`, {
+  //           params: { operation: operationId },
+            
+  //         }),
+  //       ]);
+
+  //       const updatedElementLibList = elementLibResponse.data.map((element) => {
+  //         return {
+  //           ...element,
+  //           variables: element.variables.map((variable) => {
+  //             return {
+  //               ...variable,
+  //               options: variable.options.map((option) => {
+  //                 return {
+  //                   id: option.id,
+  //                   name: option.name,
+  //                 };
+  //               }),
+  //             };
+  //           }),
+  //         };
+  //       });
+
+  //       setElementLibList(updatedElementLibList);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [elementLibResponse] = await Promise.all([
-          axios.get(`${endpoint}/element_lib/`, {
-            params: { operation_id: operationId },
-          }),
-        ]);
-
-        const updatedElementLibList = elementLibResponse.data.map((element) => {
-          return {
-            ...element,
-            variables: element.variables.map((variable) => {
-              return {
-                ...variable,
-                options: variable.options.map((option) => {
-                  return {
-                    id: option.id,
-                    name: option.name,
-                  };
-                }),
-              };
-            }),
-          };
+        const response = await axios.get(`${endpoint}/element_lib/`, {
+          params: { operation: operationId },
+          headers: headers,
         });
-
+        const updatedElementLibList = response.data.map((element) => ({
+          ...element,
+          variables: element.variables.map((variable) => ({
+            ...variable,
+            options: variable.options.map((option) => ({
+              id: option.id,
+              name: option.name,
+            })),
+          })),
+        }));
         setElementLibList(updatedElementLibList);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -183,7 +210,7 @@ const ElementLibList = () => {
     };
 
     fetchData();
-  }, []);
+  }, [operationId, headers]);
 
   const saveSelectedElementsToLocalStorage = (elements) => {
     localStorage.setItem("selectedElements", JSON.stringify(elements));
