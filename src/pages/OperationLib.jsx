@@ -2,6 +2,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Search2Icon,
+  CloseIcon
 } from "@chakra-ui/icons";
 import {
   Button,
@@ -20,7 +21,9 @@ import {
   Th,
   Thead,
   Tr,
-  Center
+  Center,
+  InputRightElement,
+  Box
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -185,6 +188,17 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
             </Flex>
           </Flex>
       
+          {/* <InputGroup mb="4">
+            <InputLeftElement pointerEvents="none">
+              <Search2Icon />
+            </InputLeftElement>
+            <Input
+              placeholder="Search by name"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+            />
+            
+          </InputGroup> */}
           <InputGroup mb="4">
             <InputLeftElement pointerEvents="none">
               <Search2Icon />
@@ -194,7 +208,15 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               value={searchTerm}
             />
+           {searchTerm && (
+              <InputRightElement>
+                <Box as="button" onClick={() => setSearchTerm('')}>
+                  <CloseIcon boxSize="3" /> 
+                </Box>
+              </InputRightElement>
+            )}
           </InputGroup>
+
           <TableContainer>
             <Table variant="striped" colorScheme="gray">
               <Thead>

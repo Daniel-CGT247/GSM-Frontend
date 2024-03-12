@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
+import { Search2Icon, CloseIcon } from "@chakra-ui/icons";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -15,6 +17,13 @@ import {
   Thead,
   Tr,
   Flex,
+  Input,
+  InputLeftElement,
+  InputGroup,
+  CardBody,
+  Card,
+  IconButton,
+  InputRightElement
 } from "@chakra-ui/react";
 
 export default function ElementList() {
@@ -223,17 +232,83 @@ export default function ElementList() {
     }
 };
 
+const [searchFilter, setSearchFilter] = useState("");
+const handleSearchChange = (event) => {
+  setSearchFilter(event.target.value);
+};
+
+const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage] = useState(5); 
+
+// Implement search filter
+const filteredElements = searchFilter
+  ? selectedElements.filter((element) =>
+      element.name.toLowerCase().includes(searchFilter.toLowerCase())
+    )
+  : selectedElements;
+
+// Calculate total pages
+const pageCount = Math.ceil(filteredElements.length / itemsPerPage);
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = filteredElements.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
+    <Card>
+      <CardBody>
     <Flex direction="column" maxW="4xl" margin="auto">
-      <Box height="650px" overflowY="auto" maxH="50vh" mb="4">
-        <Center>
-          <Text fontSize="2xl" fontWeight="bold" color="gray.700">
-            Element List
-          </Text>
-        </Center>
-        
-        <Table variant="simple">
+      <Box height="650px" overflowY="auto" maxH="75vh" mb="4">       
+        <Flex justifyContent="space-between" alignItems="center" mb="4">
+          <Center flexGrow={1}>
+            <Text color="gray.700" fontWeight="bold" fontSize="lg">
+              Element List
+            </Text>
+          </Center>       
+
+            {/* Pagination Controls */}
+            <Flex justifyContent="space-between" alignItems="center" mt="4">
+            <Box mx="4">
+              <Text>
+                Page {currentPage} of {pageCount}
+              </Text>
+            </Box>
+
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                isDisabled={currentPage === 1}
+                mr="2"
+              />
+              <IconButton
+                icon={<ChevronRightIcon />}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
+                isDisabled={currentPage >= pageCount}
+                ml="2"
+              />
+            </Flex>   
+        </Flex>
+
+         {/* Search Bar */}
+         <InputGroup mb="4">
+              <InputLeftElement pointerEvents="none">
+                <Search2Icon />
+              </InputLeftElement>
+              <Input
+                placeholder="Search by name"
+                onChange={handleSearchChange}
+                value={searchFilter}
+              />
+              {searchFilter && (
+                <InputRightElement>
+                  <Box as="button" onClick={() => setSearchFilter('')}>
+                    <CloseIcon boxSize="3" /> 
+                  </Box>
+                </InputRightElement>
+              )}
+            </InputGroup>
+
+        <Table variant="striped" colorScheme="gray">
           <Thead>
             <Tr>
               <Th style={{ width: "2%" }}>#</Th>
@@ -245,9 +320,9 @@ export default function ElementList() {
             </Tr>
           </Thead>
           <Tbody>
-            {selectedElements.map((element, index) => (
-              <Tr key={element.uniqueId ||  index }>
-                <Td>{index + 1 }</Td>
+            {currentItems.map((element, index) => (
+              <Tr key={element.uniqueId }>
+                <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
                 <Td>{element.name}</Td>
                 <Td>
                   <select
@@ -281,17 +356,17 @@ export default function ElementList() {
                         Add
                       </Button>
                     </div>
-                  )}
+                  )}  
                 </Td>
                 <Td>{element.time}</Td>
-                {/* <Td>{Object.keys(element.selectedOptions).join(", ")}</Td> */}
-                <Td>
+                <Td>{Object.keys(element.selectedOptions).join(", ")}</Td>
+                {/* <Td>
                   {Object.keys(element.selectedOptions).map((option) => (
                     <Box key={option}>
                       {option}
                     </Box>
                   ))}
-                </Td>
+                </Td> */}
 
                 
                 <Td>
@@ -307,36 +382,9 @@ export default function ElementList() {
             ))}
           </Tbody>
         </Table>
-        <Center mt="4">
-          <Text fontSize="lg" fontWeight="bold" color="gray.700">
-            Total SAM: {totalSam}
-          </Text>
-        </Center>
       </Box>
-      {/* <Flex justify="center" align="center" p="4" boxShadow="base" rounded="md" bg="white">
-        <IconButton
-          icon={<ChevronLeftIcon />}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          isDisabled={currentPage === 1}
-        />
-        <Flex overflowX="auto">
-          {Array.from({ length: pageCount }, (_, i) => (
-            <Button
-              mx="1"
-              key={i + 1}
-              colorScheme={currentPage === i + 1 ? "blue" : "gray"}
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
-        </Flex>
-        <IconButton
-          icon={<ChevronRightIcon />}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
-          isDisabled={currentPage >= pageCount}
-        />
-      </Flex> */}
     </Flex>
+    </CardBody>
+    </Card>
   );
 }

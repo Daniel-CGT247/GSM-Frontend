@@ -1,5 +1,6 @@
 import { 
-  Search2Icon 
+  Search2Icon,
+  CloseIcon
 } from "@chakra-ui/icons";
 import {
   Button,
@@ -16,7 +17,9 @@ import {
   InputLeftElement,
   InputGroup,
   Input,
-  Center
+  Center,
+  Box,
+  InputRightElement
 } from "@chakra-ui/react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
@@ -77,11 +80,19 @@ export default function YourListTable({ bundleId, listId }) {
                   value={searchTerm}
                   mb="4"
               />
+              {searchTerm && (
+                <InputRightElement>
+                  <Box as="button" onClick={() => setSearchTerm('')}>
+                    <CloseIcon boxSize="3" /> 
+                  </Box>
+                </InputRightElement>
+              )}
             </InputGroup>
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
                 <Thead>
                   <Tr>
+                    <Th>#</Th>
                     <Th>Name</Th>
                     <Th>Description</Th>
                     <Th>Job #</Th>
@@ -91,8 +102,9 @@ export default function YourListTable({ bundleId, listId }) {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {filteredOperations.map((item) => (
+                  {filteredOperations.map((item, index) => (
                     <Tr key={item.id}>
+                      <Td>{index + 1}</Td>
                       <Td>{item.operations.name}</Td>
                       <Td>{item.expanding_name}</Td>
                       <Td>{item.operations.job_code}</Td>

@@ -1,4 +1,4 @@
-import { ChevronUpIcon, ChevronDownIcon, Search2Icon } from "@chakra-ui/icons";
+import { ChevronUpIcon, ChevronDownIcon, Search2Icon, CloseIcon } from "@chakra-ui/icons";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -19,6 +19,9 @@ import {
   Collapse,
   InputLeftElement,
   InputGroup,
+  Card,
+  CardBody,
+  InputRightElement
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import useHeaders from "../customed_hook/useHeader";
@@ -28,10 +31,10 @@ export default function ElementLib(props) {
   const [elementLibList, setElementLibList] = useState([]);
   const { operationId, operationListId } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
   const [searchFilter, setSearchFilter] = useState("");
   const [visibleOptions, setVisibleOptions] = useState({});
-  const [selectedElements, setSelectedElements] = useState([]); 
+  const [selectedElements, setSelectedElements] = useState([]);
 
   const headers = useHeaders();
 
@@ -68,60 +71,71 @@ export default function ElementLib(props) {
     }));
   };
 
-const handleAddElement = async (
-  elementId, 
-  selectedOptions, 
-  userExpandingName
+  const handleAddElement = async (
+    elementId,
+    selectedOptions,
+    userExpandingName,
   ) => {
-  // Find the selected element from the list
-  const selectedElement = elementLibList.find(element => element.id === elementId);
-  if (!selectedElement) {
-    console.error(`Element with ID ${elementId} not found.`);
-    return;
-  }
 
-  const uniqueId = Date.now();
-  const newElement = {
-    ...selectedElement,
-    selectedOptions: {},
-    uniqueId,
-    time: "Fetching...",
-    expandingName: userExpandingName || selectedElement.expandingName || "N/A",
-  };
+    const selectedElement = elementLibList.find(
+      (element) => element.id === elementId,
+    );
+    if (!selectedElement) {
+      console.error(`Element with ID ${elementId} not found.`);
+      return;
+    }
 
-  selectedElement.variables.forEach(variable => {
-    const selectedOptionId = parseInt(selectedOptions[`${elementId}_${variable.name}`], 10);
-    newElement.selectedOptions[variable.name] = selectedOptionId;
-  });
-
-  try {
-    const postData = {
-      listItem: operationListId,
-      elements: newElement.id,
-      expanding_name: newElement.expandingName,
-      options: Object.values(newElement.selectedOptions),
+    const uniqueId = Date.now();
+    const newElement = {
+      ...selectedElement,
+      selectedOptions: {},
+      uniqueId,
+      time: "Fetching...",
+      expandingName:
+        userExpandingName || selectedElement.expandingName || "N/A",
     };
 
-    const addResponse = await axios.post(`${endpoint}/element_list/`, 
-      postData, 
-      { headers: headers }
-    );
-    
-    const addedElement = { ...newElement, uniqueId: addResponse.data.id || uniqueId };
-
-    setSelectedElements(prevElements => {
-      const updatedElements = [...prevElements, addedElement];
-      localStorage.setItem("selectedElements", JSON.stringify(updatedElements));        
-      props.updateSelectedElements(addedElement);
-
-      return updatedElements;
+    selectedElement.variables.forEach((variable) => {
+      const selectedOptionId = parseInt(
+        selectedOptions[`${elementId}_${variable.name}`],
+        10,
+      );
+      newElement.selectedOptions[variable.name] = selectedOptionId;
     });
 
-  } catch (error) {
-    console.error("Error in adding element", error);
-  }
-};
+    try {
+      const postData = {
+        listItem: operationListId,
+        elements: newElement.id,
+        expanding_name: newElement.expandingName,
+        options: Object.values(newElement.selectedOptions),
+      };
 
+      const addResponse = await axios.post(
+        `${endpoint}/element_list/`,
+        postData,
+        { headers: headers },
+      );
+
+      const addedElement = {
+        ...newElement,
+        uniqueId: addResponse.data.id || uniqueId,
+      };
+
+      setSelectedElements((prevElements) => {
+        const updatedElements = [...prevElements, addedElement];
+        localStorage.setItem(
+          "selectedElements",
+          JSON.stringify(updatedElements),
+        );
+        props.updateSelectedElements(addedElement);
+
+        return updatedElements;
+      });
+    } catch (error) {
+      console.error("Error in adding element", error);
+    }
+  };
 
   const [selectedVariables, setSelectedVariables] = useState({});
   const handleVariableChange = (elementId, variableName, selectedOptionId) => {
@@ -142,147 +156,204 @@ const handleAddElement = async (
 
   const areAllVariablesSelected = (elementId) => {
     const element = elementLibList.find((e) => e.id === elementId);
-    return element?.variables.every((variable) =>
-      selectedVariables.hasOwnProperty(`${elementId}_${variable.name}`) && selectedVariables[`${elementId}_${variable.name}`] !== ""
+    return element?.variables.every(
+      (variable) =>
+        selectedVariables.hasOwnProperty(`${elementId}_${variable.name}`) &&
+        selectedVariables[`${elementId}_${variable.name}`] !== "",
     );
   };
 
   const filteredElements = searchFilter
-  ? elementLibList.filter((element) =>
-      element.name.toLowerCase().includes(searchFilter.toLowerCase())
-    )
-  : elementLibList;
+    ? elementLibList.filter((element) =>
+        element.name.toLowerCase().includes(searchFilter.toLowerCase()),
+      )
+    : elementLibList;
 
   const handleSearchChange = (event) => {
     setSearchFilter(event.target.value);
   };
 
+  const [filteredLibs, setFilteredLibs] = useState([]);
 
   const pageCount = Math.ceil(filteredElements.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredElements.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredElements.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
 
   return (
-    <Flex direction="column" maxW="4xl" margin="auto">
-      <Box height="650px" overflowY="auto" maxH="50vh" mb="4">
-        <Center flexGrow={1}>
-          <Text color="gray.700" fontWeight="bold" fontSize="lg" mb="4">
-            Element Library
-          </Text>
-        </Center>
-        
-        <InputGroup mb="4">
-          <InputLeftElement pointerEvents="none">
-            <Search2Icon />
-          </InputLeftElement>
-          <Input 
-            placeholder="Search elements"
-            onChange={handleSearchChange}
-            value={searchFilter}
-          />
-        </InputGroup>
+    <Card>
+      <CardBody>
+        <Flex direction="column" maxW="4xl" margin="auto">
+          <Box overflowY="auto" mb="4">
+            {/* Title Styling */}
+            <Flex justifyContent="space-between" alignItems="center" mb="4">
+              <Center flexGrow={1}>
+                <Text color="gray.700" fontWeight="bold" fontSize="lg">
+                  Element Library
+                </Text>
+              </Center>
+              <Flex justifyContent="space-between" alignItems="center" mt="4">
+                <Box mx="4">
+                  <Text>
+                    Page {currentPage} of {pageCount}
+                  </Text>
+                </Box>
 
-        <Table width="100%" variant="simple">
-          <Thead>
-            <Tr>
-              <Th style={{ width: "5%" }}>#</Th>
-              <Th style={{ width: "25%" }}>Name</Th> 
-              <Th style={{ width: "30px"}}>Options</Th> 
-              <Th style={{ width: "10%" }}>Action</Th>
-             
-            </Tr>
-          </Thead>
-          <Tbody>
-            {currentItems.map((element, index) => (
-              <Tr key={element.id}>
-                <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
-                <Td>{element.name}</Td>
-                <Td>
-                  {element.variables.some(variable => variable.options.length) ? (
-                    <>
-                      <IconButton
-                        icon={visibleOptions[element.id] ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                        onClick={() => toggleOptionsVisibility(element.id)}
-                        aria-label="Toggle options visibility"
-                        size="sm"
-                      />
-                      <Collapse in={visibleOptions[element.id]} animateOpacity>
-                        <div style={{ marginTop: "8px" }}>
-                          {element.variables.map((variable, index) => (
-                            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                              <label
-                                htmlFor={variable.name}
-                                style={{ fontWeight: '600', marginRight: '8px', minWidth: '100px' }}
-                              >
-                                {variable.name}:
-                              </label>
-                              <select
-                                className="form-select"
-                                id={variable.name}
-                                onChange={(e) =>
-                                  handleVariableChange(
-                                    element.id,
-                                    variable.name,
-                                    e.target.value
-                                  )
-                                }
-                                value={selectedVariables[`${element.id}_${variable.name}`] || ""}
-                                style={{ width: 'auto', flex: '1' }}
-                              >
-                                <option value="">Select an option</option>
-                                {variable.options.map((option, optionIndex) => (
-                                  <option key={optionIndex} value={option.id}>
-                                    {option.name}
-                                  </option>
-                                ))}
-                              </select>
+                <IconButton
+                  icon={<ChevronLeftIcon />}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  isDisabled={currentPage === 1}
+                  mr="2"
+                />
+                {/* <Text>{currentPage}</Text> Current Page Number */}
+                <IconButton
+                  icon={<ChevronRightIcon />}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, pageCount))
+                  }
+                  isDisabled={currentPage >= pageCount}
+                  ml="2"
+                />
+              </Flex>
+            </Flex>
+            <InputGroup mb="4">
+              <InputLeftElement pointerEvents="none">
+                <Search2Icon />
+              </InputLeftElement>
+              <Input
+                placeholder="Search by name"
+                onChange={handleSearchChange}
+                value={searchFilter}
+              />
+              {searchFilter && (
+                <InputRightElement>
+                  <Box as="button" onClick={() => setSearchFilter('')}>
+                    <CloseIcon boxSize="3" /> 
+                  </Box>
+                </InputRightElement>
+              )}
+            </InputGroup>
+            <Table width="100%" variant="striped" colorScheme="gray">
+              <Thead>
+                <Tr>
+                  <Th style={{ width: "5%" }}>#</Th>
+                  <Th style={{ width: "25%" }}>Name</Th>
+                  <Th style={{ width: "30px" }}>Options</Th>
+                  <Th style={{ width: "10%" }}>Action</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {currentItems.map((element, index) => (
+                  <Tr key={element.id}>
+                    <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
+                    <Td>{element.name}</Td>
+                    <Td>
+                      {element.variables.some(
+                        (variable) => variable.options.length,
+                      ) ? (
+                        <>
+                          <Button
+                            onClick={() => toggleOptionsVisibility(element.id)}
+                            aria-label="Toggle options visibility"
+                            size="sm"
+                            rightIcon={
+                              visibleOptions[element.id] ? (
+                                <ChevronUpIcon />
+                              ) : (
+                                <ChevronDownIcon />
+                              )
+                            }
+                            colorScheme="green"
+                          >
+                            VAR
+                          </Button>
+                          <Collapse
+                            in={visibleOptions[element.id]}
+                            animateOpacity
+                          >
+                            <div style={{ marginTop: "8px" }}>
+                              {element.variables.map((variable, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    marginBottom: "8px",
+                                  }}
+                                >
+                                  <label
+                                    htmlFor={variable.name}
+                                    style={{
+                                      fontWeight: "600",
+                                      marginRight: "8px",
+                                      minWidth: "100px",
+                                    }}
+                                  >
+                                    {variable.name}:
+                                  </label>
+                                  <select
+                                    className="form-select"
+                                    id={variable.name}
+                                    onChange={(e) =>
+                                      handleVariableChange(
+                                        element.id,
+                                        variable.name,
+                                        e.target.value,
+                                      )
+                                    }
+                                    value={
+                                      selectedVariables[
+                                        `${element.id}_${variable.name}`
+                                      ] || ""
+                                    }
+                                    style={{ width: "auto", flex: "1" }}
+                                  >
+                                    <option value="">Select an option</option>
+                                    {variable.options.map(
+                                      (option, optionIndex) => (
+                                        <option
+                                          key={optionIndex}
+                                          value={option.id}
+                                        >
+                                          {option.name}
+                                        </option>
+                                      ),
+                                    )}
+                                  </select>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </Collapse>
-                    </>
-                  ) : "None"}
-                </Td>
-                <Td>
-                  <Button 
-                    colorScheme="blue" 
-                    size="sm" 
-                    disabled={!areAllVariablesSelected(element.id)}
-                    onClick={() => handleAddElement(element.id, selectedVariables, "")}
-                  >
-                    Add
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
-      <Flex justify="center" align="center" p="4" boxShadow="base" rounded="md" bg="white">
-        <IconButton
-          icon={<ChevronLeftIcon />}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          isDisabled={currentPage === 1}
-        />
-        <Flex overflowX="auto">
-          {Array.from({ length: pageCount }, (_, i) => (
-            <Button
-              mx="1"
-              key={i + 1}
-              colorScheme={currentPage === i + 1 ? "blue" : "gray"}
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
+                          </Collapse>
+                        </>
+                      ) : (
+                        "None"
+                      )}
+                    </Td>
+                    <Td>
+                      <Button
+                        colorScheme="blue"
+                        size="sm"
+                        disabled={!areAllVariablesSelected(element.id)}
+                        onClick={() =>
+                          handleAddElement(element.id, selectedVariables, "")
+                        }
+                      >
+                        Add
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
         </Flex>
-        <IconButton
-          icon={<ChevronRightIcon />}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
-          isDisabled={currentPage >= pageCount}
-        />
-      </Flex>
-    </Flex>
+      </CardBody>
+    </Card>
   );
-}  
+}

@@ -4,7 +4,7 @@ import {
   CheckIcon, 
   CloseIcon, 
   EditIcon, 
-  Search2Icon 
+  Search2Icon,
 } from "@chakra-ui/icons";
 import {
   Alert,
@@ -33,7 +33,9 @@ import {
   Center,
   InputLeftElement,
   InputGroup,
-  Flex
+  Flex,
+  Box,
+  InputRightElement
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -185,6 +187,13 @@ export default function OperationList({
                 value={searchTerm}
                 mb="4"
               />
+              {searchTerm && (
+                <InputRightElement>
+                  <Box as="button" onClick={() => setSearchTerm('')}>
+                    <CloseIcon boxSize="3" /> 
+                  </Box>
+                </InputRightElement>
+              )}
           </InputGroup>
 
           <TableContainer>
