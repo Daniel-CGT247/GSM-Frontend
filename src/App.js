@@ -39,7 +39,7 @@ export default function App({ pca }) {
                   "nav main"`}
           templateColumns={isSidebarOpen ? `250px 1fr` : `50px 1fr`}
         >
-          <GridItem area="header" position="sticky" top={0} zIndex={10}>
+          <GridItem area="header" position="sticky" top={0} zIndex={9}>
             <Navigation
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}

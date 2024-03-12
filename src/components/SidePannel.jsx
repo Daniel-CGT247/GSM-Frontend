@@ -1,4 +1,4 @@
-import { Flex, Icon, Text, Link } from "@chakra-ui/react";
+import { Flex, Icon, Link, Text, Tooltip } from "@chakra-ui/react";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { RiAdminLine } from "react-icons/ri";
 import { TbJacket } from "react-icons/tb";
@@ -19,7 +19,7 @@ export default function SidePannel({ isOpen }) {
     },
     {
       name: "Admin",
-      path: "http://localhost:8000/admin",
+      path: "http://localhost:8000/admin/",
       icon: RiAdminLine,
       isExternal: true,
     },
@@ -36,18 +36,28 @@ export default function SidePannel({ isOpen }) {
     >
       <Flex flexDirection="column" alignItems="start" gap={3} p={0}>
         {navs.map((nav, index) => (
-          <Link
+          <Tooltip
             key={index}
-            href={nav.path}
-            isExternal={nav.isExternal}
-            w={isOpen ? "100%" : ""}
-            _hover={{ bgColor: "#888098" }}
+            background="#3c3744"
+            hasArrow
+            label={nav.name}
+            placement="right"
+            isDisabled={isOpen}
           >
-            <Flex alignItems="center" gap={2} p={2} ml={1} opacity="0.9">
-              <Icon color="white" as={nav.icon} boxSize={7} />
-              {isOpen && <Text color="white">{nav.name}</Text>}
-            </Flex>
-          </Link>
+            <Link
+              key={index}
+              href={nav.path}
+              isExternal={nav.isExternal}
+              w={isOpen ? "100%" : ""}
+              _hover={{ bgColor: "#888098" }}
+              transition="all 0.3s ease-in-out"
+            >
+              <Flex alignItems="center" gap={2} p={2} ml={1} opacity="0.9">
+                <Icon color="white" as={nav.icon} boxSize={7} />
+                {isOpen && <Text color="white">{nav.name}</Text>}
+              </Flex>
+            </Link>
+          </Tooltip>
         ))}
       </Flex>
     </Flex>

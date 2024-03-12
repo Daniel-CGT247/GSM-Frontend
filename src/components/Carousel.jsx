@@ -26,7 +26,7 @@ export default function CarouselCollection({ children }) {
     },
   };
   return (
-    <Carousel responsive={responsive} infinite={true}>
+    <Carousel responsive={responsive} infinite={true} draggable={false}>
       {children}
     </Carousel>
   );
