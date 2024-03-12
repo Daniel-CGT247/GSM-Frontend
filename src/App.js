@@ -9,6 +9,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navigation from "./components/NavBar";
 import Collection from "./pages/Collection";
 import ElementPage from "./pages/ElementPage";
+//import Element from "./pages/Element";
 import JobGroup from "./pages/JobGroup";
 import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
@@ -66,6 +67,10 @@ export default function App({ pca }) {
                   path="/:listId/operation/:operationId/:operationListId/element"
                   element={<ElementPage />}
                 />
+                 {/* <Route
+                  path="/:listId/operation/:operationId/:operationListId/element"
+                  element={<Element />}
+                /> */}
               </Routes>
             </Router>
           </GridItem>

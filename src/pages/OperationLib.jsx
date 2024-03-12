@@ -2,20 +2,18 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Search2Icon,
+  CloseIcon
 } from "@chakra-ui/icons";
 import {
-  Box,
   Button,
   Card,
   CardBody,
   Flex,
-  HStack,
   IconButton,
   Input,
   InputGroup,
   InputLeftElement,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -23,6 +21,9 @@ import {
   Th,
   Thead,
   Tr,
+  Center,
+  InputRightElement,
+  Box
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -77,21 +78,21 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       .catch((error) => console.error("Error adding operation:", error));
   };
 
-  const renderPaginationNumbers = () => {
-    let items = [];
-    for (let number = 1; number <= totalPages; number++) {
-      items.push(
-        <Button
-          key={number}
-          colorScheme={currentPage === number ? "twitter" : "gray"}
-          onClick={() => setCurrentPage(number)}
-        >
-          {number}
-        </Button>
-      );
-    }
-    return items;
-  };
+  // const renderPaginationNumbers = () => {
+  //   let items = [];
+  //   for (let number = 1; number <= totalPages; number++) {
+  //     items.push(
+  //       <Button
+  //         key={number}
+  //         colorScheme={currentPage === number ? "twitter" : "gray"}
+  //         onClick={() => setCurrentPage(number)}
+  //       >
+  //         {number}
+  //       </Button>
+  //     );
+  //   }
+  //   return items;
+  // };
 
   useEffect(() => {
     const filtered = operations.filter((operation) => {
@@ -109,73 +110,139 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       {isLibLoading ? (
         <TableSkeleton header="Operation Library" columns={columns} />
       ) : (
-        <Card>
-          <CardBody>
-            <TableContainer>
-              <Table variant="striped" colorScheme="gray">
-                <TableCaption placement="top" bgColor="gray.50">
-                  <Text color="gray.700" fontWeight="bold" fontSize="lg">
-                    Operation Library
-                  </Text>
-                  <Box mt={3}>
-                    <InputGroup>
-                      <InputLeftElement pointerEvents="none">
-                        <Search2Icon />
-                      </InputLeftElement>
-                      <Input
-                        placeholder="Search by name"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        value={searchTerm}
-                        mb="4"
-                      />
-                    </InputGroup>
-                  </Box>
-                </TableCaption>
-
-                <Thead>
-                  <Tr>
-                    <Th textAlign="center">Name</Th>
-                    <Th textAlign="center">Action</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {currentItems.map((operation) => (
-                    <Tr key={operation.id}>
-                      <Td textAlign="center">{operation.name}</Td>
-                      <Td textAlign="center">
-                        <Flex justifyContent="center">
-                          <Button
-                            colorScheme="green"
-                            onClick={() => addOperation(operation)}
-                          >
-                            Add
-                          </Button>
-                        </Flex>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-            <Flex mt="4" justifyContent="center" alignItems="center">
+      // <Card>
+      //   <CardBody>
+      //     <Text color="gray.700" fontWeight="bold" fontSize="lg" mb="4">
+      //       <Center>Operation Library</Center>
+      //     </Text>
+      //     <InputGroup mb="4">
+      //       <InputLeftElement pointerEvents="none">
+      //         <Search2Icon />
+      //       </InputLeftElement>
+      //       <Input
+      //         placeholder="Search by name"
+      //         onChange={(e) => setSearchTerm(e.target.value)}
+      //         value={searchTerm}
+      //       />
+      //     </InputGroup>
+      //     <TableContainer>
+      //       <Table variant="striped" colorScheme="gray">
+      //         <Thead>
+      //           <Tr>
+      //             <Th textAlign="center">Name</Th>
+      //             <Th textAlign="center">Action</Th>
+      //           </Tr>
+      //         </Thead>
+      //         <Tbody>
+      //           {currentItems.map((operation) => (
+      //             <Tr key={operation.id}>
+      //               <Td textAlign="center">{operation.name}</Td>
+      //               <Td textAlign="center">
+      //                 <Flex justifyContent="center">
+      //                   <Button colorScheme="green" onClick={() => addOperation(operation)}>
+      //                     Add
+      //                   </Button>
+      //                 </Flex>
+      //               </Td>
+      //             </Tr>
+      //           ))}
+      //         </Tbody>
+      //       </Table>
+      //     </TableContainer>
+      //     {/* <Flex mt="4" justifyContent="space-between" alignItems="center">
+      //       <IconButton
+      //         icon={<ChevronLeftIcon />}
+      //         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      //         isDisabled={currentPage === 1}
+      //       />
+      //       {renderPaginationNumbers()}
+      //       <IconButton
+      //         icon={<ChevronRightIcon />}
+      //         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      //         isDisabled={currentPage >= totalPages}
+      //       />
+      //     </Flex> */}
+      //   </CardBody>
+      <Card>
+        <CardBody>
+          <Flex justifyContent="space-between" alignItems="center" mb="4">
+            <Center flexGrow={1}>
+              <Text color="gray.700" fontWeight="bold" fontSize="lg">
+                Operation Library
+              </Text>
+            </Center>
+            <Flex alignItems="center">
               <IconButton
                 icon={<ChevronLeftIcon />}
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 isDisabled={currentPage === 1}
-                mr="4"
+                mr="2"
               />
-              <HStack spacing="20px">{renderPaginationNumbers()}</HStack>
+              <Text>{currentPage}</Text>
               <IconButton
                 icon={<ChevronRightIcon />}
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 isDisabled={currentPage >= totalPages}
-                ml="4"
+                ml="2"
               />
             </Flex>
-          </CardBody>
-        </Card>
+          </Flex>
+      
+          {/* <InputGroup mb="4">
+            <InputLeftElement pointerEvents="none">
+              <Search2Icon />
+            </InputLeftElement>
+            <Input
+              placeholder="Search by name"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+            />
+            
+          </InputGroup> */}
+          <InputGroup mb="4">
+            <InputLeftElement pointerEvents="none">
+              <Search2Icon />
+            </InputLeftElement>
+            <Input
+              placeholder="Search by name"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+            />
+           {searchTerm && (
+              <InputRightElement>
+                <Box as="button" onClick={() => setSearchTerm('')}>
+                  <CloseIcon boxSize="3" /> 
+                </Box>
+              </InputRightElement>
+            )}
+          </InputGroup>
+
+          <TableContainer>
+            <Table variant="striped" colorScheme="gray">
+              <Thead>
+                <Tr>
+                  <Th textAlign="center">Name</Th>
+                  <Th textAlign="center">Action</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {currentItems.map((operation) => (
+                  <Tr key={operation.id}>
+                    <Td textAlign="center">{operation.name}</Td>
+                    <Td textAlign="center">
+                      <Flex justifyContent="center">
+                        <Button colorScheme="green" onClick={() => addOperation(operation)}>
+                          Add
+                        </Button>
+                      </Flex>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </CardBody>
+      </Card>
       )}
     </>
   );

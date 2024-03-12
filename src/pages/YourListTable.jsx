@@ -1,21 +1,30 @@
+import { 
+  Search2Icon,
+  CloseIcon
+} from "@chakra-ui/icons";
 import {
   Button,
   Card,
   CardBody,
-  Heading,
   Text,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
   Tr,
+  InputLeftElement,
+  InputGroup,
+  Input,
+  Center,
+  Box,
+  InputRightElement
 } from "@chakra-ui/react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
+import { useState, useEffect } from "react";
 
 const columns = [
   "Name",
@@ -26,6 +35,9 @@ const columns = [
   "",
 ];
 export default function YourListTable({ bundleId, listId }) {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredOperations, setFilteredOperations] = useState([]);
+
   const params = {
     operations__bundle_group_id: bundleId,
     list_id: listId,
@@ -35,6 +47,17 @@ export default function YourListTable({ bundleId, listId }) {
     `${endpoint}/operation_list/`,
     params
   );
+
+
+ useEffect(() => {
+  const filtered = operationList.filter((operation) =>
+    operation.operations.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (operation.operations.job_code && operation.operations.job_code.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  setFilteredOperations(filtered);
+}, [searchTerm, operationList]); 
+
+
   return (
     <>
       {isLoading ? (
@@ -42,26 +65,46 @@ export default function YourListTable({ bundleId, listId }) {
       ) : (
         <Card>
           <CardBody>
+            <Center flexGrow={1}>
+              <Text fontSize="lg" color="gray.700" fontWeight="bold" mb="4">
+                Your List
+              </Text>
+            </Center>
+            <InputGroup mb="4">
+              <InputLeftElement pointerEvents="none">
+                  <Search2Icon />
+              </InputLeftElement>
+              <Input
+                  placeholder="Search by name or job ID"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm}
+                  mb="4"
+              />
+              {searchTerm && (
+                <InputRightElement>
+                  <Box as="button" onClick={() => setSearchTerm('')}>
+                    <CloseIcon boxSize="3" /> 
+                  </Box>
+                </InputRightElement>
+              )}
+            </InputGroup>
             <TableContainer>
               <Table variant="striped" colorScheme="gray">
-                <TableCaption placement="top" bgColor="gray.50">
-                  <Text fontSize="lg" color="gray.700" fontWeight="bold">
-                    Your List
-                  </Text>
-                </TableCaption>
                 <Thead>
                   <Tr>
+                    <Th>#</Th>
                     <Th>Name</Th>
                     <Th>Description</Th>
                     <Th>Job #</Th>
-                    <Th isNumeric>Total SAM</Th>
+                    <Th isNumeric>SAM</Th>
                     <Th isNumeric># of Elements</Th>
                     <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {operationList.map((item) => (
+                  {filteredOperations.map((item, index) => (
                     <Tr key={item.id}>
+                      <Td>{index + 1}</Td>
                       <Td>{item.operations.name}</Td>
                       <Td>{item.expanding_name}</Td>
                       <Td>{item.operations.job_code}</Td>

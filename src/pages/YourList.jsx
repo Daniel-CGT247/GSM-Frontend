@@ -7,9 +7,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
-  StatArrow,
-  StatGroup,
   HStack,
 } from "@chakra-ui/react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";

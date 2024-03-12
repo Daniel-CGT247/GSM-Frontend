@@ -12,7 +12,8 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  SimpleGrid
+  SimpleGrid,
+  InputRightElement,
 } from "@chakra-ui/react";
 
 import React, { useState } from "react";
@@ -24,7 +25,7 @@ import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-
+import { CloseIcon } from "@chakra-ui/icons";
 import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
@@ -78,6 +79,13 @@ export default function Collection() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <InputRightElement>
+                <Box as="button" onClick={() => setSearchTerm('')}>
+                  <CloseIcon boxSize="3" /> 
+                </Box>
+              </InputRightElement>
+            )}
           </InputGroup>
           <Flex alignItems="center" gap="2">
             <Menu>
