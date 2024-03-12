@@ -15,6 +15,7 @@ import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
+import { list } from "postcss";
 
 export default function YourList() {
   const { listId, jobId, bundleId } = useParams();
@@ -35,6 +36,16 @@ export default function YourList() {
     jobGroup.bundle_groups &&
     jobGroup.bundle_groups.find((bundle) => bundle.id.toString() === bundleId);
   const bundleName = bundle_group && bundle_group.name;
+
+  const params = {
+    operations__bundle_group_id: bundleId,
+    list_id: listId,
+  };
+
+  const { data: operationList, isLoading: isListLoading } = useGet(
+    `${endpoint}/operation_list/`,
+    params
+  );
 
   return (
     <Container maxW="8xl" mt={4}>
@@ -59,31 +70,38 @@ export default function YourList() {
             </Heading>
           )}
         </Box>
-        <HStack alignItems="baseline" justifyContent="space-between" w="400px">
-          <Stat
-            px="2"
-            shadow="sm"
-            border="1px solid #e2e8f0"
-            borderRadius="md"
-            _hover={{ borderColor: "blue", shadow: "lg" }}
-            transition={"all 0.3s ease"}
+        {!isListLoading && (
+          <HStack
+            alignItems="baseline"
+            justifyContent="space-between"
+            w="400px"
           >
-            <StatLabel fontSize="lg">Total SAM</StatLabel>
-            <StatNumber>34.24</StatNumber>
-          </Stat>
+            <Stat
+              px="2"
+              shadow="sm"
+              border="1px solid #e2e8f0"
+              borderRadius="md"
+              _hover={{ borderColor: "blue", shadow: "lg" }}
+              transition={"all 0.3s ease"}
+            >
+              <StatLabel fontSize="lg">Total SAM</StatLabel>
+              <StatNumber>34.24</StatNumber>
+            </Stat>
 
-          <Stat
-            px="2"
-            shadow="sm"
-            border="1px solid #e2e8f0"
-            borderRadius="md"
-            _hover={{ borderColor: "blue", shadow: "lg" }}
-            transition={"all 0.3s ease"}
-          >
-            <StatLabel fontSize="lg">Count</StatLabel>
-            <StatNumber>3</StatNumber>
-          </Stat>
-        </HStack>
+            <Stat
+              px="2"
+              shadow="sm"
+              border="1px solid #e2e8f0"
+              borderRadius="md"
+              _hover={{ borderColor: "blue", shadow: "lg" }}
+              transition={"all 0.3s ease"}
+            >
+              <StatLabel fontSize="lg">Count</StatLabel>
+              <StatNumber>3</StatNumber>
+            </Stat>
+          </HStack>
+        )}
+
         <Button
           as="a"
           href={`/${listId}/job_group/${jobId}/${bundleId}/operation`}
@@ -95,7 +113,11 @@ export default function YourList() {
           Edit Operation List
         </Button>
       </Flex>
-      <YourListTable bundleId={bundleId} listId={listId} />
+      <YourListTable
+        operationList={operationList}
+        isLoading={isListLoading}
+        listId={listId}
+      />
     </Container>
   );
 }
