@@ -46,7 +46,7 @@ export default function JobGroup() {
             </Heading>
           )}
         </Box>
-        <HStack alignItems="baseline" justifyContent="space-between" w="400px">
+        <HStack alignItems="baseline" justifyContent="space-between" w="150px">
           <Stat
             px="2"
             shadow="sm"
@@ -55,20 +55,10 @@ export default function JobGroup() {
             _hover={{ borderColor: "blue", shadow: "lg" }}
             transition={"all 0.3s ease"}
           >
-            <StatLabel fontSize="lg">Total SAM</StatLabel>
-            <StatNumber>34.24</StatNumber>
-          </Stat>
-
-          <Stat
-            px="2"
-            shadow="sm"
-            border="1px solid #e2e8f0"
-            borderRadius="md"
-            _hover={{ borderColor: "blue", shadow: "lg" }}
-            transition={"all 0.3s ease"}
-          >
-            <StatLabel fontSize="lg">Count</StatLabel>
-            <StatNumber>3</StatNumber>
+            <Stat textAlign="center">
+              <StatLabel fontSize="lg">Total SAM</StatLabel>
+              <StatNumber>34.24</StatNumber>
+            </Stat>
           </Stat>
         </HStack>
 

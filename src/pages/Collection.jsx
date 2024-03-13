@@ -16,7 +16,7 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GrPowerReset } from "react-icons/gr";
 import { IoSearch } from "react-icons/io5";
 import { Link } from "react-router-dom";
@@ -25,11 +25,12 @@ import CarouselCollection from "../components/Carousel";
 import CollectionCard from "../components/CollectionCard";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CloseIcon} from "@chakra-ui/icons";
 import { FaChevronDown } from "react-icons/fa6";
 
 export default function Collection() {
-  const { data, isLoading } = useGet(`${endpoint}/collection/`);
+  const { data: fetchedData, isLoading } = useGet(`${endpoint}/collection/`);
+  const [data, setData] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedProto, setSelectedProto] = useState("");
@@ -39,6 +40,13 @@ export default function Collection() {
     setSelectedSeason("");
     setSelectedProto("");
   };
+
+
+  useEffect(() => {
+    if (fetchedData) {
+      setData(fetchedData);
+    }
+  }, [fetchedData]);
 
   const filteredData = data.filter(
     (item) =>
@@ -54,6 +62,15 @@ export default function Collection() {
   const uniquePrototype = [
     ...new Set(data.map((item) => item.item.proto)),
   ].sort();
+
+
+  const updateItemInData = (updatedItem) => {
+    const newData = data.map((item) =>
+      item.id === updatedItem.id ? updatedItem : item
+    );
+    setData(newData); 
+  };
+  
 
   return (
     <Container maxW="8xl" py={8}>
@@ -173,7 +190,13 @@ export default function Collection() {
         <>
           <SimpleGrid columns={3} spacing={10}>
             {filteredData.slice(0, 3).map((list, index) => (
-              <CollectionCard key={index} list={list} maxWidth="md" />
+              <CollectionCard 
+                key={index} 
+                list={list} 
+                maxWidth="md" 
+                updateItemInData={updateItemInData}  
+              />
+
             ))}
           </SimpleGrid>
 
@@ -184,7 +207,7 @@ export default function Collection() {
               </Heading>
               <CarouselCollection>
                 {filteredData.slice(3).map((list, index) => (
-                  <CollectionCard key={index} list={list} maxWidth="sm" />
+                  <CollectionCard key={index} list={list} maxWidth="md" updateItemInData={updateItemInData} />
                 ))}
               </CarouselCollection>
             </>

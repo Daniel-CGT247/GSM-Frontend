@@ -78,22 +78,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       .catch((error) => console.error("Error adding operation:", error));
   };
 
-  // const renderPaginationNumbers = () => {
-  //   let items = [];
-  //   for (let number = 1; number <= totalPages; number++) {
-  //     items.push(
-  //       <Button
-  //         key={number}
-  //         colorScheme={currentPage === number ? "twitter" : "gray"}
-  //         onClick={() => setCurrentPage(number)}
-  //       >
-  //         {number}
-  //       </Button>
-  //     );
-  //   }
-  //   return items;
-  // };
-
   useEffect(() => {
     const filtered = operations.filter((operation) => {
       return (
@@ -110,59 +94,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       {isLibLoading ? (
         <TableSkeleton header="Operation Library" columns={columns} />
       ) : (
-      // <Card>
-      //   <CardBody>
-      //     <Text color="gray.700" fontWeight="bold" fontSize="lg" mb="4">
-      //       <Center>Operation Library</Center>
-      //     </Text>
-      //     <InputGroup mb="4">
-      //       <InputLeftElement pointerEvents="none">
-      //         <Search2Icon />
-      //       </InputLeftElement>
-      //       <Input
-      //         placeholder="Search by name"
-      //         onChange={(e) => setSearchTerm(e.target.value)}
-      //         value={searchTerm}
-      //       />
-      //     </InputGroup>
-      //     <TableContainer>
-      //       <Table variant="striped" colorScheme="gray">
-      //         <Thead>
-      //           <Tr>
-      //             <Th textAlign="center">Name</Th>
-      //             <Th textAlign="center">Action</Th>
-      //           </Tr>
-      //         </Thead>
-      //         <Tbody>
-      //           {currentItems.map((operation) => (
-      //             <Tr key={operation.id}>
-      //               <Td textAlign="center">{operation.name}</Td>
-      //               <Td textAlign="center">
-      //                 <Flex justifyContent="center">
-      //                   <Button colorScheme="green" onClick={() => addOperation(operation)}>
-      //                     Add
-      //                   </Button>
-      //                 </Flex>
-      //               </Td>
-      //             </Tr>
-      //           ))}
-      //         </Tbody>
-      //       </Table>
-      //     </TableContainer>
-      //     {/* <Flex mt="4" justifyContent="space-between" alignItems="center">
-      //       <IconButton
-      //         icon={<ChevronLeftIcon />}
-      //         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      //         isDisabled={currentPage === 1}
-      //       />
-      //       {renderPaginationNumbers()}
-      //       <IconButton
-      //         icon={<ChevronRightIcon />}
-      //         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      //         isDisabled={currentPage >= totalPages}
-      //       />
-      //     </Flex> */}
-      //   </CardBody>
       <Card>
         <CardBody>
           <Flex justifyContent="space-between" alignItems="center" mb="4">
@@ -187,18 +118,6 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
               />
             </Flex>
           </Flex>
-      
-          {/* <InputGroup mb="4">
-            <InputLeftElement pointerEvents="none">
-              <Search2Icon />
-            </InputLeftElement>
-            <Input
-              placeholder="Search by name"
-              onChange={(e) => setSearchTerm(e.target.value)}
-              value={searchTerm}
-            />
-            
-          </InputGroup> */}
           <InputGroup mb="4">
             <InputLeftElement pointerEvents="none">
               <Search2Icon />

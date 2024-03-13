@@ -76,7 +76,7 @@ export default function ElementLib(props) {
     selectedOptions,
     userExpandingName,
   ) => {
-
+    // Find the selected element from the list
     const selectedElement = elementLibList.find(
       (element) => element.id === elementId,
     );
@@ -196,6 +196,8 @@ export default function ElementLib(props) {
                   Element Library
                 </Text>
               </Center>
+
+              {/* Pagination Styling */}
               <Flex justifyContent="space-between" alignItems="center" mt="4">
                 <Box mx="4">
                   <Text>
@@ -222,6 +224,8 @@ export default function ElementLib(props) {
                 />
               </Flex>
             </Flex>
+
+            {/* Search Bar */}
             <InputGroup mb="4">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon />
@@ -239,6 +243,8 @@ export default function ElementLib(props) {
                 </InputRightElement>
               )}
             </InputGroup>
+
+            {/* Table */}
             <Table width="100%" variant="striped" colorScheme="gray">
               <Thead>
                 <Tr>
