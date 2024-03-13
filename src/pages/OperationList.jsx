@@ -1,9 +1,9 @@
-import { 
+import {
+  CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CheckIcon, 
-  CloseIcon, 
-  EditIcon, 
+  CloseIcon,
+  EditIcon,
   Search2Icon,
 } from "@chakra-ui/icons";
 import {
@@ -11,6 +11,7 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
+  Box,
   Button,
   ButtonGroup,
   Card,
@@ -18,8 +19,13 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
+  Flex,
+  HStack,
   IconButton,
   Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
   Table,
   TableContainer,
   Tbody,
@@ -28,17 +34,10 @@ import {
   Th,
   Thead,
   Tr,
-  useEditableControls,
-  HStack,
-  Center,
-  InputLeftElement,
-  InputGroup,
-  Flex,
-  Box,
-  InputRightElement
+  useEditableControls
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import useHeaders from "../customed_hook/useHeader";
@@ -54,12 +53,14 @@ export default function OperationList({
   const [filteredOperations, setFilteredOperations] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredLibs, setFilteredLibs] = useState([]);
   const [itemsPerPage] = useState(5);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
+  const currentItems = filteredOperations.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredOperations.length / itemsPerPage);
 
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -127,61 +128,108 @@ export default function OperationList({
     );
   }
 
-  
   useEffect(() => {
-    const filtered = operationList.filter((operation) =>
-      operation.operations.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (operation.operations.job_code && operation.operations.job_code.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = operationList.filter(
+      (operation) =>
+        operation.operations.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (operation.operations.job_code &&
+          operation.operations.job_code
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()))
     );
     setFilteredOperations(filtered);
-  }, [searchTerm, operationList]); 
+  }, [searchTerm, operationList]);
 
-  
   return (
     <>
       {isOperationListLoading ? (
         <TableSkeleton header="Operation List" columns={columns} />
       ) : (
         <Card>
-        {error && (
-          <Alert status="error">
-            <AlertIcon />
-            <AlertTitle>Cannot Delete Operation</AlertTitle>
-            <AlertDescription>
-              Please remove the elements list first
-            </AlertDescription>
-          </Alert>
-        )}
+          {error && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle>Cannot Delete Operation</AlertTitle>
+              <AlertDescription>
+                Please remove the elements list first
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <CardBody>
-          <Flex justifyContent="space-between" alignItems="center" mb="4">
-            <Center flexGrow={1}>
-              <Text color="gray.700" fontWeight="bold" fontSize="lg" mb="4">
-                Operation List
+          <CardBody>
+            <Flex justifyContent="space-between" alignItems="center" mb="4">
+              <Text color="gray.700" fontWeight="bold" fontSize="xl">
+                Operation Library
               </Text>
-            </Center>
-            <Flex alignItems="center">
-              <IconButton
-                icon={<ChevronLeftIcon />}
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                isDisabled={currentPage === 1}
-                mr="2"
-              />
-              <Text>{currentPage}</Text> {/* page number */}
-              <IconButton
-                icon={<ChevronRightIcon />}
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                isDisabled={currentPage >= totalPages}
-                ml="2"
-              />
-            </Flex>
-          </Flex>
 
-          <InputGroup mb="4">
-            <InputLeftElement pointerEvents="none">
+              <Flex justifyContent="space-between" alignItems="center" gap={2}>
+                <Text color="gray">
+                  Page <span style={{ fontWeight: "bold" }}>{currentPage}</span>{" "}
+                  of {totalPages}
+                </Text>
+
+                <IconButton
+                  icon={<ChevronLeftIcon />}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  isDisabled={currentPage === 1}
+                  size="sm"
+                />
+                <IconButton
+                  icon={<ChevronRightIcon />}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(
+                        prev + 1,
+                        <Flex
+                          justifyContent="space-between"
+                          alignItems="center"
+                          gap={2}
+                        >
+                          <Text color="gray">
+                            Page{" "}
+                            <span style={{ fontWeight: "bold" }}>
+                              {currentPage}
+                            </span>{" "}
+                            of {totalPages}
+                          </Text>
+
+                          <IconButton
+                            icon={<ChevronLeftIcon />}
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
+                            isDisabled={currentPage === 1}
+                            size="sm"
+                          />
+                          <IconButton
+                            icon={<ChevronRightIcon />}
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            isDisabled={currentPage >= totalPages}
+                            size="sm"
+                          />
+                        </Flex>
+                      )
+                    )
+                  }
+                  isDisabled={currentPage >= totalPages}
+                  size="sm"
+                />
+              </Flex>
+            </Flex>
+            <InputGroup mb="4">
+              <InputLeftElement pointerEvents="none">
                 <Search2Icon />
-            </InputLeftElement>
-            <Input
+              </InputLeftElement>
+              <Input
                 placeholder="Search by name or job ID"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 value={searchTerm}
@@ -189,56 +237,63 @@ export default function OperationList({
               />
               {searchTerm && (
                 <InputRightElement>
-                  <Box as="button" onClick={() => setSearchTerm('')}>
-                    <CloseIcon boxSize="3" /> 
+                  <Box as="button" onClick={() => setSearchTerm("")}>
+                    <CloseIcon boxSize="3" />
                   </Box>
                 </InputRightElement>
               )}
-          </InputGroup>
+            </InputGroup>
 
-          <TableContainer>
-            <Table variant="striped" colorScheme="gray">
-              <Thead>
-                <Tr>
-                  <Th>#</Th>
-                  <Th>Name</Th>
-                  <Th>Description</Th>
-                  <Th>Job #</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filteredOperations.map((item, index) => (
-                  <Tr key={item.id}>
-                    <Td>{index + 1}</Td>
-                    <Td>{item.operations.name}</Td>
-                    <Td>
-                      <HStack>
-                        <Editable
-                          defaultValue={item.expanding_name ? item.expanding_name : "N/A"}
-                          onChange={(value) => setInputVal(value)}
-                          onSubmit={() => handleUpdate(item.id)}
-                        >
-                          <EditablePreview />
-                          <Input as={EditableInput} />
-                          <EditableControls handleUpdate={() => handleUpdate(item.id)} />
-                        </Editable>
-                        <EditIcon />
-                      </HStack>
-                    </Td>
-                    <Td>{item.operations.job_code}</Td>
-                    <Td>
-                      <Button colorScheme="red" onClick={() => handleDelete(item.id)}>
-                        Delete
-                      </Button>
-                    </Td>
+            <TableContainer>
+              <Table variant="striped" colorScheme="gray">
+                <Thead>
+                  <Tr>
+                    <Th>#</Th>
+                    <Th>Name</Th>
+                    <Th>Description</Th>
+                    <Th>Job #</Th>
+                    <Th></Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </CardBody>
-      </Card>
+                </Thead>
+                <Tbody>
+                  {filteredOperations.map((item, index) => (
+                    <Tr key={item.id}>
+                      <Td>{index + 1}</Td>
+                      <Td>{item.operations.name}</Td>
+                      <Td>
+                        <HStack>
+                          <Editable
+                            defaultValue={
+                              item.expanding_name ? item.expanding_name : "N/A"
+                            }
+                            onChange={(value) => setInputVal(value)}
+                            onSubmit={() => handleUpdate(item.id)}
+                          >
+                            <EditablePreview />
+                            <Input as={EditableInput} />
+                            <EditableControls
+                              handleUpdate={() => handleUpdate(item.id)}
+                            />
+                          </Editable>
+                          <EditIcon />
+                        </HStack>
+                      </Td>
+                      <Td>{item.operations.job_code}</Td>
+                      <Td>
+                        <Button
+                          colorScheme="red"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </CardBody>
+        </Card>
       )}
     </>
   );

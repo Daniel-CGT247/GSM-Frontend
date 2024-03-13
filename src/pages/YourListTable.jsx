@@ -1,30 +1,27 @@
-import { 
-  Search2Icon,
-  CloseIcon
-} from "@chakra-ui/icons";
+import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Card,
   CardBody,
-  Text,
+  Center,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
-  InputLeftElement,
-  InputGroup,
-  Input,
-  Center,
-  Box,
-  InputRightElement
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
-import { useState, useEffect } from "react";
 
 const columns = [
   "Name",
@@ -34,29 +31,24 @@ const columns = [
   "# of Elements",
   "",
 ];
-export default function YourListTable({ bundleId, listId }) {
-  const [searchTerm, setSearchTerm] = useState("")
+export default function YourListTable({ operationList, listId, isLoading }) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredOperations, setFilteredOperations] = useState([]);
 
-  const params = {
-    operations__bundle_group_id: bundleId,
-    list_id: listId,
-  };
-
-  const { data: operationList, isLoading } = useGet(
-    `${endpoint}/operation_list/`,
-    params
-  );
-
-
- useEffect(() => {
-  const filtered = operationList.filter((operation) =>
-    operation.operations.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (operation.operations.job_code && operation.operations.job_code.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-  setFilteredOperations(filtered);
-}, [searchTerm, operationList]); 
-
+  useEffect(() => {
+    const filtered = operationList.filter(
+      (operation) =>
+        operation.operations.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (operation.operations.job_code &&
+          operation.operations.job_code
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()))
+    );
+    setFilteredOperations(filtered);
+  }, [searchTerm, operationList]);
 
   return (
     <>
@@ -66,24 +58,24 @@ export default function YourListTable({ bundleId, listId }) {
         <Card>
           <CardBody>
             <Center flexGrow={1}>
-              <Text fontSize="lg" color="gray.700" fontWeight="bold" mb="4">
+              <Text fontSize="xl" color="gray.700" fontWeight="bold" mb="4">
                 Your List
               </Text>
             </Center>
             <InputGroup mb="4">
               <InputLeftElement pointerEvents="none">
-                  <Search2Icon />
+                <Search2Icon />
               </InputLeftElement>
               <Input
-                  placeholder="Search by name or job ID"
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  value={searchTerm}
-                  mb="4"
+                placeholder="Search by name or job ID"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                mb="4"
               />
               {searchTerm && (
                 <InputRightElement>
-                  <Box as="button" onClick={() => setSearchTerm('')}>
-                    <CloseIcon boxSize="3" /> 
+                  <Box as="button" onClick={() => setSearchTerm("")}>
+                    <CloseIcon boxSize="3" />
                   </Box>
                 </InputRightElement>
               )}
