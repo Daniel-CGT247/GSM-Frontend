@@ -3,13 +3,11 @@ import {
   CardBody,
   Flex,
   Heading,
-  Icon,
   Image,
   Link,
   Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { TbCircleFilled } from "react-icons/tb";
 import { useParams } from "react-router-dom";
 
 export default function JobGroupCard({ job_group, operationsChanged }) {
@@ -28,13 +26,13 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
     return "no-progress";
   }
 
-  function handleStatusChange() {
-    const newStatus = status === "in-progress" ? "finished" : "in-progress";
-    setStatus(newStatus);
+  // function handleStatusChange() {
+  //   const newStatus = status === "in-progress" ? "finished" : "in-progress";
+  //   setStatus(newStatus);
 
-    const uniqueKey = `status-${listId}-${job_group.id}`;
-    localStorage.setItem(uniqueKey, newStatus);
-  }
+  //   const uniqueKey = `status-${listId}-${job_group.id}`;
+  //   localStorage.setItem(uniqueKey, newStatus);
+  // }
 
   useEffect(() => {
     const uniqueKey = `status-${listId}-${job_group.id}`;
@@ -107,7 +105,30 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
       <CardBody>
         <Flex alignItems="center" gap={2}>
           <Heading size="md">{job_group.name}</Heading>
-          <Icon as={TbCircleFilled} color="orange" boxSize="3" />
+          {/* <Icon as={TbCircleFilled} color="orange" boxSize="3" /> */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              paddingRight: "10px",
+              paddingTop: "5px",
+            }}
+          >
+            <span
+              style={{
+                height: "10px",
+                width: "10px",
+                borderRadius: "50%",
+                backgroundColor:
+                  status === "in-progress"
+                    ? "orange"
+                    : status === "finished"
+                    ? "green"
+                    : "red",
+              }}
+            ></span>
+
+          </div>
         </Flex>
 
         {job_group.bundle_groups.map((bundle_group) => (
@@ -128,7 +149,7 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
                 </Link>
               )}
             </Text>
-            <Text>{bundle_group.operations_count}</Text>
+            {/* <Text>{bundle_group.operations_count}</Text> */}
           </Flex>
         ))}
       </CardBody>

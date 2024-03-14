@@ -7,7 +7,7 @@ import {
   Text,
   Th,
   Thead,
-  Tr
+  Tr,
 } from "@chakra-ui/react";
 
 export default function TableSkeleton({ header, columns }) {

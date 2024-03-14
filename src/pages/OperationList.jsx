@@ -51,16 +51,12 @@ export default function OperationList({
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOperations, setFilteredOperations] = useState([]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredOperations.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
   const totalPages = Math.ceil(filteredOperations.length / itemsPerPage);
+  const [error, setError] = useState(false);
+  const [inputVal, setInputVal] = useState("");
+  const headers = useHeaders();
 
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -71,10 +67,6 @@ export default function OperationList({
     setData: setOperationList,
     isLoading: isOperationListLoading,
   } = useGet(`${endpoint}/operation_list`, paramList, [updateOperationList]);
-
-  const headers = useHeaders();
-
-  const [error, setError] = useState(false);
 
   const handleDelete = async (operationListId) => {
     try {
@@ -93,8 +85,6 @@ export default function OperationList({
       }, 5000);
     }
   };
-
-  const [inputVal, setInputVal] = useState("");
 
   const handleUpdate = (operationListId) => {
     axios.patch(
@@ -162,7 +152,7 @@ export default function OperationList({
           <CardBody>
             <Flex justifyContent="space-between" alignItems="center" mb="4">
               <Text color="gray.700" fontWeight="bold" fontSize="xl">
-                Operation Library
+                Operation List
               </Text>
 
               <Flex justifyContent="space-between" alignItems="center" gap={2}>
@@ -181,45 +171,7 @@ export default function OperationList({
                 />
                 <IconButton
                   icon={<ChevronRightIcon />}
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(
-                        prev + 1,
-                        <Flex
-                          justifyContent="space-between"
-                          alignItems="center"
-                          gap={2}
-                        >
-                          <Text color="gray">
-                            Page{" "}
-                            <span style={{ fontWeight: "bold" }}>
-                              {currentPage}
-                            </span>{" "}
-                            of {totalPages}
-                          </Text>
-
-                          <IconButton
-                            icon={<ChevronLeftIcon />}
-                            onClick={() =>
-                              setCurrentPage((prev) => Math.max(prev - 1, 1))
-                            }
-                            isDisabled={currentPage === 1}
-                            size="sm"
-                          />
-                          <IconButton
-                            icon={<ChevronRightIcon />}
-                            onClick={() =>
-                              setCurrentPage((prev) =>
-                                Math.min(prev + 1, totalPages)
-                              )
-                            }
-                            isDisabled={currentPage >= totalPages}
-                            size="sm"
-                          />
-                        </Flex>
-                      )
-                    )
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1))}
                   isDisabled={currentPage >= totalPages}
                   size="sm"
                 />

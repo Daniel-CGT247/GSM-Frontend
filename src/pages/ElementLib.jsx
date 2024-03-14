@@ -1,18 +1,23 @@
 import {
-  ChevronUpIcon,
   ChevronDownIcon,
-  Search2Icon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
   CloseIcon,
+  Search2Icon,
 } from "@chakra-ui/icons";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
 import {
   Box,
   Button,
-  Center,
+  Card,
+  CardBody,
+  Collapse,
   Flex,
   IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
   Table,
   Tbody,
   Td,
@@ -20,16 +25,11 @@ import {
   Th,
   Thead,
   Tr,
-  Input,
-  Collapse,
-  InputLeftElement,
-  InputGroup,
-  Card,
-  CardBody,
-  InputRightElement,
 } from "@chakra-ui/react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import TableSkeleton from "../components/TableSkeleton";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
@@ -41,12 +41,12 @@ export default function ElementLib(props) {
   const [searchFilter, setSearchFilter] = useState("");
   const [visibleOptions, setVisibleOptions] = useState({});
   const [selectedElements, setSelectedElements] = useState([]);
-  const [isLibLoading, setIsLibLoading] = useState(true);
+  const [isLibLoading, setIsLibLoading] = useState(false);
   const headers = useHeaders();
 
   useEffect(() => {
+    setIsLibLoading(true);
     const fetchData = async () => {
-      setIsLibLoading(true);
       try {
         const response = await axios.get(`${endpoint}/element_lib/`, {
           params: { operation: operationId },
@@ -85,6 +85,7 @@ export default function ElementLib(props) {
     selectedOptions,
     userExpandingName
   ) => {
+    // Find the selected element from the list
     const selectedElement = elementLibList.find(
       (element) => element.id === elementId
     );
@@ -171,8 +172,7 @@ export default function ElementLib(props) {
   const handleSearchChange = (event) => {
     setSearchFilter(event.target.value);
   };
-  const columns = ["#", "Name", "Options", ""];
-  const [filteredLibs, setFilteredLibs] = useState([]);
+
   const pageCount = Math.ceil(filteredElements.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -180,12 +180,14 @@ export default function ElementLib(props) {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
 
   return (
     <>
       {isLibLoading ? (
-        <TableSkeleton header={"Element Library"} columns={columns} />
+        <TableSkeleton
+          columns={["#", "Name", "Option", ""]}
+          header="Element Library"
+        />
       ) : (
         <Card>
           <CardBody>
@@ -195,6 +197,7 @@ export default function ElementLib(props) {
                   <Text color="gray.700" fontWeight="bold" fontSize="xl">
                     Element Library
                   </Text>
+
                   <Flex
                     justifyContent="space-between"
                     alignItems="center"
@@ -205,25 +208,26 @@ export default function ElementLib(props) {
                       <span style={{ fontWeight: "bold" }}>{currentPage}</span>{" "}
                       of {pageCount}
                     </Text>
-
                     <IconButton
+                      size="sm"
                       icon={<ChevronLeftIcon />}
                       onClick={() =>
                         setCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
                       isDisabled={currentPage === 1}
-                      size="sm"
                     />
                     <IconButton
+                      size="sm"
                       icon={<ChevronRightIcon />}
                       onClick={() =>
                         setCurrentPage((prev) => Math.min(prev + 1, pageCount))
                       }
                       isDisabled={currentPage >= pageCount}
-                      size="sm"
                     />
                   </Flex>
                 </Flex>
+
+                {/* Search Bar */}
                 <InputGroup mb="4">
                   <InputLeftElement pointerEvents="none">
                     <Search2Icon />
@@ -241,6 +245,8 @@ export default function ElementLib(props) {
                     </InputRightElement>
                   )}
                 </InputGroup>
+
+                {/* Table */}
                 <Table width="100%" variant="striped" colorScheme="gray">
                   <Thead>
                     <Tr>

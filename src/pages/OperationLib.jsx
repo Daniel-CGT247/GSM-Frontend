@@ -22,7 +22,7 @@ import {
   Text,
   Th,
   Thead,
-  Tr
+  Tr,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -116,50 +116,13 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
                 />
                 <IconButton
                   icon={<ChevronRightIcon />}
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(
-                        prev + 1,
-                        <Flex
-                          justifyContent="space-between"
-                          alignItems="center"
-                          gap={2}
-                        >
-                          <Text color="gray">
-                            Page{" "}
-                            <span style={{ fontWeight: "bold" }}>
-                              {currentPage}
-                            </span>{" "}
-                            of {totalPages}
-                          </Text>
-
-                          <IconButton
-                            icon={<ChevronLeftIcon />}
-                            onClick={() =>
-                              setCurrentPage((prev) => Math.max(prev - 1, 1))
-                            }
-                            isDisabled={currentPage === 1}
-                            size="sm"
-                          />
-                          <IconButton
-                            icon={<ChevronRightIcon />}
-                            onClick={() =>
-                              setCurrentPage((prev) =>
-                                Math.min(prev + 1, totalPages)
-                              )
-                            }
-                            isDisabled={currentPage >= totalPages}
-                            size="sm"
-                          />
-                        </Flex>
-                      )
-                    )
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1))}
                   isDisabled={currentPage >= totalPages}
                   size="sm"
                 />
               </Flex>
             </Flex>
+
             <InputGroup mb="4">
               <InputLeftElement pointerEvents="none">
                 <Search2Icon />

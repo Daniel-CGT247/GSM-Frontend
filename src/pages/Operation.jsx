@@ -1,11 +1,11 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
   GridItem,
   Heading,
   SimpleGrid,
-  Box,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {

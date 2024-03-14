@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import useHeaders from "../customed_hook/useHeader";
-import endpoint from "../utils/endpoint";
-import { Search2Icon, CloseIcon } from "@chakra-ui/icons";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  Search2Icon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  Center,
+  Card,
+  CardBody,
+  Flex,
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
   Table,
   Tbody,
   Td,
@@ -16,48 +22,118 @@ import {
   Th,
   Thead,
   Tr,
-  Flex,
-  Input,
-  InputLeftElement,
-  InputGroup,
-  CardBody,
-  Card,
-  IconButton,
-  InputRightElement,
 } from "@chakra-ui/react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import TableSkeleton from "../components/TableSkeleton";
+import useHeaders from "../customed_hook/useHeader";
+import endpoint from "../utils/endpoint";
 
 export default function ElementList() {
-  const [elementLibList, setElementLibList] = useState([]);
   const [selectedElements, setSelectedElements] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [searchFilter, setSearchFilter] = useState("");
   const [expandingNamesList, setExpandingNamesList] = useState([]);
-  const { operationId, operationListId } = useParams();
-  const headers = useHeaders();
-  const [totalSam, setTotalSam] = useState("Loading...");
+  const [newExpandingName, setNewExpandingName] = useState("");
+  const { operationListId } = useParams();
   const [isListLoading, setIsListLoading] = useState(false);
+  const headers = useHeaders();
 
-  const calculateTotalSam = () => {
-    const totalTime = selectedElements.reduce((total, element) => {
-      const elementTime = parseFloat(element.time) || 0;
-      return total + elementTime;
-    }, 0);
+  const handleSearchChange = (event) => {
+    setSearchFilter(event.target.value);
+  };
 
-    return totalTime.toFixed(2);
+  const handleExpandingNameChange = async (uniqueId, newExpandingName) => {
+    setSelectedElements((prevElements) =>
+      prevElements.map((element) =>
+        element.uniqueId === uniqueId
+          ? { ...element, expandingName: newExpandingName }
+          : element
+      )
+    );
+
+    try {
+      await axios.patch(
+        `${endpoint}/element_list/${uniqueId}/`,
+        { expanding_name: newExpandingName },
+        { headers }
+      );
+    } catch (error) {
+      console.error("Error updating expanding name:", error);
+    }
+  };
+
+  const handleAddNewExpandingName = async (uniqueId) => {
+    if (newExpandingName.trim() !== "") {
+      setNewExpandingName("");
+      const selectedElement = selectedElements.find(
+        (element) => element.uniqueId === uniqueId
+      );
+      if (!selectedElement) {
+        console.error(`Element with uniqueId ${uniqueId} not found.`);
+        return;
+      }
+      try {
+        const response = await axios.patch(
+          `${endpoint}/element_list/${selectedElement.uniqueId}/`,
+          { expanding_name: newExpandingName },
+          { headers }
+        );
+        console.log("Expanding name added successfully:", response.data);
+
+        const updatedSelectedElements = selectedElements.map((element) =>
+          element.uniqueId === uniqueId
+            ? { ...element, expandingName: newExpandingName }
+            : element
+        );
+        setSelectedElements(updatedSelectedElements);
+
+        if (!expandingNamesList.includes(newExpandingName)) {
+          setExpandingNamesList([...expandingNamesList, newExpandingName]);
+        }
+
+        saveSelectedElementsToLocalStorage(updatedSelectedElements);
+      } catch (error) {
+        console.error("Error adding expanding name:", error);
+      }
+    }
+  };
+
+  const handleDeleteElement = async (elementId) => {
+    try {
+      const response = await axios.delete(
+        `${endpoint}/element_list/${elementId}/`,
+        {
+          headers: headers,
+        }
+      );
+      if (response.status >= 200 && response.status < 300) {
+        setSelectedElements((prevElements) =>
+          prevElements.filter((element) => element.uniqueId !== elementId)
+        );
+        saveSelectedElementsToLocalStorage(selectedElements);
+      } else {
+        throw new Error("Failed to delete the element from the backend.");
+      }
+    } catch (error) {
+      console.error("Error deleting element:", error);
+    }
+  };
+
+  const saveSelectedElementsToLocalStorage = (elements) => {
+    localStorage.setItem("selectedElements", JSON.stringify(elements));
   };
 
   useEffect(() => {
-    const finalTotalTime = calculateTotalSam();
-    setTotalSam(finalTotalTime);
-  }, [selectedElements]);
-
-  useEffect(() => {
     setIsListLoading(true);
-    axios
-      .get(`${endpoint}/element_list/`, {
-        params: { listItem_id: operationListId },
-        headers: headers,
-      })
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${endpoint}/element_list/`, {
+          params: { listItem_id: operationListId },
+          headers: headers,
+        });
         const combinedData = response.data.map((item) => ({
           uniqueId: item.id,
           id: item.elements.id,
@@ -71,11 +147,12 @@ export default function ElementList() {
         }));
         setSelectedElements(combinedData);
         setIsListLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching data:", error);
         setIsListLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, [operationListId, headers]);
 
   useEffect(() => {
@@ -103,161 +180,10 @@ export default function ElementList() {
     fetchExpandingNames();
   }, [operationListId, headers]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/element_lib/`, {
-          params: { operation: operationId },
-          headers: headers,
-        });
-        const filteredElements = response.data.filter((element) =>
-          element.operation.includes(parseInt(operationId))
-        );
-        setElementLibList(filteredElements);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, [operationId, headers]);
-
-  const handleDeleteElement = async (elementId) => {
-    try {
-      const response = await axios.delete(
-        `${endpoint}/element_list/${elementId}/`,
-        {
-          headers: headers,
-        }
-      );
-      if (response.status >= 200 && response.status < 300) {
-        setSelectedElements((prevElements) =>
-          prevElements.filter((element) => element.uniqueId !== elementId)
-        );
-        saveSelectedElementsToLocalStorage(selectedElements);
-      } else {
-        throw new Error("Failed to delete the element from the backend.");
-      }
-    } catch (error) {
-      console.error("Error deleting element:", error);
-    }
-  };
-
-  const [loading, setLoading] = useState(true);
-  const loadSelectedElements = async () => {
-    try {
-      const storedElements = localStorage.getItem("selectedElements");
-      if (storedElements) {
-        setSelectedElements(JSON.parse(storedElements));
-      } else {
-        const response = await axios.get(`${endpoint}/element_list/`, {
-          params: { listItem_id: operationListId },
-          headers: headers,
-        });
-        const combinedData = response.data.map((item) => ({
-          uniqueId: item.id,
-          id: item.elements.id,
-          name: item.elements.name,
-          expandingName: item.expanding_name || "N/A",
-          time: item.nmt ? parseFloat(item.nmt).toFixed(4) : "N/A",
-          selectedOptions: item.options.reduce((acc, curr) => {
-            acc[curr.name] = curr.name;
-            return acc;
-          }, {}),
-        }));
-        setSelectedElements(combinedData);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching or loading data:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadSelectedElements();
-  }, [operationListId, headers]);
-
-  const saveSelectedElementsToLocalStorage = (elements) => {
-    localStorage.setItem("selectedElements", JSON.stringify(elements));
-  };
-
-  const [newExpandingName, setNewExpandingName] = useState("");
-  const handleAddNewExpandingName = async (uniqueId) => {
-    if (newExpandingName.trim() !== "") {
-      setNewExpandingName(""); // Clear the input field
-      const selectedElement = selectedElements.find(
-        (element) => element.uniqueId === uniqueId
-      );
-      if (!selectedElement) {
-        console.error(`Element with uniqueId ${uniqueId} not found.`);
-        return;
-      }
-      try {
-        const response = await axios.patch(
-          `${endpoint}/element_list/${selectedElement.uniqueId}/`,
-          { expanding_name: newExpandingName },
-          { headers: headers }
-        );
-        console.log("Expanding name added successfully:", response.data);
-
-        const updatedSelectedElements = selectedElements.map((element) =>
-          element.uniqueId === uniqueId
-            ? { ...element, expandingName: newExpandingName }
-            : element
-        );
-        setSelectedElements(updatedSelectedElements);
-
-        if (!expandingNamesList.includes(newExpandingName)) {
-          setExpandingNamesList([...expandingNamesList, newExpandingName]);
-        }
-
-        saveSelectedElementsToLocalStorage(updatedSelectedElements);
-      } catch (error) {
-        console.error("Error adding expanding name:", error);
-      }
-    }
-  };
-
-  const handleExpandingNameChange = async (uniqueId, newExpandingName) => {
-    setSelectedElements((prevElements) =>
-      prevElements.map((element) =>
-        element.uniqueId === uniqueId
-          ? { ...element, expandingName: newExpandingName }
-          : element
-      )
-    );
-
-    try {
-      await axios.patch(
-        `${endpoint}/element_list/${uniqueId}/`,
-        { expanding_name: newExpandingName },
-        { headers }
-      );
-    } catch (error) {
-      console.error("Error updating expanding name:", error);
-    }
-  };
-
-  const [searchFilter, setSearchFilter] = useState("");
-  const handleSearchChange = (event) => {
-    setSearchFilter(event.target.value);
-  };
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
-
-  // Implement search filter
-  const filteredElements = searchFilter
-    ? selectedElements.filter((element) =>
-        element.name.toLowerCase().includes(searchFilter.toLowerCase())
-      )
-    : selectedElements;
-
-  // Calculate total pages
-  const pageCount = Math.ceil(filteredElements.length / itemsPerPage);
-
+  const pageCount = Math.ceil(selectedElements.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredElements.slice(
+  const currentItems = selectedElements.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
@@ -273,12 +199,11 @@ export default function ElementList() {
         <Card>
           <CardBody>
             <Flex direction="column" maxW="4xl" margin="auto">
-              {/* <Box height="650px" overflowY="auto" maxH="75vh" mb="4"> */}
+              <Box height="650px" overflowY="auto" maxH="75vh" mb="4">
                 <Flex justifyContent="space-between" alignItems="center" mb="4">
                   <Text color="gray.700" fontWeight="bold" fontSize="xl">
                     Element List
                   </Text>
-
                   <Flex
                     justifyContent="space-between"
                     alignItems="center"
@@ -289,22 +214,21 @@ export default function ElementList() {
                       <span style={{ fontWeight: "bold" }}>{currentPage}</span>{" "}
                       of {pageCount}
                     </Text>
-
                     <IconButton
+                      size="sm"
                       icon={<ChevronLeftIcon />}
                       onClick={() =>
                         setCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
                       isDisabled={currentPage === 1}
-                      size="sm"
                     />
                     <IconButton
+                      size="sm"
                       icon={<ChevronRightIcon />}
                       onClick={() =>
                         setCurrentPage((prev) => Math.min(prev + 1, pageCount))
                       }
                       isDisabled={currentPage >= pageCount}
-                      size="sm"
                     />
                   </Flex>
                 </Flex>
@@ -404,7 +328,7 @@ export default function ElementList() {
                     ))}
                   </Tbody>
                 </Table>
-              {/* </Box> */}
+              </Box>
             </Flex>
           </CardBody>
         </Card>

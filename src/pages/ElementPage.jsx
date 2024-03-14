@@ -1,17 +1,17 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
   GridItem,
+  HStack,
   Heading,
   SimpleGrid,
-  Box,
-  HStack,
   Stat,
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IoArrowBackCircleOutline,
   IoCheckmarkCircleOutline,

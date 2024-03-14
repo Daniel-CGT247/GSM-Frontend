@@ -28,10 +28,10 @@ export default function NewItem() {
   return (
     <Container size="7xl" p={5}>
       <Card style={{ width: "30rem" }}>
-        <Image src={newItemHeaderImage} />
+        <Image src={newItemHeaderImage} height="200px" width="100%" objectFit="cover"/>
         <CardBody>
-          <Heading fontSize="2xl">New Item Information</Heading>
-          <Text color="gray.500">Start building your own style</Text>
+          <Heading fontSize="2xl" >New Item Information</Heading>
+          <Text color="gray.500" >Start building your own style</Text>
         </CardBody>
         <CardBody>
           <NewItemForm username={username} />
