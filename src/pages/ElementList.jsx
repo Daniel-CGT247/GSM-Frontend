@@ -273,7 +273,7 @@ export default function ElementList() {
         <Card>
           <CardBody>
             <Flex direction="column" maxW="4xl" margin="auto">
-              <Box height="650px" overflowY="auto" maxH="75vh" mb="4">
+              {/* <Box height="650px" overflowY="auto" maxH="75vh" mb="4"> */}
                 <Flex justifyContent="space-between" alignItems="center" mb="4">
                   <Text color="gray.700" fontWeight="bold" fontSize="xl">
                     Element List
@@ -404,7 +404,7 @@ export default function ElementList() {
                     ))}
                   </Tbody>
                 </Table>
-              </Box>
+              {/* </Box> */}
             </Flex>
           </CardBody>
         </Card>

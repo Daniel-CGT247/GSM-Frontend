@@ -34,7 +34,7 @@ import {
   Th,
   Thead,
   Tr,
-  useEditableControls
+  useEditableControls,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -233,7 +233,6 @@ export default function OperationList({
                 placeholder="Search by name or job ID"
                 onChange={(e) => setSearchTerm(e.target.value)}
                 value={searchTerm}
-                mb="4"
               />
               {searchTerm && (
                 <InputRightElement>
