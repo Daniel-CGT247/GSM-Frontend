@@ -23,6 +23,7 @@ import {
   Th,
   Thead,
   Tr,
+  Select
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -42,7 +43,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
   const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
   const headers = useHeaders();
-
+  
   const paramLib = { bundle_group_id: bundleId };
   const paramList = {
     operations__bundle_group_id: bundleId,

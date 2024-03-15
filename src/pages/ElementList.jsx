@@ -30,7 +30,7 @@ import TableSkeleton from "../components/TableSkeleton";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
-export default function ElementList() {
+export default function ElementList({ onTotalTimeUpdate }) {
   const [selectedElements, setSelectedElements] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
@@ -40,6 +40,17 @@ export default function ElementList() {
   const { operationListId } = useParams();
   const [isListLoading, setIsListLoading] = useState(false);
   const headers = useHeaders();
+
+  
+  // - calculate total sam
+  useEffect(() => {
+    const total = selectedElements.reduce((acc, curr) => {
+      const timeValue = parseFloat(curr.time);
+      return acc + (isNaN(timeValue) ? 0 : timeValue);
+    }, 0);
+    onTotalTimeUpdate(total);  
+  }, [selectedElements, onTotalTimeUpdate]);  
+  
 
   const handleSearchChange = (event) => {
     setSearchFilter(event.target.value);
@@ -259,7 +270,7 @@ export default function ElementList() {
                       <Th style={{ width: "15%" }}>Expanding Field</Th>
                       <Th style={{ width: "10%" }}>Time</Th>
                       <Th style={{ width: "50%" }}>Selected Options</Th>
-                      <Th style={{ width: "8%" }}></Th>
+                      <Th style={{ width: "8%" }}>Action</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -287,13 +298,15 @@ export default function ElementList() {
                           </select>
                           {element.expandingName === "__ADD_NEW__" && (
                             <div className="mt-2">
-                              <input
-                                type="text"
+                              <textarea
                                 value={newExpandingName}
-                                onChange={(e) =>
-                                  setNewExpandingName(e.target.value)
-                                }
+                                onChange={(e) => setNewExpandingName(e.target.value)}
                                 placeholder="Enter new expanding field"
+                                style={{
+                                  width: '130px', 
+                                  minHeight: '35px',
+                                  resize: 'none', 
+                                }}
                               />
                               <Button
                                 size="sm"

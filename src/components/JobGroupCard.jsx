@@ -26,13 +26,13 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
     return "no-progress";
   }
 
-  // function handleStatusChange() {
-  //   const newStatus = status === "in-progress" ? "finished" : "in-progress";
-  //   setStatus(newStatus);
+  function handleStatusChange() {
+    const newStatus = status === "in-progress" ? "finished" : "in-progress";
+    setStatus(newStatus);
 
-  //   const uniqueKey = `status-${listId}-${job_group.id}`;
-  //   localStorage.setItem(uniqueKey, newStatus);
-  // }
+    const uniqueKey = `status-${listId}-${job_group.id}`;
+    localStorage.setItem(uniqueKey, newStatus);
+  }
 
   useEffect(() => {
     const uniqueKey = `status-${listId}-${job_group.id}`;
@@ -100,6 +100,8 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
           <button onClick={handleStatusChange}>✔️</button>
         )}
       </div> */}
+
+      
       <Image objectFit="cover" src="https://placehold.co/300x200" />
 
       <CardBody>
@@ -126,8 +128,14 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
                     ? "green"
                     : "red",
               }}
+              
             ></span>
-
+            {status === "in-progress" && (
+              <button onClick={handleStatusChange}>✔️</button>
+            )}
+            {status === "finished" && (
+              <button onClick={handleStatusChange}>✔️</button>
+            )}
           </div>
         </Flex>
 

@@ -11,7 +11,7 @@ import {
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   IoArrowBackCircleOutline,
   IoCheckmarkCircleOutline,
@@ -25,6 +25,7 @@ import ElementLib from "./ElementLib";
 import ElementList from "./ElementList";
 
 export default function ElementPage() {
+  const headers = useHeaders();
   const { listId, operationId } = useParams();
   const { data: styleNum, isLoading: isStyleLoading } = useGet(
     `${endpoint}/collection/${listId}`
@@ -39,33 +40,25 @@ export default function ElementPage() {
 
   const [selectedElements, setSelectedElements] = useState([]);
   const navigate = useNavigate();
-  const headers = useHeaders();
-
+  
   const updateSelectedElements = (newElement) => {
     setSelectedElements((prevElements) => [...prevElements, newElement]);
   };
+ 
+const [totalTime, setTotalTime] = useState(0);
 
-  const [totalSam, setTotalSam] = useState("Loading...");
-  const calculateTotalSam = () => {
-    const totalTime = selectedElements.reduce((total, element) => {
-      const elementTime = parseFloat(element.time) || 0;
-      return total + elementTime;
-    }, 0);
+// Function to update total time
+const handleTotalTimeUpdate = (time) => {
+  setTotalTime(time);
+};
 
-    return totalTime.toFixed(2);
-  };
 
-  useEffect(() => {
-    const finalTotalTime = calculateTotalSam();
-    setTotalSam(finalTotalTime);
-  }, [selectedElements]);
-
-  ////==============================================
-  //// - filter the elements based on the operations
-  ////==============================================
+  //==============================================
+  // - filter the elements based on the operations
+  //==============================================
 
   return (
-    <Container maxW="8xl" mt={4}>
+    <Container maxW="85%" mt={4}>
       <Flex
         gap={2}
         alignItems="center"
@@ -93,7 +86,7 @@ export default function ElementPage() {
         </Box>
 
         <HStack alignItems="baseline" justifyContent="space-between" w="150px">
-          <Stat
+        <Stat
             px="2"
             shadow="sm"
             border="1px solid #e2e8f0"
@@ -103,7 +96,8 @@ export default function ElementPage() {
           >
             <Stat textAlign="center">
               <StatLabel fontSize="lg">Total SAM</StatLabel>
-              <StatNumber>{totalSam}</StatNumber>
+              {/* <StatNumber isNumeric>{Number(timeData).toFixed(2)}</StatNumber> */}
+              <StatNumber>{totalTime.toFixed(2)}</StatNumber>
             </Stat>
           </Stat>
         </HStack>
@@ -141,6 +135,7 @@ export default function ElementPage() {
           <ElementList
             selectedElements={selectedElements}
             updateSelectedElements={updateSelectedElements}
+            onTotalTimeUpdate={handleTotalTimeUpdate} 
           />
         </GridItem>
       </SimpleGrid>

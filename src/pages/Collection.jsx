@@ -14,8 +14,8 @@ import {
   MenuOptionGroup,
   SimpleGrid,
   InputRightElement,
+  IconButton
 } from "@chakra-ui/react";
-
 import React, { useState, useEffect } from "react";
 import { GrPowerReset } from "react-icons/gr";
 import { IoSearch } from "react-icons/io5";
@@ -40,7 +40,6 @@ export default function Collection() {
     setSelectedSeason("");
     setSelectedProto("");
   };
-
 
   useEffect(() => {
     if (fetchedData) {
@@ -71,39 +70,35 @@ export default function Collection() {
     setData(newData); 
   };
   
-
   return (
     <Container maxW="8xl" py={8}>
-      <Box
-        p={2}
-        shadow="md"
-        bgColor="white"
-        position="sticky"
-        top={"50px"}
-        zIndex={9}
-      >
+         <Box w="full" bgColor="white" p="6" shadow="md" rounded="lg">
         <Flex alignItems="center" my={0} justifyContent="space-between" gap={4}>
           <Heading size="lg">Collection</Heading>
-          <InputGroup width="50%">
-            <InputLeftElement pointerEvents="none">
-              <IoSearch color="gray.300" />
-            </InputLeftElement>
-
-            <Input
-              className="text-center"
-              type="text"
-              placeholder="Search a Style"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <InputRightElement>
-                <Box as="button" onClick={() => setSearchTerm('')}>
-                  <CloseIcon boxSize="3" /> 
-                </Box>
-              </InputRightElement>
-            )}
-          </InputGroup>
+              <InputGroup maxWidth="50%">
+              <InputLeftElement pointerEvents="none">
+                <IoSearch color="gray.300" />
+              </InputLeftElement>
+              <Input
+                type="text"
+                placeholder="Search a Style"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                variant="filled"
+                focusBorderColor="blue.500"
+              />
+              {searchTerm && (
+                <InputRightElement>
+                  <IconButton
+                    icon={<CloseIcon />}
+                    size="sm"
+                    onClick={() => setSearchTerm('')}
+                    aria-label="Clear search"
+                    variant="ghost"
+                  />
+                </InputRightElement>
+              )}
+            </InputGroup>
           <Flex alignItems="center" gap="2">
             <Menu>
               {({ isOpen }) => (

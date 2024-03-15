@@ -20,8 +20,6 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import TableSkeleton from "../components/TableSkeleton";
-import useGet from "../customed_hook/useGet";
-import endpoint from "../utils/endpoint";
 
 const columns = [
   "Name",
@@ -51,7 +49,7 @@ export default function YourListTable({ operationList, listId, isLoading }) {
   }, [searchTerm, operationList]);
 
   return (
-    <>
+    <>  
       {isLoading ? (
         <TableSkeleton header="Your List" columns={columns} />
       ) : (

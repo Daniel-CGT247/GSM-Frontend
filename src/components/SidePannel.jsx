@@ -2,6 +2,7 @@ import { Flex, Icon, Link, Text, Tooltip } from "@chakra-ui/react";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { RiAdminLine } from "react-icons/ri";
 import { TbJacket } from "react-icons/tb";
+import { HiQuestionMarkCircle } from "react-icons/hi";
 
 export default function SidePannel({ isOpen }) {
   const navs = [
@@ -21,6 +22,12 @@ export default function SidePannel({ isOpen }) {
       name: "Admin",
       path: "http://localhost:8000/admin/",
       icon: RiAdminLine,
+      isExternal: true,
+    },
+    {
+      name: "Support",
+      path: "http://localhost:8000/support/",
+      icon: HiQuestionMarkCircle,
       isExternal: true,
     },
   ];

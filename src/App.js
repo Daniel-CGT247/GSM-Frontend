@@ -15,6 +15,7 @@ import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
 import YourList from "./pages/YourList";
 import SidePannel from "./components/SidePannel";
+import Support from "./components/Support";
 import { useState } from "react";
 
 export default function App({ pca }) {
@@ -71,6 +72,10 @@ export default function App({ pca }) {
                   path="/:listId/operation/:operationId/:operationListId/element"
                   element={<Element />}
                 /> */}
+                <Route
+                  path="/support"
+                  element={<Support />}
+                />
               </Routes>
             </Router>
           </GridItem>

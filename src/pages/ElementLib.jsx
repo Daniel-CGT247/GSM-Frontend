@@ -25,6 +25,7 @@ import {
   Th,
   Thead,
   Tr,
+  Select
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -37,12 +38,13 @@ export default function ElementLib(props) {
   const [elementLibList, setElementLibList] = useState([]);
   const { operationId, operationListId } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(5); 
   const [searchFilter, setSearchFilter] = useState("");
   const [visibleOptions, setVisibleOptions] = useState({});
   const [selectedElements, setSelectedElements] = useState([]);
   const [isLibLoading, setIsLibLoading] = useState(false);
   const headers = useHeaders();
+  
 
   useEffect(() => {
     setIsLibLoading(true);
@@ -180,6 +182,12 @@ export default function ElementLib(props) {
     indexOfFirstItem,
     indexOfLastItem
   );
+  
+  // - row per page 
+  // const handleItemsPerPageChange = (event) => {
+  //   setCurrentPage(1); 
+  //   setItemsPerPage(Number(event.target.value));
+  // };
 
   return (
     <>
@@ -224,6 +232,13 @@ export default function ElementLib(props) {
                       }
                       isDisabled={currentPage >= pageCount}
                     />
+                   
+                    {/* <Select value={itemsPerPage} onChange={handleItemsPerPageChange} size="sm">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="20">20</option>
+                    </Select> */}
                   </Flex>
                 </Flex>
 
@@ -253,7 +268,7 @@ export default function ElementLib(props) {
                       <Th style={{ width: "5%" }}>#</Th>
                       <Th style={{ width: "25%" }}>Name</Th>
                       <Th style={{ width: "30px" }}>Options</Th>
-                      <Th style={{ width: "10%" }}></Th>
+                      <Th style={{ width: "10%" }}>Action</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -283,6 +298,7 @@ export default function ElementLib(props) {
                               >
                                 VAR
                               </Button>
+          
                               <Collapse
                                 in={visibleOptions[element.id]}
                                 animateOpacity
@@ -322,11 +338,16 @@ export default function ElementLib(props) {
                                             `${element.id}_${variable.name}`
                                           ] || ""
                                         }
-                                        style={{ width: "auto", flex: "1" }}
+                                        style={{
+                                          maxWidth: "280px", 
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                          width: "auto", 
+                                          flex: "1",
+                                        }}
                                       >
-                                        <option value="">
-                                          Select an option
-                                        </option>
+                                        <option value="">Select an option</option>
                                         {variable.options.map(
                                           (option, optionIndex) => (
                                             <option

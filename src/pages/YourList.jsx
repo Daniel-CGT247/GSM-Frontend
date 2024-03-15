@@ -15,7 +15,6 @@ import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
-import { list } from "postcss";
 
 export default function YourList() {
   const { listId, jobId, bundleId } = useParams();
@@ -47,6 +46,8 @@ export default function YourList() {
     params
   );
 
+  const totalSAM = operationList.reduce((acc, curr) => acc + Number(curr.total_sam), 0);
+  
   return (
     <Container maxW="8xl" mt={4}>
       <Flex
@@ -71,35 +72,21 @@ export default function YourList() {
           )}
         </Box>
         {!isListLoading && (
-          <HStack
-            alignItems="baseline"
-            justifyContent="space-between"
-            w="400px"
-          >
-            <Stat
-              px="2"
-              shadow="sm"
-              border="1px solid #e2e8f0"
-              borderRadius="md"
-              _hover={{ borderColor: "blue", shadow: "lg" }}
-              transition={"all 0.3s ease"}
-            >
-              <StatLabel fontSize="lg">Total SAM</StatLabel>
-              <StatNumber>34.24</StatNumber>
-            </Stat>
-
-            <Stat
-              px="2"
-              shadow="sm"
-              border="1px solid #e2e8f0"
-              borderRadius="md"
-              _hover={{ borderColor: "blue", shadow: "lg" }}
-              transition={"all 0.3s ease"}
-            >
-              <StatLabel fontSize="lg">Count</StatLabel>
-              <StatNumber>3</StatNumber>
-            </Stat>
-          </HStack>
+           <HStack alignItems="baseline" justifyContent="space-between" w="150px">
+           <Stat
+             px="2"
+             shadow="sm"
+             border="1px solid #e2e8f0"
+             borderRadius="md"
+             _hover={{ borderColor: "blue", shadow: "lg" }}
+             transition={"all 0.3s ease"}
+           >
+             <Stat textAlign="center">
+               <StatLabel fontSize="lg">Total SAM</StatLabel>
+               <StatNumber>{totalSAM.toFixed(3)}</StatNumber>
+             </Stat>
+           </Stat>
+         </HStack>
         )}
 
         <Button
