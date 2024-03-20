@@ -7,10 +7,6 @@ import {
   Search2Icon,
 } from "@chakra-ui/icons";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   ButtonGroup,
@@ -189,7 +185,11 @@ export default function OperationList({
             .includes(searchTerm.toLowerCase()))
     );
     setFilteredOperations(filtered);
-  }, [searchTerm, operationList]);
+
+    const newTotalPages = Math.ceil(filtered.length / itemsPerPage);
+  
+    setCurrentPage(newTotalPages)
+  }, [searchTerm, operationList, itemsPerPage]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

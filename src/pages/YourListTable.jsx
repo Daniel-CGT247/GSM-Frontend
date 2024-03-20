@@ -98,7 +98,7 @@ export default function YourListTable({ operationList, listId, isLoading }) {
                       <Td>{item.operations.name}</Td>
                       <Td>{item.expanding_name}</Td>
                       <Td>{item.operations.job_code}</Td>
-                      <Td isNumeric>{Number(item.total_sam).toFixed(2)}</Td>
+                      <Td isNumeric>{Number(item.total_sam).toFixed(4)}</Td>
                       <Td isNumeric>{item.element_count}</Td>
                       <Td>
                         <Button

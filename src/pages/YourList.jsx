@@ -83,7 +83,7 @@ export default function YourList() {
            >
              <Stat textAlign="center">
                <StatLabel fontSize="lg">Total SAM</StatLabel>
-               <StatNumber>{totalSAM.toFixed(3)}</StatNumber>
+               <StatNumber>{totalSAM.toFixed(2)}</StatNumber>
              </Stat>
            </Stat>
          </HStack>

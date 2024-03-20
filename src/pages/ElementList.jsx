@@ -58,6 +58,7 @@ export default function ElementList({ onTotalTimeUpdate }) {
 
   const handleExpandingNameChange = async (uniqueId, newExpandingName) => {
     setSelectedElements((prevElements) =>
+    
       prevElements.map((element) =>
         element.uniqueId === uniqueId
           ? { ...element, expandingName: newExpandingName }
@@ -191,13 +192,23 @@ export default function ElementList({ onTotalTimeUpdate }) {
     fetchExpandingNames();
   }, [operationListId, headers]);
 
-  const pageCount = Math.ceil(selectedElements.length / itemsPerPage);
+  // const pageCount = Math.ceil(selectedElements.length / itemsPerPage);
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentItems = selectedElements.slice(
+  //   indexOfFirstItem,
+  //   indexOfLastItem
+  // );
+
+  const filteredElements = selectedElements.filter(element =>
+    element.name.toLowerCase().includes(searchFilter.toLowerCase())
+  );
+
+  const pageCount = Math.ceil(filteredElements.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = selectedElements.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredElements.slice(indexOfFirstItem, indexOfLastItem);
+  
 
   return (
     <>

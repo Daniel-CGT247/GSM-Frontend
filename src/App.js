@@ -9,13 +9,12 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navigation from "./components/NavBar";
 import Collection from "./pages/Collection";
 import ElementPage from "./pages/ElementPage";
-//import Element from "./pages/Element";
 import JobGroup from "./pages/JobGroup";
 import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
 import YourList from "./pages/YourList";
 import SidePannel from "./components/SidePannel";
-import Support from "./components/Support";
+import Support from "./pages/Support";
 import { useState } from "react";
 
 export default function App({ pca }) {
@@ -68,10 +67,6 @@ export default function App({ pca }) {
                   path="/:listId/operation/:operationId/:operationListId/element"
                   element={<ElementPage />}
                 />
-                 {/* <Route
-                  path="/:listId/operation/:operationId/:operationListId/element"
-                  element={<Element />}
-                /> */}
                 <Route
                   path="/support"
                   element={<Support />}

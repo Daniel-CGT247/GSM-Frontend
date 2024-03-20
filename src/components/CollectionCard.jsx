@@ -164,7 +164,7 @@ export default function CollectionCard({ list, maxWidth, updateItemInData }) {
               <Heading size="md">{list.item.name}</Heading>
               <Icon
                 as={TbCircleFilled}
-                color={list.complete ? "green" : "orange"}
+                color={list.complete ? "green" : "red"}
                 boxSize={3}
               />
             </HStack> 

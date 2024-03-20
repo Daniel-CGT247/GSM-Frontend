@@ -24,12 +24,12 @@ export default function SidePannel({ isOpen }) {
       icon: RiAdminLine,
       isExternal: true,
     },
-    {
-      name: "Support",
-      path: "http://localhost:8000/support/",
-      icon: HiQuestionMarkCircle,
-      isExternal: true,
-    },
+    // {
+    //   name: "Support",
+    //   path: "http://localhost:3000/support",
+    //   icon: HiQuestionMarkCircle,
+    //   isExternal: true,
+    // },
   ];
 
   return (

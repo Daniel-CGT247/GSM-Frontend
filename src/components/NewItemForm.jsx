@@ -7,14 +7,13 @@ import {
   VStack,
   Image,
   Text,
-  useToast,
   FormErrorMessage,
   Container,
   InputGroup,
   InputLeftElement,
   Icon,
 } from "@chakra-ui/react";
-import { MdDescription, MdDateRange, MdStyle } from "react-icons/md";
+import { MdDescription, MdDateRange } from "react-icons/md";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -47,10 +46,51 @@ export default function NewItemForm({ username }) {
   }, [user]);
 
   console.log(formData);
+
+
+  const validateInput = (name, value) => {
+    const itemNamePattern = /^\d{4}[A-Z]{1,7}$/;
+    const seasonPattern = /^(SP|FW)\d{4}$/;
+    let newErrors = {...errors}; 
+  
+    // validate name
+    if (name === "name") {
+      if (!value.trim()) {
+        newErrors.name = 'Style name is required.';
+      } else if (!itemNamePattern.test(value.trim())) {
+        newErrors.name = 'Item name must start with 4 digits followed by 1-7 upper case letters.';
+      } else {
+        delete newErrors.name; 
+      }
+    }
+    // validate season
+    else if (name === "season") {
+      if (!value.trim()) {
+        newErrors.season = 'Season is required.';
+      } else if (!seasonPattern.test(value.trim())) {
+        newErrors.season = 'Season must start with SP/FW followed by year (YYYY).';
+      } else {
+        delete newErrors.season; 
+      }
+    }
+    // validate proto
+    else if (name === "proto") {
+      if (!value.trim()) {
+        newErrors.proto = 'Prototype is required.';
+      } else if (isNaN(value) || parseInt(value, 10) <= 0) {
+        newErrors.proto = 'Prototype must be a positive number.';
+      } else {
+        delete newErrors.proto; 
+      }
+    }
+  
+    setErrors(newErrors);
+  };
+  
+  
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const toast = useToast();
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -76,11 +116,42 @@ export default function NewItemForm({ username }) {
           [name]: value,
         },
       }));
+      validateInput(name, value);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const itemNamePattern = /^\d{4}[A-Z]{1,7}$/;
+    const seasonPattern = /^(SP|FW)\d{4}$/;
+  
+    let newErrors = {}; 
+    //===================================
+    // - validate the format
+    //===================================
+    // refStyle 
+    if (!formData.item.name.trim()) {
+      newErrors.name = 'Style name is required.';
+    } else if (!itemNamePattern.test(formData.item.name.trim())) {
+      newErrors.name = 'Item name must start with 4 digits followed by 1-7 upper case letters.';
+    }
+  
+    // season
+    if (!formData.item.season.trim()) {
+      newErrors.season = 'Season is required.';
+    } else if (!seasonPattern.test(formData.item.season.trim())) {
+      newErrors.season = 'Season must start with SP/FW followed by year (YYYY).';
+    }
+   
+    // proto
+    if (formData.item.proto === null || formData.item.proto === undefined || formData.item.proto === '') {
+      newErrors.proto = 'Prototype is required.';
+    }
+    setErrors(newErrors);
+
+    // if no errors
+    if (Object.keys(newErrors).length > 0) return;
 
     const formDataToSend = new FormData();
 
@@ -152,21 +223,16 @@ export default function NewItemForm({ username }) {
           <FormErrorMessage>{errors.item?.image}</FormErrorMessage>
         </FormControl>
 
-        <FormControl isInvalid={!!errors.item?.name}>
+        <FormControl isInvalid={!!errors.name}>
           <FormLabel>Style Name</FormLabel>
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <Icon as={MdStyle} color="gray.500" />
-            </InputLeftElement>
-            <Input
-              name="name"
-              placeholder="Enter Your Style..."
-              autocomplete="off"
-              onChange={handleChange}
-              value={formData.item.name}
-            />
-          </InputGroup>
-          <FormErrorMessage>{errors.item?.name}</FormErrorMessage>
+          <Input
+            name="name"
+            placeholder="Enter Your Style..."
+            autocomplete="off"
+            onChange={handleChange}
+            value={formData.item.name}
+          />
+          {errors.name && <FormErrorMessage>{errors.name}</FormErrorMessage>}
         </FormControl>
 
         <FormControl>
@@ -185,7 +251,7 @@ export default function NewItemForm({ username }) {
           </InputGroup>
         </FormControl>
 
-        <FormControl isInvalid={!!errors.item?.season}>
+        <FormControl isInvalid={!!errors.season}>
           <FormLabel>Season</FormLabel>
           <InputGroup>
             <InputLeftElement pointerEvents="none">
@@ -200,9 +266,10 @@ export default function NewItemForm({ username }) {
             />
           </InputGroup>
           <FormErrorMessage>{errors.item?.season}</FormErrorMessage>
+          {errors.season && <FormErrorMessage>{errors.season}</FormErrorMessage>}
         </FormControl>
 
-        <FormControl isInvalid={!!errors.item?.proto}>
+        <FormControl isInvalid={!!errors.proto}>
           <FormLabel>Prototype</FormLabel>
           <Input
             name="proto"
@@ -212,7 +279,7 @@ export default function NewItemForm({ username }) {
             onChange={handleChange}
             value={formData.item.proto}
           />
-          <FormErrorMessage>{errors.item?.proto}</FormErrorMessage>
+          {errors.proto && <FormErrorMessage>{errors.proto}</FormErrorMessage>}
         </FormControl>
         <Button
           colorScheme="twitter"

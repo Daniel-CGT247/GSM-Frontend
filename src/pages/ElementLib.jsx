@@ -25,7 +25,6 @@ import {
   Th,
   Thead,
   Tr,
-  Select
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -142,7 +141,9 @@ export default function ElementLib(props) {
         props.updateSelectedElements(addedElement);
 
         return updatedElements;
+  
       });
+ 
     } catch (error) {
       console.error("Error in adding element", error);
     }
