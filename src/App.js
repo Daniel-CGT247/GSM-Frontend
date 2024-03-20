@@ -3,19 +3,18 @@ import {
   MsalProvider,
   UnauthenticatedTemplate,
 } from "@azure/msal-react";
-import { Container, Heading, Grid, GridItem } from "@chakra-ui/react";
-import React from "react";
+import { Container, Grid, GridItem, Heading } from "@chakra-ui/react";
+import React, { useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navigation from "./components/NavBar";
+import SidePannel from "./components/SidePannel";
 import Collection from "./pages/Collection";
 import ElementPage from "./pages/ElementPage";
-//import Element from "./pages/Element";
 import JobGroup from "./pages/JobGroup";
 import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
+import Support from "./pages/Support";
 import YourList from "./pages/YourList";
-import SidePannel from "./components/SidePannel";
-import { useState } from "react";
 
 export default function App({ pca }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -67,10 +66,7 @@ export default function App({ pca }) {
                   path="/:listId/operation/:operationId/:operationListId/element"
                   element={<ElementPage />}
                 />
-                 {/* <Route
-                  path="/:listId/operation/:operationId/:operationListId/element"
-                  element={<Element />}
-                /> */}
+                <Route path="/support" element={<Support />} />
               </Routes>
             </Router>
           </GridItem>

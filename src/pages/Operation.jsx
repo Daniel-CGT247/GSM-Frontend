@@ -50,7 +50,7 @@ export default function Operation() {
         shadow="md"
         borderRadius="md"
       >
-        <Box>
+        <Box position="sticky" top="50px" zIndex={10}>
           <Heading size="lg">
             Build Operation {!isJobLoading && <>- {bundleName}</>}
           </Heading>

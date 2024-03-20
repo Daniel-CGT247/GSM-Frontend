@@ -1,18 +1,37 @@
 import {
   Card,
   CardBody,
+  Checkbox,
   Flex,
   Heading,
+  Icon,
   Image,
   Link,
   Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { TbCircleFilled } from "react-icons/tb";
 import { useParams } from "react-router-dom";
+import useGet from "../customed_hook/useGet";
+import endpoint from "../utils/endpoint";
 
 export default function JobGroupCard({ job_group, operationsChanged }) {
   const { listId } = useParams();
+  const { data: operationList } = useGet(`${endpoint}/operation_list`);
   const [status, setStatus] = useState(getInitialStatus());
+  const totalSamCal = (bundle_group) => {
+    return operationList
+      ? operationList
+          .filter((item) => item.list === parseInt(listId))
+          .filter(
+            (item) =>
+              item.operations &&
+              item.operations.bundle_group &&
+              item.operations.bundle_group === bundle_group
+          )
+          .reduce((acc, curr) => acc + curr.total_sam, 0)
+      : 0;
+  };
 
   function getInitialStatus() {
     const uniqueKey = `status-${listId}-${job_group.id}`;
@@ -26,13 +45,13 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
     return "no-progress";
   }
 
-  // function handleStatusChange() {
-  //   const newStatus = status === "in-progress" ? "finished" : "in-progress";
-  //   setStatus(newStatus);
+  function handleStatusChange() {
+    const newStatus = status === "in-progress" ? "finished" : "in-progress";
+    setStatus(newStatus);
 
-  //   const uniqueKey = `status-${listId}-${job_group.id}`;
-  //   localStorage.setItem(uniqueKey, newStatus);
-  // }
+    const uniqueKey = `status-${listId}-${job_group.id}`;
+    localStorage.setItem(uniqueKey, newStatus);
+  }
 
   useEffect(() => {
     const uniqueKey = `status-${listId}-${job_group.id}`;
@@ -72,63 +91,42 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
       key={job_group.id}
       boxShadow="0 4px 8px 0 rgba(0,0,0,0.2)"
     >
-      {/* <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          paddingRight: "10px",
-          paddingTop: "5px",
-        }}
-      >
-        <span
-          style={{
-            height: "10px",
-            width: "10px",
-            borderRadius: "50%",
-            backgroundColor:
-              status === "in-progress"
-                ? "orange"
-                : status === "finished"
-                ? "green"
-                : "red",
-          }}
-        ></span>
-        {status === "in-progress" && (
-          <button onClick={handleStatusChange}>✔️</button>
-        )}
-        {status === "finished" && (
-          <button onClick={handleStatusChange}>✔️</button>
-        )}
-      </div> */}
-      <Image objectFit="cover" src="https://placehold.co/300x200" />
+      <Image
+        objectFit="cover"
+        src={job_group.image ? job_group.image : "https://placehold.co/300x200"}
+        width="300px"
+        height="200px"
+      />
 
       <CardBody>
-        <Flex alignItems="center" gap={2}>
-          <Heading size="md">{job_group.name}</Heading>
-          {/* <Icon as={TbCircleFilled} color="orange" boxSize="3" /> */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              paddingRight: "10px",
-              paddingTop: "5px",
-            }}
-          >
-            <span
-              style={{
-                height: "10px",
-                width: "10px",
-                borderRadius: "50%",
-                backgroundColor:
-                  status === "in-progress"
-                    ? "orange"
-                    : status === "finished"
-                    ? "green"
-                    : "red",
-              }}
-            ></span>
-
-          </div>
+        <Flex alignItems="center" justifyContent="space-between">
+          <Flex alignItems="center" gap={2}>
+            <Heading size="md">{job_group.name}</Heading>
+            <Icon
+              as={TbCircleFilled}
+              color={
+                status === "in-progress"
+                  ? "orange"
+                  : status === "finished"
+                  ? "green"
+                  : "red"
+              }
+              boxSize="3"
+            />
+          </Flex>
+          {status === "in-progress" && (
+            <Checkbox
+              borderColor={"orange"}
+              onChange={handleStatusChange}
+            ></Checkbox>
+          )}
+          {status === "finished" && (
+            <Checkbox
+              isChecked
+              colorScheme="green"
+              onChange={handleStatusChange}
+            ></Checkbox>
+          )}
         </Flex>
 
         {job_group.bundle_groups.map((bundle_group) => (
@@ -140,7 +138,7 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
           >
             <Text>
               {status === "finished" ? (
-                <Text style={{ color: "green" }}>{bundle_group.name}</Text>
+                <Text color="green">{bundle_group.name}</Text>
               ) : (
                 <Link
                   href={`/${listId}/job_group/${job_group.id}/${bundle_group.id}/operation`}
@@ -149,7 +147,9 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
                 </Link>
               )}
             </Text>
-            {/* <Text>{bundle_group.operations_count}</Text> */}
+            <Text color={status === "finished" && "green"}>
+              {totalSamCal(bundle_group.name).toFixed(3)}
+            </Text>
           </Flex>
         ))}
       </CardBody>

@@ -7,10 +7,6 @@ import {
   Search2Icon,
 } from "@chakra-ui/icons";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   ButtonGroup,
@@ -35,6 +31,7 @@ import {
   Thead,
   Tr,
   useEditableControls,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -57,6 +54,7 @@ export default function OperationList({
   const [error, setError] = useState(false);
   const [inputVal, setInputVal] = useState("");
   const headers = useHeaders();
+  const toast = useToast();
 
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -77,21 +75,50 @@ export default function OperationList({
         operationList.filter((item) => item.id !== operationListId)
       );
       setError(false);
+      toast({
+        title: "Operation Deleted",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error deleting operation:", error);
       setError(true);
       setTimeout(() => {
         setError(false);
       }, 5000);
+      toast({
+        title: "Error Deleting Operation",
+        description: "Please remove the elements list first",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
-  const handleUpdate = (operationListId) => {
-    axios.patch(
-      `${endpoint}/operation_list/${operationListId}/`,
-      { expanding_name: inputVal },
-      { headers: headers }
-    );
+  const handleUpdate = async (operationListId) => {
+    try {
+      await axios.patch(
+        `${endpoint}/operation_list/${operationListId}/`,
+        { expanding_name: inputVal },
+        { headers: headers }
+      );
+      toast({
+        title: "Operation Updated",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error updating operation:", error);
+      toast({
+        title: "Error Updating Operation",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   function EditableControls({ handleUpdate }) {
@@ -100,9 +127,10 @@ export default function OperationList({
 
     return (
       isEditing && (
-        <ButtonGroup ml="2" size="sm">
+        <ButtonGroup justifyContent="center" size="sm">
           <IconButton
             colorScheme="green"
+            aria-label="Save"
             icon={<CheckIcon w="3" />}
             {...getSubmitButtonProps({
               onClick: handleUpdate,
@@ -110,6 +138,7 @@ export default function OperationList({
           />
           <IconButton
             colorScheme="red"
+            aria-label="Cancel"
             icon={<CloseIcon w="3" />}
             {...getCancelButtonProps()}
           />
@@ -131,7 +160,18 @@ export default function OperationList({
             .includes(searchTerm.toLowerCase()))
     );
     setFilteredOperations(filtered);
-  }, [searchTerm, operationList]);
+
+    const newTotalPages = Math.ceil(filtered.length / itemsPerPage);
+
+    setCurrentPage(newTotalPages);
+  }, [searchTerm, operationList, itemsPerPage]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredOperations.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   return (
     <>
@@ -139,16 +179,6 @@ export default function OperationList({
         <TableSkeleton header="Operation List" columns={columns} />
       ) : (
         <Card>
-          {error && (
-            <Alert status="error">
-              <AlertIcon />
-              <AlertTitle>Cannot Delete Operation</AlertTitle>
-              <AlertDescription>
-                Please remove the elements list first
-              </AlertDescription>
-            </Alert>
-          )}
-
           <CardBody>
             <Flex justifyContent="space-between" alignItems="center" mb="4">
               <Text color="gray.700" fontWeight="bold" fontSize="xl">
@@ -207,26 +237,41 @@ export default function OperationList({
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {filteredOperations.map((item, index) => (
+                  {currentItems.map((item, index) => (
                     <Tr key={item.id}>
-                      <Td>{index + 1}</Td>
+                      <Td>{index + 1 + (currentPage - 1) * itemsPerPage}</Td>
                       <Td>{item.operations.name}</Td>
                       <Td>
-                        <HStack>
+                        <HStack spacing={2}>
                           <Editable
-                            defaultValue={
-                              item.expanding_name ? item.expanding_name : "N/A"
-                            }
-                            onChange={(value) => setInputVal(value)}
-                            onSubmit={() => handleUpdate(item.id)}
+                            defaultValue={item.expanding_name || "N/A"}
+                            onSubmit={(newValue) => {
+                              const valueToSend =
+                                newValue.trim() === "" ? "N/A" : newValue;
+                              handleUpdate(item.id, valueToSend);
+                              setInputVal(valueToSend);
+                            }}
+                            isPreviewFocusable={true}
                           >
-                            <EditablePreview />
-                            <Input as={EditableInput} />
-                            <EditableControls
-                              handleUpdate={() => handleUpdate(item.id)}
+                            <EditablePreview
+                              _empty={{
+                                padding: "8px",
+                                display: "inline-block",
+                                minWidth: "100px",
+                              }}
                             />
+                            <EditableInput
+                              onChange={(e) => setInputVal(e.target.value)}
+                              w="auto"
+                              maxWidth="250px"
+                            />
+                            <EditableControls
+                              handleUpdate={() =>
+                                handleUpdate(item.id, inputVal)
+                              }
+                            />
+                            <EditIcon ml="2" />
                           </Editable>
-                          <EditIcon />
                         </HStack>
                       </Td>
                       <Td>{item.operations.job_code}</Td>

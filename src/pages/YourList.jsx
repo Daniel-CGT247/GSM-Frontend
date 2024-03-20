@@ -3,11 +3,11 @@ import {
   Button,
   Container,
   Flex,
+  HStack,
   Heading,
   Stat,
   StatLabel,
   StatNumber,
-  HStack,
 } from "@chakra-ui/react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
@@ -15,7 +15,6 @@ import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 import YourListTable from "./YourListTable";
-import { list } from "postcss";
 
 export default function YourList() {
   const { listId, jobId, bundleId } = useParams();
@@ -47,6 +46,11 @@ export default function YourList() {
     params
   );
 
+  const totalSAM = operationList.reduce(
+    (acc, curr) => acc + Number(curr.total_sam),
+    0
+  );
+
   return (
     <Container maxW="8xl" mt={4}>
       <Flex
@@ -57,8 +61,12 @@ export default function YourList() {
         shadow="md"
         borderRadius="md"
         mb={5}
+        position="sticky"
+        top="50px"
+        zIndex={10}
+        bgColor="white"
       >
-        <Box bgColor="white" position="sticky" top={"50px"} zIndex={9}>
+        <Box>
           <Heading size="lg">
             Your List {!isJobLoading && <>- {bundleName}</>}
           </Heading>
@@ -74,7 +82,7 @@ export default function YourList() {
           <HStack
             alignItems="baseline"
             justifyContent="space-between"
-            w="400px"
+            w="150px"
           >
             <Stat
               px="2"
@@ -84,20 +92,10 @@ export default function YourList() {
               _hover={{ borderColor: "blue", shadow: "lg" }}
               transition={"all 0.3s ease"}
             >
-              <StatLabel fontSize="lg">Total SAM</StatLabel>
-              <StatNumber>34.24</StatNumber>
-            </Stat>
-
-            <Stat
-              px="2"
-              shadow="sm"
-              border="1px solid #e2e8f0"
-              borderRadius="md"
-              _hover={{ borderColor: "blue", shadow: "lg" }}
-              transition={"all 0.3s ease"}
-            >
-              <StatLabel fontSize="lg">Count</StatLabel>
-              <StatNumber>3</StatNumber>
+              <Stat textAlign="center">
+                <StatLabel fontSize="lg">Total SAM</StatLabel>
+                <StatNumber>{totalSAM.toFixed(2)}</StatNumber>
+              </Stat>
             </Stat>
           </HStack>
         )}

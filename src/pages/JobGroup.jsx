@@ -1,11 +1,10 @@
-import React from "react";
 import {
+  Box,
   Button,
   Container,
   Flex,
-  Heading,
-  Box,
   HStack,
+  Heading,
   Stat,
   StatLabel,
   StatNumber,
@@ -25,6 +24,14 @@ export default function JobGroup() {
   );
   const itemName = styleNum && styleNum.item && styleNum.item.name;
 
+  // - calculate total sam
+  const { data: operationList } = useGet(`${endpoint}/operation_list`);
+  const totalSam = operationList
+    ? operationList
+        .filter((item) => item.list === parseInt(listId))
+        .reduce((acc, curr) => acc + curr.total_sam, 0)
+    : 0;
+
   return (
     <Container maxW="8xl" mt={4}>
       <Flex
@@ -37,7 +44,6 @@ export default function JobGroup() {
       >
         <Box>
           <Heading size="lg">Job Group</Heading>
-
           {isStyleLoading ? (
             <StyleSkeleton />
           ) : (
@@ -57,7 +63,11 @@ export default function JobGroup() {
           >
             <Stat textAlign="center">
               <StatLabel fontSize="lg">Total SAM</StatLabel>
-              <StatNumber>34.24</StatNumber>
+              {isStyleLoading ? (
+                <StyleSkeleton />
+              ) : (
+                <StatNumber>{totalSam.toFixed(3)}</StatNumber>
+              )}
             </Stat>
           </Stat>
         </HStack>
