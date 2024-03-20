@@ -42,7 +42,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
   const currentItems = filteredLibs.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredLibs.length / itemsPerPage);
   const headers = useHeaders();
-
+  
   const paramLib = { bundle_group_id: bundleId };
   const paramList = {
     operations__bundle_group_id: bundleId,
@@ -86,6 +86,7 @@ export default function OperationLib({ bundleId, listId, setUpdateFunc }) {
       );
     });
     setFilteredLibs(filtered);
+
   }, [operations, searchTerm]);
 
   return (

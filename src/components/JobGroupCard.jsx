@@ -48,7 +48,13 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
   function handleStatusChange() {
     const newStatus = status === "in-progress" ? "finished" : "in-progress";
     setStatus(newStatus);
+  function handleStatusChange() {
+    const newStatus = status === "in-progress" ? "finished" : "in-progress";
+    setStatus(newStatus);
 
+    const uniqueKey = `status-${listId}-${job_group.id}`;
+    localStorage.setItem(uniqueKey, newStatus);
+  }
     const uniqueKey = `status-${listId}-${job_group.id}`;
     localStorage.setItem(uniqueKey, newStatus);
   }

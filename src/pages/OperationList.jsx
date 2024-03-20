@@ -66,6 +66,23 @@ export default function OperationList({
     isLoading: isOperationListLoading,
   } = useGet(`${endpoint}/operation_list`, paramList, [updateOperationList]);
 
+  // const handleDelete = async (operationListId) => {
+  //   try {
+  //     await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
+  //       headers: headers,
+  //     });
+  //     setOperationList((operationList) =>
+  //       operationList.filter((item) => item.id !== operationListId)
+  //     );
+  //     setError(false);
+  //   } catch (error) {
+  //     console.error("Error deleting operation:", error);
+  //     setError(true);
+  //     setTimeout(() => {
+  //       setError(false);
+  //     }, 5000);
+  //   }
+  // };
   const handleDelete = async (operationListId) => {
     try {
       await axios.delete(`${endpoint}/operation_list/${operationListId}`, {
@@ -120,6 +137,14 @@ export default function OperationList({
       });
     }
   };
+
+  // const handleUpdate = (operationListId) => {
+  //   axios.patch(
+  //     `${endpoint}/operation_list/${operationListId}/`,
+  //     { expanding_name: inputVal },
+  //     { headers: headers }
+  //   );
+  // };
 
   function EditableControls({ handleUpdate }) {
     const { isEditing, getSubmitButtonProps, getCancelButtonProps } =
@@ -179,6 +204,16 @@ export default function OperationList({
         <TableSkeleton header="Operation List" columns={columns} />
       ) : (
         <Card>
+          {/* {error && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle>Cannot Delete Operation</AlertTitle>
+              <AlertDescription>
+                Please remove the elements list first
+              </AlertDescription>
+            </Alert>
+          )} */}
+
           <CardBody>
             <Flex justifyContent="space-between" alignItems="center" mb="4">
               <Text color="gray.700" fontWeight="bold" fontSize="xl">

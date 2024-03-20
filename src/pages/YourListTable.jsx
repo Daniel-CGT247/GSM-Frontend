@@ -49,7 +49,7 @@ export default function YourListTable({ operationList, listId, isLoading }) {
   }, [searchTerm, operationList]);
 
   return (
-    <>
+    <>  
       {isLoading ? (
         <TableSkeleton header="Your List" columns={columns} />
       ) : (

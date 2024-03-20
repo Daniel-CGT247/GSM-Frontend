@@ -117,6 +117,7 @@ export default function NewItemForm({ username }) {
         },
       }));
       validateInput(name, value);
+      validateInput(name, value);
     }
   };
 
@@ -239,6 +240,14 @@ export default function NewItemForm({ username }) {
             value={formData.item.name}
           />
           {errors.name && <FormErrorMessage>{errors.name}</FormErrorMessage>}
+          <Input
+            name="name"
+            placeholder="Enter Your Style..."
+            autocomplete="off"
+            onChange={handleChange}
+            value={formData.item.name}
+          />
+          {errors.name && <FormErrorMessage>{errors.name}</FormErrorMessage>}
         </FormControl>
 
         <FormControl>
@@ -287,6 +296,7 @@ export default function NewItemForm({ username }) {
             onChange={handleChange}
             value={formData.item.proto}
           />
+          {errors.proto && <FormErrorMessage>{errors.proto}</FormErrorMessage>}
           {errors.proto && <FormErrorMessage>{errors.proto}</FormErrorMessage>}
         </FormControl>
         <Button

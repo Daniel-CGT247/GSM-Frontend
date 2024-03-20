@@ -19,13 +19,11 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
-import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 import ElementLib from "./ElementLib";
 import ElementList from "./ElementList";
 
 export default function ElementPage() {
-  const headers = useHeaders();
   const { listId, operationId } = useParams();
   const { data: styleNum, isLoading: isStyleLoading } = useGet(
     `${endpoint}/collection/${listId}`
@@ -95,6 +93,8 @@ export default function ElementPage() {
           >
             <Stat textAlign="center">
               <StatLabel fontSize="lg">Total SAM</StatLabel>
+              {/* <StatNumber isNumeric>{Number(timeData).toFixed(2)}</StatNumber> */}
+              <StatNumber>{totalTime.toFixed(2)}</StatNumber>
               {/* <StatNumber isNumeric>{Number(timeData).toFixed(2)}</StatNumber> */}
               <StatNumber>{totalTime.toFixed(2)}</StatNumber>
             </Stat>
