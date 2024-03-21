@@ -34,7 +34,6 @@ export default function Collection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedProto, setSelectedProto] = useState("");
-
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedSeason("");

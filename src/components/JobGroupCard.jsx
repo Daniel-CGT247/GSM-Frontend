@@ -15,7 +15,12 @@ import { useParams } from "react-router-dom";
 import useGet from "../customed_hook/useGet";
 import endpoint from "../utils/endpoint";
 
-export default function JobGroupCard({ job_group, operationsChanged }) {
+export default function JobGroupCard({
+  job_group,
+  operationsChanged,
+  statusChange,
+  setStatusChange,
+}) {
   const { listId } = useParams();
   const { data: operationList } = useGet(`${endpoint}/operation_list`);
   const [status, setStatus] = useState(getInitialStatus());
@@ -48,15 +53,9 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
   function handleStatusChange() {
     const newStatus = status === "in-progress" ? "finished" : "in-progress";
     setStatus(newStatus);
-  function handleStatusChange() {
-    const newStatus = status === "in-progress" ? "finished" : "in-progress";
-    setStatus(newStatus);
-
     const uniqueKey = `status-${listId}-${job_group.id}`;
     localStorage.setItem(uniqueKey, newStatus);
-  }
-    const uniqueKey = `status-${listId}-${job_group.id}`;
-    localStorage.setItem(uniqueKey, newStatus);
+    setStatusChange(!statusChange);
   }
 
   useEffect(() => {
@@ -87,7 +86,6 @@ export default function JobGroupCard({ job_group, operationsChanged }) {
       localStorage.setItem(uniqueKey, newStatus);
       setStatus(newStatus);
     }
-
     evaluateStatus();
   }, [job_group.bundle_groups, job_group.id, listId, operationsChanged]);
 

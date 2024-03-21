@@ -22,12 +22,13 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaPen } from "react-icons/fa";
 import { HiPuzzle } from "react-icons/hi";
 import { LuFlower } from "react-icons/lu";
 import { RxLapTimer } from "react-icons/rx";
 import { TbCircleFilled } from "react-icons/tb";
+import useGet from "../customed_hook/useGet";
 import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
@@ -37,48 +38,17 @@ export default function CollectionCard({ list, maxWidth, updateItemInData }) {
   const headers = useHeaders();
   const placeholderImage = "https://placehold.co/200x170";
   const imageUrl = list.item.image || placeholderImage;
-
   const [newName, setNewName] = useState(list.item.name);
   const [newSeason, setNewSeason] = useState(list.item.season);
   const [newProto, setNewProto] = useState(list.item.proto);
-  const [totalSam, setTotalSam] = useState(0);
-  const [operationList, setOperationList] = useState([]);
 
-  // - calculate total sam
-  useEffect(() => {
-    const fetchOperationList = async () => {
-      try {
-        const response = await fetch(`${endpoint}/operation_list/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...headers,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setOperationList(data);
-
-          const sumTotalSam = data
-            .filter((item) => item.list === list.id)
-            .reduce((acc, curr) => acc + curr.total_sam, 0);
-          setTotalSam(sumTotalSam);
-        } else {
-          throw new Error("Failed to fetch operation list");
-        }
-      } catch (error) {
-        // toast({
-        //   title: 'Error fetching operation list.',
-        //   description: error.message,
-        //   status: 'error',
-        //   duration: 5000,
-        //   isClosable: true,
-        // });
-      }
-    };
-
-    fetchOperationList();
-  }, [list.id, headers, toast]);
+  // - calculate total SAM
+  const { data: operationList } = useGet(`${endpoint}/operation_list`);
+  const totalSam = operationList
+    ? operationList
+        .filter((item) => item.list === list.id)
+        .reduce((acc, curr) => acc + curr.total_sam, 0)
+    : 0;
 
   const handleUpdate = async () => {
     try {

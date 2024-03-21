@@ -8,12 +8,16 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Text,
 } from "@chakra-ui/react";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import JobGroupCard from "../components/JobGroupCard";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
+import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
 export default function JobGroup() {
@@ -22,8 +26,9 @@ export default function JobGroup() {
   const { data: styleNum, isLoading: isStyleLoading } = useGet(
     `${endpoint}/collection/${listId}`
   );
+  const headers = useHeaders();
   const itemName = styleNum && styleNum.item && styleNum.item.name;
-
+  const [statusChannge, setStatusChange] = useState(false);
   // - calculate total sam
   const { data: operationList } = useGet(`${endpoint}/operation_list`);
   const totalSam = operationList
@@ -31,6 +36,42 @@ export default function JobGroup() {
         .filter((item) => item.list === parseInt(listId))
         .reduce((acc, curr) => acc + curr.total_sam, 0)
     : 0;
+
+  const checkJobStatus = useCallback(
+    (jobGroup) => {
+      let count = 0;
+      jobGroup &&
+        jobGroup.forEach((job) => {
+          const key = `status-${listId}-${job.id}`;
+          const status = localStorage.getItem(key);
+          if (status === "finished") {
+            count++;
+          }
+        });
+      if (count === jobGroup.length && jobGroup.length > 0) {
+        localStorage.setItem(`listStatus-${listId}`, true);
+        return "Yes";
+      } else if (jobGroup.length > 0 && count < jobGroup.length) {
+        localStorage.setItem(`listStatus-${listId}`, false);
+        return "No";
+      } else return;
+    },
+    [listId]
+  );
+  const text = data && operationList && checkJobStatus(data);
+  useEffect(() => {
+    console.log("statusChannge", statusChannge);
+    const updateListStatus = async () => {
+      const status = localStorage.getItem(`listStatus-${listId}`);
+      await axios.patch(
+        `${endpoint}/collection/${listId}/`,
+        { complete: status },
+        { headers: headers }
+      );
+    };
+    updateListStatus();
+    console.log("It goes here too", statusChannge);
+  }, [statusChannge, checkJobStatus, headers, listId]);
 
   return (
     <Container maxW="8xl" mt={4}>
@@ -52,6 +93,7 @@ export default function JobGroup() {
             </Heading>
           )}
         </Box>
+        <Text>Complete {text}</Text>
         <HStack alignItems="baseline" justifyContent="space-between" w="150px">
           <Stat
             px="2"
@@ -96,6 +138,8 @@ export default function JobGroup() {
             key={job_group.id}
             job_group={job_group}
             listId={listId}
+            statusChange={statusChannge}
+            setStatusChange={setStatusChange}
             style={{ flex: "0 0 calc(20% - 10px)", marginBottom: "10px" }}
           />
         ))}
