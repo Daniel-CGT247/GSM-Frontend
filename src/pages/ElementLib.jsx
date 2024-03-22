@@ -140,9 +140,7 @@ export default function ElementLib(props) {
         props.updateSelectedElements(addedElement);
 
         return updatedElements;
-  
       });
- 
     } catch (error) {
       console.error("Error in adding element", error);
     }
@@ -268,7 +266,6 @@ export default function ElementLib(props) {
                       <Th style={{ width: "5%" }}>#</Th>
                       <Th style={{ width: "25%" }}>Name</Th>
                       <Th style={{ width: "30px" }}>Options</Th>
-                      <Th style={{ width: "10%" }}>Action</Th>
                       <Th style={{ width: "10%" }}>Action</Th>
                     </Tr>
                   </Thead>
