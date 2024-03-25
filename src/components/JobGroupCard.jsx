@@ -9,10 +9,12 @@ import {
   Link,
   Text,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { TbCircleFilled } from "react-icons/tb";
 import { useParams } from "react-router-dom";
 import useGet from "../customed_hook/useGet";
+import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 
 export default function JobGroupCard({
@@ -20,9 +22,12 @@ export default function JobGroupCard({
   operationsChanged,
   statusChange,
   setStatusChange,
+  checkJobStatus,
+  job_groups,
 }) {
   const { listId } = useParams();
   const { data: operationList } = useGet(`${endpoint}/operation_list`);
+  const headers = useHeaders();
   const [status, setStatus] = useState(getInitialStatus());
   const totalSamCal = (bundle_group) => {
     return operationList
@@ -50,12 +55,20 @@ export default function JobGroupCard({
     return "no-progress";
   }
 
-  function handleStatusChange() {
+  async function handleStatusChange() {
     const newStatus = status === "in-progress" ? "finished" : "in-progress";
     setStatus(newStatus);
     const uniqueKey = `status-${listId}-${job_group.id}`;
     localStorage.setItem(uniqueKey, newStatus);
     setStatusChange(!statusChange);
+    checkJobStatus(job_groups);
+    const finalStatus = localStorage.getItem(`listStatus-${listId}`);
+    await axios.patch(
+      `${endpoint}/collection/${listId}/`,
+      { complete: finalStatus },
+      { headers: headers }
+    );
+    console.log("FINAL STATUS: ", finalStatus);
   }
 
   useEffect(() => {
