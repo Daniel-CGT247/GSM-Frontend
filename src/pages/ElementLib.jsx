@@ -181,12 +181,6 @@ export default function ElementLib(props) {
     indexOfLastItem
   );
 
-  // - row per page
-  // const handleItemsPerPageChange = (event) => {
-  //   setCurrentPage(1);
-  //   setItemsPerPage(Number(event.target.value));
-  // };
-
   return (
     <>
       {isLibLoading ? (
@@ -230,13 +224,6 @@ export default function ElementLib(props) {
                       }
                       isDisabled={currentPage >= pageCount}
                     />
-
-                    {/* <Select value={itemsPerPage} onChange={handleItemsPerPageChange} size="sm">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                    </Select> */}
                   </Flex>
                 </Flex>
 

@@ -3,15 +3,16 @@ import {
   Button,
   Container,
   Flex,
-  GridItem,
   HStack,
   Heading,
+  Icon,
   SimpleGrid,
   Stat,
   StatLabel,
   StatNumber,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import {
   IoArrowBackCircleOutline,
   IoCheckmarkCircleOutline,
@@ -19,14 +20,13 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import StyleSkeleton from "../components/StyleSkeleton";
 import useGet from "../customed_hook/useGet";
-import useHeaders from "../customed_hook/useHeader";
 import endpoint from "../utils/endpoint";
 import ElementLib from "./ElementLib";
 import ElementList from "./ElementList";
 
 export default function ElementPage() {
-  const headers = useHeaders();
-  const { listId, operationId } = useParams();
+  const [open, setOpen] = useState(true);
+  const { listId, operationId, operationListId } = useParams();
   const { data: styleNum, isLoading: isStyleLoading } = useGet(
     `${endpoint}/collection/${listId}`
   );
@@ -121,22 +121,47 @@ export default function ElementPage() {
           >
             Complete
           </Button>
+          <Button
+            as="a"
+            leftIcon={<FaChevronCircleRight />}
+            href={`/${operationListId}/timestudy`}
+          >
+            Time Study
+          </Button>
         </Flex>
       </Flex>
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5} my={5}>
-        <GridItem colSpan={1}>
+      <SimpleGrid
+        position={"relative"}
+        columns={open ? 2 : 1}
+        spacing={5}
+        my={5}
+      >
+        {open && (
           <ElementLib
             selectedElements={selectedElements}
             updateSelectedElements={updateSelectedElements}
           />
-        </GridItem>
-        <GridItem colSpan={1} key={selectedElements.length}>
-          <ElementList
-            selectedElements={selectedElements}
-            updateSelectedElements={updateSelectedElements}
-            onTotalTimeUpdate={handleTotalTimeUpdate}
-          />
-        </GridItem>
+        )}
+        <ElementList
+          selectedElements={selectedElements}
+          updateSelectedElements={updateSelectedElements}
+          onTotalTimeUpdate={handleTotalTimeUpdate}
+        />
+        <Icon
+          as={open ? FaChevronCircleLeft : FaChevronCircleRight}
+          position="absolute"
+          boxSize={6}
+          top="4%"
+          left="-1.2%"
+          zIndex={10}
+          color="blue.400"
+          onClick={() => {
+            setOpen(!open);
+          }}
+          cursor="pointer"
+        >
+          Button
+        </Icon>
       </SimpleGrid>
     </Container>
   );

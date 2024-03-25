@@ -14,6 +14,7 @@ import JobGroup from "./pages/JobGroup";
 import NewItem from "./pages/NewItem";
 import Operation from "./pages/Operation";
 import Support from "./pages/Support";
+import TimeStudy from "./pages/TimeStudy";
 import YourList from "./pages/YourList";
 
 export default function App({ pca }) {
@@ -67,6 +68,10 @@ export default function App({ pca }) {
                   element={<ElementPage />}
                 />
                 <Route path="/support" element={<Support />} />
+                <Route
+                  path="/:operationListId/timestudy"
+                  element={<TimeStudy />}
+                />
               </Routes>
             </Router>
           </GridItem>

@@ -189,14 +189,6 @@ export default function ElementList({ onTotalTimeUpdate }) {
     fetchExpandingNames();
   }, [operationListId, headers]);
 
-  // const pageCount = Math.ceil(selectedElements.length / itemsPerPage);
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = selectedElements.slice(
-  //   indexOfFirstItem,
-  //   indexOfLastItem
-  // );
-
   const filteredElements = selectedElements.filter((element) =>
     element.name.toLowerCase().includes(searchFilter.toLowerCase())
   );
@@ -219,7 +211,7 @@ export default function ElementList({ onTotalTimeUpdate }) {
       ) : (
         <Card>
           <CardBody>
-            <Flex direction="column" maxW="4xl" margin="auto">
+            <Flex direction="column" margin="auto">
               <Box height="650px" overflowY="auto" maxH="75vh" mb="4">
                 <Flex justifyContent="space-between" alignItems="center" mb="4">
                   <Text color="gray.700" fontWeight="bold" fontSize="xl">
