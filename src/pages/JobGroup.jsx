@@ -89,7 +89,7 @@ export default function JobGroup() {
               {isStyleLoading ? (
                 <StyleSkeleton />
               ) : (
-                <StatNumber>{totalSam.toFixed(3)}</StatNumber>
+                <StatNumber>{totalSam.toFixed(2)}</StatNumber>
               )}
             </Stat>
           </Stat>

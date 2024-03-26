@@ -146,7 +146,6 @@ export default function Collection() {
               </MenuList>
             </Menu>
   
-  
             {/* completion status filter */}
             <Menu>
               <MenuButton as={Button} rightIcon={<FaChevronDown />}>
