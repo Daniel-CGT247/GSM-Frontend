@@ -99,17 +99,28 @@ export default function YourList() {
             </Stat>
           </HStack>
         )}
-
-        <Button
-          as="a"
-          href={`/${listId}/job_group/${jobId}/${bundleId}/operation`}
-          variant="outline"
-          size="sm"
-          colorScheme="twitter"
-          leftIcon={<IoArrowBackCircleOutline />}
-        >
-          Edit Operation List
-        </Button>
+        <Flex alignItems="center" gap={2}>
+          <Button
+            as="a"
+            href={`/${listId}/job_group/`}
+            variant="outline"
+            size="sm"
+            colorScheme="twitter"
+            leftIcon={<IoArrowBackCircleOutline />}
+          >
+            Back to Job Group
+          </Button>
+          <Button
+            as="a"
+            href={`/${listId}/job_group/${jobId}/${bundleId}/operation`}
+            variant="outline"
+            size="sm"
+            colorScheme="twitter"
+            leftIcon={<IoArrowBackCircleOutline />}
+          >
+            Edit Operation List
+          </Button>
+        </Flex>
       </Flex>
       <YourListTable
         operationList={operationList}

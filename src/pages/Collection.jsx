@@ -34,10 +34,13 @@ export default function Collection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedProto, setSelectedProto] = useState("");
+  const [selectedComplete, setSelectedComplete] = useState("");
+
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedSeason("");
     setSelectedProto("");
+    setSelectedComplete("")
   };
 
   useEffect(() => {
@@ -50,7 +53,8 @@ export default function Collection() {
     (item) =>
       item.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedSeason === "" || item.item.season === selectedSeason) &&
-      (selectedProto === "" || item.item.proto === parseInt(selectedProto))
+      (selectedProto === "" || item.item.proto === parseInt(selectedProto)) &&
+      (selectedComplete === "" || item.complete === (selectedComplete === "true"))
   );
 
   const uniqueSeasons = [
@@ -106,60 +110,57 @@ export default function Collection() {
               </InputRightElement>
             )}
           </InputGroup>
+  
           <Flex alignItems="center" gap="2">
+            {/* season filter */}
             <Menu>
-              {({ isOpen }) => (
-                <>
-                  <MenuButton
-                    isActive={isOpen}
-                    as={Button}
-                    rightIcon={<FaChevronDown />}
-                  >
-                    {!selectedSeason ? "Season" : selectedSeason}
-                  </MenuButton>
-                  <MenuList>
-                    <MenuOptionGroup
-                      type="radio"
-                      onChange={(value) => setSelectedSeason(value)}
-                    >
-                      <MenuItemOption value="">All</MenuItemOption>
-                      {uniqueSeasons.map((season) => (
-                        <MenuItemOption key={season} value={season}>
-                          {season}
-                        </MenuItemOption>
-                      ))}
-                    </MenuOptionGroup>
-                  </MenuList>
-                </>
-              )}
+              <MenuButton as={Button} rightIcon={<FaChevronDown />}>
+                {!selectedSeason ? "Season" : selectedSeason}
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup type="radio" value={selectedSeason} onChange={(value) => setSelectedSeason(value)}>
+                  <MenuItemOption value="">All</MenuItemOption>
+                  {uniqueSeasons.map((season) => (
+                    <MenuItemOption key={season} value={season}>
+                      {season}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
             </Menu>
+
+            {/* proto filter */}
             <Menu>
-              {({ isOpen }) => (
-                <>
-                  <MenuButton
-                    isActive={isOpen}
-                    as={Button}
-                    rightIcon={<FaChevronDown />}
-                  >
-                    {!selectedProto ? "Proto" : selectedProto}
-                  </MenuButton>
-                  <MenuList>
-                    <MenuOptionGroup
-                      type="radio"
-                      value={selectedProto.toString()}
-                      onChange={(value) => setSelectedProto(value)}
-                    >
-                      <MenuItemOption value="">All</MenuItemOption>
-                      {uniquePrototype.map((proto) => (
-                        <MenuItemOption key={proto} value={proto.toString()}>
-                          {proto}
-                        </MenuItemOption>
-                      ))}
-                    </MenuOptionGroup>
-                  </MenuList>
-                </>
-              )}
+              <MenuButton as={Button} rightIcon={<FaChevronDown />}>
+                {!selectedProto ? "Proto" : selectedProto}
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup type="radio" value={selectedProto.toString()} onChange={(value) => setSelectedProto(value)}>
+                  <MenuItemOption value="">All</MenuItemOption>
+                  {uniquePrototype.map((proto) => (
+                    <MenuItemOption key={proto} value={proto.toString()}>
+                      {proto}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
             </Menu>
+  
+  
+            {/* completion status filter */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<FaChevronDown />}>
+                {selectedComplete === "" ? "Completion Status" : selectedComplete === "true" ? "Complete" : "Incomplete"}
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup type="radio" value={selectedComplete} onChange={(value) => setSelectedComplete(value)}>
+                  <MenuItemOption value="">All</MenuItemOption>
+                  <MenuItemOption value="true">Complete</MenuItemOption>
+                  <MenuItemOption value="false">Incomplete</MenuItemOption>
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+
             <Button
               rightIcon={GrPowerReset}
               colorScheme="red"
@@ -170,17 +171,17 @@ export default function Collection() {
           </Flex>
         </Flex>
       </Box>
-
+  
       <Heading size="md" color="gray.500" my={5}>
         Recent Update
       </Heading>
-
+  
       {isLoading && (
         <SimpleGrid columns={3} spacing={10}>
           <CardSkeleton />
         </SimpleGrid>
       )}
-
+  
       {!isLoading && filteredData.length === 0 ? (
         <div className="flex justify-center items-center flex-col">
           <h3>No List Found</h3>
@@ -192,12 +193,7 @@ export default function Collection() {
         <>
           <SimpleGrid columns={3} spacing={10}>
             {filteredData.slice(0, 3).map((list, index) => (
-              <CollectionCard
-                key={index}
-                list={list}
-                maxWidth="md"
-                updateItemInData={updateItemInData}
-              />
+              <CollectionCard key={index} list={list} maxWidth="md" updateItemInData={updateItemInData} />
             ))}
           </SimpleGrid>
 
